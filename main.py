@@ -6,7 +6,7 @@ from client import Client
 
 app = Flask(__name__)
 
-# This Dissabless Logging
+# This Dissabless Logging 1
 app.logger.disabled = True
 log = logging.getLogger('werkzeug')
 log.disabled = True
