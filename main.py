@@ -1,6 +1,6 @@
 import logging
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 
 from client import Client
 
@@ -12,9 +12,23 @@ log = logging.getLogger('werkzeug')
 log.disabled = True
 
 
+@app.route("/test", methods=['POST'])
+def test():
+    if request.method == 'POST':
+        data = request.form
+        print(data)
+        print(data["bundleName"])
+        return "ok"
+
+
 @app.route("/")
 def main():
-    return render_template("dashboard.html", ip=c1.publicIP)
+    return render_template("index.html", myIP=c1.publicIP)
+
+
+@app.route("/groups")
+def groups():
+    return render_template("groups.html", myIP=c1.publicIP)
 
 
 if __name__ == "__main__":

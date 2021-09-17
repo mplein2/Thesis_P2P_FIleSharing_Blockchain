@@ -13,7 +13,7 @@ def Receive():
     datasize = 0
     while True:
         print("Peer 1 Listening")
-        data, addr = sock.recvfrom(4096)  # buffer size is 1024 bytes
+        data, addr = sock.recvfrom(65507)  # buffer size is 1024 bytes
         x = json.loads(data, object_hook=lambda d: SimpleNamespace(**d))
         print(x)
         try:
