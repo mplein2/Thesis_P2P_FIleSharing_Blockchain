@@ -9,6 +9,7 @@ class Client:
         self.hostname = socket.gethostname()
         self.publicIP = get('https://api.ipify.org').text
         self.localIP = socket.gethostbyname(self.hostname)
+        self.port = 6969
         self.print()
 
     def print(self):
