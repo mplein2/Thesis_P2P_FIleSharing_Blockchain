@@ -12,12 +12,12 @@ log = logging.getLogger('werkzeug')
 log.disabled = True
 
 
-@app.route("/test", methods=['POST'])
+@app.route("/create_group", methods=['POST'])
 def test():
     if request.method == 'POST':
         data = request.form
         print(data)
-        print(data["bundleName"])
+        print(data["GroupName"])
         return "ok"
 
 

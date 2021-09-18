@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+    <title>Torrent App</title>
+    <!-- plugins:css -->
+    <link href="static/vendors/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="static/vendors/css/vendor.bundle.base.css" rel="stylesheet">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link href="static/css/style.css" rel="stylesheet">
+    <!-- End layout styles -->
+    <!--    <link rel="shortcut icon" href="static/images/favicon.ico" />-->
+</head>
+
+<body>
+<div class="container-scroller">
+
+    <!--Header Import-->
+    {% include 'Header.html' %}
+    <!--Header Import-->
+
+    <div class="container-fluid page-body-wrapper">
+
+        <!--Navbar Import-->
+        {% include 'navbar.html' %}
+        <!--Navbar Import-->
+
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h3 class="page-title">
+                  <span class="page-title-icon bg-gradient-primary text-white mr-2">
+                    <i class="mdi mdi-group"></i>
+                  </span> Groups
+                    </h3>
+                    <span class="d-flex align-items-center">
+                  <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#CreateGroup"><i
+                            class="mdi mdi-lock-plus"></i></button>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#"><i
+                            class="mdi mdi-key-plus"></i></button>
+                  </div>
+                </span>
+                </div>
+
+
+                <footer class="footer">
+                    <div class="container-fluid clearfix">
+                        <!-- TODO: add footer here-->
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+    <script src="static/vendors/js/vendor.bundle.base.js"></script>
+    <script src="static/assets/js/off-canvas.js"></script>
+    <script src="static/js/hoverable-collapse.js"></script>
+    <script src="static/js/misc.js"></script>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="CreateGroup" tabindex="-1" role="dialog" aria-labelledby="CreateGroup" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create Group</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/create_group" method="POST">
+                <div class="modal-body">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-gradient-primary text-white">#</span>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Group Name" aria-label="Group Name"
+                               aria-describedby="basic-addon1" name="GroupName">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" value="submit">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

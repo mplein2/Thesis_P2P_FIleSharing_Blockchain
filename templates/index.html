@@ -1,9 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
     <title>Torrent App</title>
+    <!-- plugins:css -->
+    <link href="static/vendors/mdi/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="static/vendors/css/vendor.bundle.base.css" rel="stylesheet">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <!-- endinject -->
+    <!-- Layout styles -->
+    <link href="static/css/style.css" rel="stylesheet">
+    <!-- End layout styles -->
+    <!--    <link rel="shortcut icon" href="static/images/favicon.ico" />-->
 </head>
+
 <body>
+<div class="container-scroller">
+    <!--Header Import-->
+    {% include 'Header.html' %}
+    <!--Header Import-->
+    <div class="container-fluid page-body-wrapper">
+        <!--Navbar Import-->
+        {% include 'navbar.html' %}
+        <!--Navbar Import-->
+
+
+        <div class="main-panel">
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <h3 class="page-title">
+                <span class="page-title-icon bg-gradient-primary text-white mr-2">
+                  <i class="mdi mdi-home"></i>
+                </span> Dashboard
+                    </h3>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 stretch-card grid-margin">
+                        <div class="card bg-gradient-danger card-img-holder text-white">
+                            <div class="card-body">
+                                <img src="static/images/dashboard/circle.svg" class="card-img-absolute"
+                                     alt="circle-image"/>
+                                <h4 class="font-weight-normal mb-3">Weekly Download <i
+                                        class="mdi mdi-arrow-down-bold mdi-24px float-right"></i>
+                                </h4>
+                                <h2 class="mb-5">9,523.2 MB</h2>
+                                <h6 class="card-text">WOW THATS SO MUCH PORN</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 stretch-card grid-margin">
+                        <div class="card bg-gradient-info card-img-holder text-white">
+                            <div class="card-body">
+                                <img src="static/images/dashboard/circle.svg" class="card-img-absolute"
+                                     alt="circle-image"/>
+                                <h4 class="font-weight-normal mb-3">Weekly Upload <i
+                                        class="mdi mdi-arrow-up-bold mdi-24px float-right"></i>
+                                </h4>
+                                <h2 class="mb-5">523.6 MB</h2>
+                                <h6 class="card-text">thats kids numbers</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 stretch-card grid-margin">
+                        <div class="card bg-gradient-success card-img-holder text-white">
+                            <div class="card-body">
+                                <img src="static/images/dashboard/circle.svg" class="card-img-absolute"
+                                     alt="circle-image"/>
+                                <h4 class="font-weight-normal mb-3">Weekly Querys <i
+                                        class="mdi mdi-magnify mdi-24px float-right"></i>
+                                </h4>
+                                <h2 class="mb-5">632 Querys</h2>
+                                <h6 class="card-text">Not Bad</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 grid-margin stretch-card">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Bundles</h4>
+                                </p>
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>Bundle</th>
+                                        <th>Size</th>
+                                        <th>Remaining</th>
+                                        <th>Download/Up</th>
+                                        <th>Seeds/Peers</th>
+                                        <th>Progress</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>EA.Generic.Game.Downloading.Illegal</td>
+                                        </td>
+                                        <td>69.69GB</td>
+                                        <td>10.3GB</td>
+                                        <td>2MB/500KB</td>
+                                        <td>649/324</td>
+                                        <td>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar"
+                                                     style="width:90%"
+                                                     aria-valuenow="830" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- content-wrapper ends -->
+            <!-- partial:../../partials/_footer.html -->
+            <footer class="footer">
+                <div class="container-fluid clearfix">
+                    <!-- TODO: add footer here-->
+                </div>
+            </footer>
+            <!-- partial -->
+        </div>
+        <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+</div>
+<!-- container-scroller -->
+<!-- plugins:js -->
+<script src="static/vendors/js/vendor.bundle.base.js"></script>
+<!-- endinject -->
+<!-- Plugin js for this page -->
+<!-- End plugin js for this page -->
+<!-- inject:js -->
+<script src="static/assets/js/off-canvas.js"></script>
+<script src="static/js/hoverable-collapse.js"></script>
+<script src="static/js/misc.js"></script>
+<!-- endinject -->
+<!-- Custom js for this page -->
+<!-- End custom js for this page -->
 </body>
 </html>
