@@ -39,6 +39,9 @@ def main():
 def groups():
     return render_template("groups.html", myIP=c1.publicIP, groups=GroupManager.Groups)
 
+@app.route("/settings")
+def settings():
+    return render_template("settings.html", myIP=c1.publicIP)
 
 if __name__ == "__main__":
     c1 = Client()
