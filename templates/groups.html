@@ -41,27 +41,29 @@
                   </span> Groups
                     </h3>
                     <span class="d-flex align-items-center">
-                  <div class="btn-group" role="group" aria-label="Basic example">
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#CreateGroup"><i
+                  <div aria-label="Basic example" class="btn-group" role="group">
+                    <button class="btn btn-primary" data-target="#CreateGroup" data-toggle="modal" type="button"><i
                             class="mdi mdi-lock-plus"></i></button>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#"><i
+                    <button class="btn btn-primary" data-target="#" data-toggle="modal" type="button"><i
                             class="mdi mdi-key-plus"></i></button>
                   </div>
                 </span>
                 </div>
                 <div class="row">
+                    <!--Groups Display-->
                     {%for group in groups%}
                     <div class="col-md-4 stretch-card grid-margin">
                         <div class="card bg-gradient-danger card-img-holder text-white">
                             <div class="card-body">
-                                <img src="static/images/dashboard/circle.svg" class="card-img-absolute"
-                                     alt="circle-image"/>
+                                <img alt="circle-image" class="card-img-absolute"
+                                     src="static/images/dashboard/circle.svg"/>
                                 <h4 class="font-weight-normal mb-3">{{group.group_name}} <span class="float-right">{{group.peer_list|length}}</span><i
                                         class="mdi mdi-account mdi-24px float-right"></i>
                                 </h4>
-                                <h2 class="mb-5">9,523.2 MB</h2>
-                                <h6 class="card-text">WOW THATS SO MUCH PORN</h6>
+                                <h2 class="mb-5">{{group.group_desc}}</h2>
+                                <div><a class="card-text mdi mdi-magnify" href="#"></a></div>
                             </div>
+
                         </div>
                     </div>
                     {%endfor%}
@@ -81,29 +83,49 @@
     <script src="static/js/hoverable-collapse.js"></script>
     <script src="static/js/misc.js"></script>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="CreateGroup" tabindex="-1" role="dialog" aria-labelledby="CreateGroup" aria-hidden="true">
+<!-- Create Group Modal -->
+<div aria-hidden="true" aria-labelledby="CreateGroup" class="modal fade" id="CreateGroup" role="dialog" tabindex="-1">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Create Group</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <form action="/create_group" method="POST">
                 <div class="modal-body">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-gradient-primary text-white">#</span>
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-gradient-primary text-white">@</span>
+                            </div>
+                            <input aria-describedby="basic-addon1" aria-hidden="true" aria-label="Group Name"
+                                   class="form-control"
+                                   name="GroupName"
+                                   placeholder="Group Name" type="text">
                         </div>
-                        <input type="text" class="form-control" placeholder="Group Name" aria-label="Group Name"
-                               aria-describedby="basic-addon1" name="GroupName">
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input aria-hidden="true" aria-label="Group Description" class="form-control"
+                                   describedby="basic-addon2" name="GroupDesc" placeholder="Group Description"
+                                   type="text">
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <label class="form-check-label">
+                                <input checked="true" class="form-check-input" name="private" type="checkbox" value="1">
+                                Private Group <i class="input-helper"></i></label>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary" value="submit">Create</button>
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
+                    <button class="btn btn-primary" type="submit" value="submit">Create</button>
                 </div>
             </form>
         </div>

@@ -1,8 +1,8 @@
 import logging
+
+from flask import Flask, render_template, request, redirect
+
 from Groups import GroupManager
-
-from flask import Flask, render_template, request
-
 from client import Client
 
 app = Flask(__name__)
@@ -17,9 +17,17 @@ log.disabled = False
 def create_group():
     if request.method == 'POST':
         data = request.form
+        print(data)
         group_name = data["GroupName"]
-        GroupManager.CreateGroup(group_name, [(c1.localIP, c1.port)])
-        return "ok"
+        group_desc = data["GroupDesc"]
+        try:
+            group_priv = data["private"]
+        except:
+            group_priv = 0
+        GroupManager.CreateGroup(group_name, group_desc, group_priv, [(c1.localIP, c1.port)])
+        # Refresh Group Manager
+        GroupManager.GroupRefresh()
+        return redirect("/groups", code=302)
 
 
 @app.route("/")

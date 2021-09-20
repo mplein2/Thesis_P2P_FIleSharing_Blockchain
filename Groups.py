@@ -19,11 +19,17 @@ class GroupManager:
                 json_load_group = json.load(file)
                 file.close()
                 # Append them on Groups List
-                loaded_Group = Group(json_load_group["group_name"], json_load_group["peer_list"])
-                self.Groups.append(loaded_Group)
+                try:
+                    loaded_Group = Group(json_load_group["group_name"], json_load_group["group_desc"],
+                                         json_load_group["group_priv"],
+                                         json_load_group["peer_list"])
+                    self.Groups.append(loaded_Group)
+                except:
+                    pass
 
-    def CreateGroup(self, group_name, peer_list):
-        new_group = Group(group_name, peer_list)
+    def CreateGroup(self, group_name, group_desc, group_priv, peer_list):
+        group_name = "@" + group_name.replace(" ", "_").lower()
+        new_group = Group(group_name, group_desc, group_priv, peer_list)
         new_group.GroupSave(self.DIR_PATH_GROUPS)
 
     def JoinGroup(self):
@@ -41,11 +47,32 @@ class GroupManager:
     def GroupSave(self):
         pass
 
+    def GroupRefresh(self):
+        # Clear
+        self.Groups = []
+        # Reload
+        groupfiles = os.listdir(self.DIR_PATH_GROUPS)
+        for x in groupfiles:
+            # Load All Json Group Files
+            file = open(self.DIR_PATH_GROUPS + x)
+            json_load_group = json.load(file)
+            file.close()
+            # Append them on Groups List
+            try:
+                loaded_Group = Group(json_load_group["group_name"], json_load_group["group_desc"],
+                                     json_load_group["group_priv"],
+                                     json_load_group["peer_list"])
+                self.Groups.append(loaded_Group)
+            except:
+                pass
+
 
 # This will be a class representing a group that the user is part of .
 class Group:
-    def __init__(self, group_name, peer_list):
+    def __init__(self, group_name, group_desc, group_priv, peer_list):
         self.group_name = group_name
+        self.group_desc = group_desc
+        self.group_priv = group_priv
         self.peer_list = peer_list
 
     def AddPeer(self, ip, port):
