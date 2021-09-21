@@ -41,85 +41,36 @@
                     </h3>
                 </div>
                 <!--Page header-->
-<div class="col-md- grid-margin stretch-card">
-                <div class="card">
-                  <div class="card-body">
-                    <h4 class="card-title">Client Settings</h4>
-                        <form class="row forms-sample">
-                      <div class="col-sm">
-                      <div class="form-group row">
-                        <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Email</label>
-                        <div class="col-sm-9">
-                          <input type="text" class="form-control" id="" placeholder="Username">
+                <div class="col-md- grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Client Settings</h4>
+                            <form class="row forms-sample" action="/change_settings" method="POST">
+                                <div class="col-sm">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" for="exampleInputUsername2">GUI
+                                            Port</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" name="GUIPort" type="text" value="{{GUIPort}}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--SECOND COLLUM ON SETTINGS CARD-->
+                                <div class="col-sm">
+                                    <div class="form-group row">
+                                        <label class="col-sm-3 col-form-label" for="exampleInputUsername2">Client
+                                            Port</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" name="ClientPort" type="text" value="{{ClientPort}}">
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-gradient-primary float-right" type="submit">Apply</button>
+                                </div>
+                            </form>
                         </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="exampleInputEmail2" class="col-sm-3 col-form-label">Email</label>
-                        <div class="col-sm-9">
-                          <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Email">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="exampleInputMobile" class="col-sm-3 col-form-label">Mobile</label>
-                        <div class="col-sm-9">
-                          <input type="text" class="form-control" id="exampleInputMobile" placeholder="Mobile number">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="exampleInputPassword2" class="col-sm-3 col-form-label">Password</label>
-                        <div class="col-sm-9">
-                          <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="exampleInputConfirmPassword2" class="col-sm-3 col-form-label">Re Password</label>
-                        <div class="col-sm-9">
-                          <input type="password" class="form-control" id="exampleInputConfirmPassword2" placeholder="Password">
-                        </div>
-                      </div>
-                      <button type="submit" class="btn btn-gradient-primary mr-2">Submit</button>
-                      <button class="btn btn-light">Cancel</button>
-                      </div>
-                        <!--SECOND COLLUM ON SETTINGS CARD-->
-                      <div class="col-sm">
-                      <div class="form-group row">
-                        <label for="exampleInputUsername2" class="col-sm-3 col-form-label">Email</label>
-                        <div class="col-sm-9">
-                          <input type="text" class="form-control" id="exampleInputUsername2" placeholder="Username">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="exampleInputEmail2" class="col-sm-3 col-form-label">Email</label>
-                        <div class="col-sm-9">
-                          <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Email">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="exampleInputMobile" class="col-sm-3 col-form-label">Mobile</label>
-                        <div class="col-sm-9">
-                          <input type="text" class="form-control" id="exampleInputMobile" placeholder="Mobile number">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="exampleInputPassword2" class="col-sm-3 col-form-label">Password</label>
-                        <div class="col-sm-9">
-                          <input type="password" class="form-control" id="exampleInputPassword2" placeholder="Password">
-                        </div>
-                      </div>
-                      <div class="form-group row">
-                        <label for="exampleInputConfirmPassword2" class="col-sm-3 col-form-label">Re Password</label>
-                        <div class="col-sm-9">
-                          <input type="password" class="form-control" id="exampleInputConfirmPassword2" placeholder="Password">
-                        </div>
-                      </div>
-                      <button type="submit" class="btn btn-gradient-primary mr-2">Submit</button>
-                      <button class="btn btn-light">Cancel</button>
-                      </div>
-                        </form>
-                  </div>
 
+                    </div>
                 </div>
-              </div>
             </div>
         </div>
         <!-- content-wrapper ends -->

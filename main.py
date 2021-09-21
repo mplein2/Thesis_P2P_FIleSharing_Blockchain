@@ -30,6 +30,21 @@ def create_group():
         return redirect("/groups", code=302)
 
 
+@app.route("/change_settings", methods=['POST'])
+def change_settings():
+    if request.method == 'POST':
+        data = request.form
+        c1.port = data["ClientPort"]
+        c1.gui_port = data["GUIPort"]
+        try:
+            return redirect("http://127.0.0.1:" + c1.gui_port + "/settings", code=302)
+        finally:
+            app.run(host='127.0.0.1', port=c1.gui_port)
+
+
+
+
+
 @app.route("/")
 def main():
     return render_template("index.html", myIP=c1.publicIP)
@@ -39,11 +54,13 @@ def main():
 def groups():
     return render_template("groups.html", myIP=c1.publicIP, groups=GroupManager.Groups)
 
+
 @app.route("/settings")
 def settings():
-    return render_template("settings.html", myIP=c1.publicIP)
+    return render_template("settings.html", myIP=c1.publicIP, GUIPort=c1.gui_port, ClientPort=c1.port)
+
 
 if __name__ == "__main__":
     c1 = Client()
     GroupManager = GroupManager()
-    app.run(host='127.0.0.1', port=6700)
+    app.run(host='127.0.0.1', port=c1.gui_port)
