@@ -41,6 +41,7 @@ def change_settings():
         #     return redirect("http://127.0.0.1:" + c1.gui_port + "/settings", code=302)
         # finally:
         #     app.run(host='127.0.0.1', port=c1.gui_port)
+        c1.save()
 
 
 
