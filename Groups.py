@@ -12,18 +12,18 @@ class GroupManager:
         if not os.path.exists(self.DIR_PATH_GROUPS):
             os.makedirs(self.DIR_PATH_GROUPS)
         else:
-            groupfiles = os.listdir(self.DIR_PATH_GROUPS)
-            for x in groupfiles:
+            group_files = os.listdir(self.DIR_PATH_GROUPS)
+            for x in group_files:
                 # Load All Json Group Files
                 file = open(self.DIR_PATH_GROUPS + x)
                 json_load_group = json.load(file)
                 file.close()
                 # Append them on Groups List
                 try:
-                    loaded_Group = Group(json_load_group["group_name"], json_load_group["group_desc"],
+                    loaded_group = Group(json_load_group["group_name"], json_load_group["group_desc"],
                                          json_load_group["group_priv"],
                                          json_load_group["peer_list"])
-                    self.Groups.append(loaded_Group)
+                    self.Groups.append(loaded_group)
                 except:
                     pass
 
@@ -51,18 +51,18 @@ class GroupManager:
         # Clear
         self.Groups = []
         # Reload
-        groupfiles = os.listdir(self.DIR_PATH_GROUPS)
-        for x in groupfiles:
+        group_files = os.listdir(self.DIR_PATH_GROUPS)
+        for x in group_files:
             # Load All Json Group Files
             file = open(self.DIR_PATH_GROUPS + x)
             json_load_group = json.load(file)
             file.close()
             # Append them on Groups List
             try:
-                loaded_Group = Group(json_load_group["group_name"], json_load_group["group_desc"],
+                loaded_group = Group(json_load_group["group_name"], json_load_group["group_desc"],
                                      json_load_group["group_priv"],
                                      json_load_group["peer_list"])
-                self.Groups.append(loaded_Group)
+                self.Groups.append(loaded_group)
             except:
                 pass
 
@@ -80,10 +80,10 @@ class Group:
 
     def GroupSave(self, DIR_PATH_GROUPS):
         # Create JSON file
-        JSONFileName = self.group_name + ".json"
-        jsonFile = open(DIR_PATH_GROUPS + "\\" + JSONFileName, "w")
-        jsonFile.write(self.toJSON())
-        jsonFile.close()
+        json_file_name = self.group_name + ".json"
+        json_file = open(DIR_PATH_GROUPS + "\\" + json_file_name, "w")
+        json_file.write(self.toJSON())
+        json_file.close()
 
     def toJSON(self):
         return json.dumps(self.__dict__)

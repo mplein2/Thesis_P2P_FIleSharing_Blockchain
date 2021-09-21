@@ -2,8 +2,6 @@ import json
 import os
 import socket
 
-from requests import get
-
 
 class Client:
 
@@ -11,7 +9,7 @@ class Client:
         self.DIR_PATH_CLIENT = '%s\\TorrentApp\\' % os.environ['APPDATA']
         self.hostname = socket.gethostname()
         self.publicIP = "1.1.1.1"
-        #self.publicIP = get('https://api.ipify.org').text
+        # self.publicIP = get('https://api.ipify.org').text
         self.localIP = socket.gethostbyname(self.hostname)
         try:
             file = open(self.DIR_PATH_CLIENT + "config.json")
@@ -30,10 +28,11 @@ class Client:
 
     def save(self):
         # Create JSON file
-        JSONFileName = "config.json"
-        jsonFile = open(self.DIR_PATH_CLIENT + "\\" + JSONFileName, "w")
-        jsonFile.write(self.toJSON())
-        jsonFile.close()
+        json_file_name = "config.json"
+        json_file = open(self.DIR_PATH_CLIENT + "\\" + json_file_name, "w")
+        json_file.write(self.toJSON())
+        json_file.close()
+
     def toJSON(self):
-        ConfigFile = {"GUIPort": self.gui_port, "ClientPort": self.port}
-        return json.dumps(ConfigFile)
+        config_file = {"GUIPort": self.gui_port, "ClientPort": self.port}
+        return json.dumps(config_file)
