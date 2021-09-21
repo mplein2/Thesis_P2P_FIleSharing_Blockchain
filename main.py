@@ -36,10 +36,12 @@ def change_settings():
         data = request.form
         c1.port = data["ClientPort"]
         c1.gui_port = data["GUIPort"]
-        try:
-            return redirect("http://127.0.0.1:" + c1.gui_port + "/settings", code=302)
-        finally:
-            app.run(host='127.0.0.1', port=c1.gui_port)
+        #TODO fix this make post in js and after response run app and take care of redirect through JS on client_side .
+        # try:
+        #     return redirect("http://127.0.0.1:" + c1.gui_port + "/settings", code=302)
+        # finally:
+        #     app.run(host='127.0.0.1', port=c1.gui_port)
+
 
 
 
