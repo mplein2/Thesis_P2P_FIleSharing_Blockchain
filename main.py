@@ -1,7 +1,6 @@
 import logging
-
+import threading
 from flask import Flask, render_template, request, redirect
-
 from Groups import GroupManager
 from client import Client
 
@@ -24,7 +23,7 @@ def create_group():
             group_priv = data["private"]
         except:
             group_priv = 0
-        GroupManager.CreateGroup(group_name, group_desc, group_priv, [(c1.localIP, c1.port)])
+        GroupManager.CreateGroup(group_name, group_desc, group_priv, [(client.localIP, client.port)])
         # Refresh Group Manager
         GroupManager.GroupRefresh()
         return redirect("/groups", code=302)
@@ -34,36 +33,32 @@ def create_group():
 def change_settings():
     if request.method == 'POST':
         data = request.form
-        c1.port = data["ClientPort"]
-        c1.gui_port = data["GUIPort"]
-        #TODO fix this make post in js and after response run app and take care of redirect through JS on client_side .
+        client.port = data["ClientPort"]
+        client.gui_port = data["GUIPort"]
+        # TODO fix this make post in js and after response run app and take care of redirect through JS on client_side .
         # try:
-        #     return redirect("http://127.0.0.1:" + c1.gui_port + "/settings", code=302)
+        #     return redirect("http://127.0.0.1:" + client.gui_port + "/settings", code=302)
         # finally:
-        #     app.run(host='127.0.0.1', port=c1.gui_port)
-        c1.save()
-
-
-
-
+        #     app.run(host='127.0.0.1', port=client.gui_port)
+        client.save()
 
 
 @app.route("/")
-def main():
-    return render_template("index.html", myIP=c1.publicIP)
+def index():
+    return render_template("index.html", myIP=client.publicIP)
 
 
 @app.route("/groups")
 def groups():
-    return render_template("groups.html", myIP=c1.publicIP, groups=GroupManager.Groups)
+    return render_template("groups.html", myIP=client.publicIP, groups=GroupManager.Groups)
 
 
 @app.route("/settings")
 def settings():
-    return render_template("settings.html", myIP=c1.publicIP, GUIPort=c1.gui_port, ClientPort=c1.port)
+    return render_template("settings.html", myIP=client.publicIP, GUIPort=client.gui_port, ClientPort=client.port)
 
 
 if __name__ == "__main__":
-    c1 = Client()
+    client = Client()
     GroupManager = GroupManager()
-    app.run(host='127.0.0.1', port=c1.gui_port)
+    app.run(host='127.0.0.1', port=client.gui_port)

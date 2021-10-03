@@ -44,7 +44,7 @@
                   <div aria-label="Basic example" class="btn-group" role="group">
                     <button class="btn btn-primary" data-target="#CreateGroup" data-toggle="modal" type="button"><i
                             class="mdi mdi-lock-plus"></i></button>
-                    <button class="btn btn-primary" data-target="#" data-toggle="modal" type="button"><i
+                    <button class="btn btn-primary" data-target="#JoinGroup" data-toggle="modal" type="button"><i
                             class="mdi mdi-key-plus"></i></button>
                   </div>
                 </span>
@@ -132,5 +132,38 @@
     </div>
 </div>
 
+<!-- Create Group Modal -->
+<div aria-hidden="true" aria-labelledby="JoinGroup" class="modal fade" id="JoinGroup" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="JoinGroupModalLabel">Join Group</h5>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="/create_group" method="POST">
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text bg-gradient-primary text-white">@</span>
+                            </div>
+                            <input aria-describedby="basic-addon1" aria-hidden="true" aria-label="Group Name"
+                                   class="form-control"
+                                   name="GroupName"
+                                   placeholder="Group Name" type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
+                    <button class="btn btn-primary" type="submit" value="submit">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </body>
 </html>
