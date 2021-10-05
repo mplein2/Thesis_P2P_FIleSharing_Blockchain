@@ -1,18 +1,17 @@
 import socket
 from socket import *
 from types import SimpleNamespace
-
 from fragment import *
 
 
-def Receive():
-    UDP_IP = "127.0.0.1"
-    UDP_PORT = 6969
+def receiver(client):
+    UDP_IP = client.localIP
+    UDP_PORT = client.port
     sock = socket(AF_INET, SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
     datasize = 0
     while True:
-        print("Peer 1 Listening")
+        print("Listening on ", UDP_IP, ":", UDP_PORT)
         data, addr = sock.recvfrom(65507)  # buffer size is 1024 bytes
         x = json.loads(data, object_hook=lambda d: SimpleNamespace(**d))
         print(x)
@@ -30,7 +29,7 @@ def Receive():
 async def SendFiles(fileName, fileFragment, fragmentSize):
     # Create a socket for sending files
     clientSocket = socket(AF_INET, SOCK_DGRAM)
-    addr = ("127.0.0.1", 6969)
+    addr = ("192.168.178.26", 6969)
     fragment = Fragment(fileName, fileFragment, fragmentSize)
     print(fragment.toJSON(), "\n")
     print("Sending File")

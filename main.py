@@ -3,6 +3,7 @@ import threading
 from flask import Flask, render_template, request, redirect
 from Groups import GroupManager
 from client import Client
+from p2p import *
 
 app = Flask(__name__)
 
@@ -61,4 +62,6 @@ def settings():
 if __name__ == "__main__":
     client = Client()
     GroupManager = GroupManager()
+    x = threading.Thread(target=receiver, args=(client,))
+    x.start()
     app.run(host='127.0.0.1', port=client.gui_port)
