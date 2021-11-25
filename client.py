@@ -20,8 +20,8 @@ class Client:
             json_load_group = json.load(file)
             file.close()
             print(json_load_group)
-            self.port = json_load_group["ClientPort"]
-            self.gui_port = json_load_group["GUIPort"]
+            self.port = int(json_load_group["ClientPort"])
+            self.gui_port = int(json_load_group["GUIPort"])
             print("Config Loaded")
         except:
             print('Config Not Found')

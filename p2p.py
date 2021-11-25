@@ -5,7 +5,8 @@ from fragment import *
 
 
 def receiver(client):
-    UDP_IP = client.localIP
+    #UDP_IP = client.localIP
+    UDP_IP = '127.0.0.1'
     UDP_PORT = client.port
     sock = socket(AF_INET, SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
@@ -29,7 +30,7 @@ def receiver(client):
 async def SendFiles(fileName, fileFragment, fragmentSize):
     # Create a socket for sending files
     clientSocket = socket(AF_INET, SOCK_DGRAM)
-    addr = ("192.168.178.26", 6969)
+    addr = ("127.0.0.1", 6969)
     fragment = Fragment(fileName, fileFragment, fragmentSize)
     print(fragment.toJSON(), "\n")
     print("Sending File")
