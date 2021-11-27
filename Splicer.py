@@ -1,47 +1,81 @@
 import hashlib
+import os
 import json
+import time
+from json import JSONEncoder
+
+# Size Constants
 
 
-class Splice:
-    # Fragment variables
-    def __init__(self, fileName, fragmentSize):
-        self.fileName = fileName
+SPLICE_1K = 1024
+SPLICE_2K = 2048
+SPLICE_4K = 4096
+SPLICE_8K = 8192
+SPLICE_16K = 16384
+SPLICE_32K = 32768
+SPLICE_64K = 65536
+
+
+class FileEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
+
+
+class Bundle:
+    def __init__(self, bundleName, startDirectory, fragmentSize):
+        self.bundleName = bundleName
+        # TODO dynamic when sharing a bundle
+        self.owner = "8.8.8.8"
+        self.timestamp = time.time()
+        self.startDirectory = startDirectory
         self.fragmentSize = fragmentSize
-        self.fragmentHashes = []
+        self.files = []
+        self.parse()
+        self.createJSON()
 
-    def addFragment(self, fragmentHash):
-        self.fragmentHashes.append(fragmentHash)
+    def parse(self):
+        for (root, dirs, files) in os.walk(self.startDirectory, topdown=True):
+            for x in files:
+                self.files.append(File(x, root, self.fragmentSize))
 
     def toJSON(self):
-        return json.dumps(self.__dict__)
+        del self.startDirectory
+        return json.dumps(self.__dict__, indent=4, cls=FileEncoder)
+
+    def createJSON(self):
+        JSONFileName = self.bundleName + ".json"
+        jsonFile = open(JSONFileName, "w")
+        jsonFile.write(self.toJSON())
+        jsonFile.close()
 
 
-def SpliceFile(fileName, fragmentSize):
-    s = Splice(fileName, fragmentSize)
-    f = open(fileName, "rb")
-    Status = True
-    fragmentNumber = 0
-    while Status:
-        fragmentContent = f.read(fragmentSize)
-        if fragmentContent == b'':
-            Status = False
-            continue
+class File:
+    def __init__(self, fileName, directory, fragmentSize):
+        self.fileName = fileName
+        if len(directory.split('\\')) > 1:
+            dir = directory.split('\\')
+            dir.pop(0)
+            self.directory = '/'.join(dir)
         else:
-            s.addFragment((fragmentNumber, hashlib.sha1(fragmentContent).hexdigest()))
-            fragmentNumber = fragmentNumber + 1
-    # Finished With Hashing
-    # Create JSON file
-    # Split File Name From Extension
-    JSONFileName = s.fileName.split('.')[0] + ".json"
-    print(JSONFileName)
-    jsonFile = open(JSONFileName, "w")
-    print(s.fragmentHashes)
-    jsonFile.write(s.toJSON())
-    jsonFile.close()
+            self.directory = "/"
+        self.hash = 0
+        f = open(directory + "/" + fileName, "rb")
+        file = f.read(fragmentSize)
+        f.close()
+        self.hash = hashlib.sha1(file).hexdigest()
+        self.slices = []
+        with open(directory + "/" + fileName, "rb") as f:
+            count = 0
+            while True:
+                data = f.read(fragmentSize)
+                if not data:
+                    break
+                self.slices.append((count, hashlib.sha1(data).hexdigest()))
+                count = count + 1
 
 
 def main():
-    SpliceFile("Test1.jpg", 4096)
+    Bundle("TestBundle", "C:/Users/Ftoy/Desktop/bundleTesting", SPLICE_64K)
 
 
 if __name__ == '__main__':
