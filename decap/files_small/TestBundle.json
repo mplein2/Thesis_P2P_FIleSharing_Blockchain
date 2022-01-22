@@ -1,0 +1,196 @@
+{
+    "bundleName": "TestBundle",
+    "owner": "8.8.8.8",
+    "timestamp": 1638079409.3882108,
+    "fragmentSize": 65536,
+    "files": [
+        {
+            "fileName": "main2.txt",
+            "directory": "/",
+            "hash": "41f59c89461ef4df19d20b2e4c943c5d3c9ea518",
+            "slices": [
+                [
+                    0,
+                    "41f59c89461ef4df19d20b2e4c943c5d3c9ea518"
+                ]
+            ]
+        },
+        {
+            "fileName": "main3.txt",
+            "directory": "/",
+            "hash": "05858cdd1ba8cbb64244ec9db30c8c97e3187a37",
+            "slices": [
+                [
+                    0,
+                    "05858cdd1ba8cbb64244ec9db30c8c97e3187a37"
+                ]
+            ]
+        },
+        {
+            "fileName": "data.csv",
+            "directory": "folder1",
+            "hash": "4b0c11558c864ed3c0f92499361c8d8e9a16e402",
+            "slices": [
+                [
+                    0,
+                    "4b0c11558c864ed3c0f92499361c8d8e9a16e402"
+                ],
+                [
+                    1,
+                    "3f27ecfd657276c6225054bd7a26af5804ee15d1"
+                ],
+                [
+                    2,
+                    "1d64c7df07e8f735dc2323131b52aa4b90ed7f00"
+                ],
+                [
+                    3,
+                    "e16f662d29f6554515abd1c45a136f502bb61013"
+                ],
+                [
+                    4,
+                    "c26c5dd0918eb346e83a07d8e9afee2eb52735a3"
+                ],
+                [
+                    5,
+                    "14f40bf89590ecebe442b9bd97f430ae15407633"
+                ],
+                [
+                    6,
+                    "f8457d5155b9e8fbda7ca6d2af5a09f174bdf805"
+                ],
+                [
+                    7,
+                    "749c17630658747d7bc525a7870d472579f46598"
+                ]
+            ]
+        },
+        {
+            "fileName": "main2.txt",
+            "directory": "folder1",
+            "hash": "71db0cce255ca7dda0fdd81ad1e9fa2b6129a2ae",
+            "slices": [
+                [
+                    0,
+                    "71db0cce255ca7dda0fdd81ad1e9fa2b6129a2ae"
+                ]
+            ]
+        },
+        {
+            "fileName": "main3.txt",
+            "directory": "folder1",
+            "hash": "05858cdd1ba8cbb64244ec9db30c8c97e3187a37",
+            "slices": [
+                [
+                    0,
+                    "05858cdd1ba8cbb64244ec9db30c8c97e3187a37"
+                ]
+            ]
+        },
+        {
+            "fileName": "data.csv",
+            "directory": "folder1/folder3",
+            "hash": "4b0c11558c864ed3c0f92499361c8d8e9a16e402",
+            "slices": [
+                [
+                    0,
+                    "4b0c11558c864ed3c0f92499361c8d8e9a16e402"
+                ],
+                [
+                    1,
+                    "3f27ecfd657276c6225054bd7a26af5804ee15d1"
+                ],
+                [
+                    2,
+                    "1d64c7df07e8f735dc2323131b52aa4b90ed7f00"
+                ],
+                [
+                    3,
+                    "e16f662d29f6554515abd1c45a136f502bb61013"
+                ],
+                [
+                    4,
+                    "c26c5dd0918eb346e83a07d8e9afee2eb52735a3"
+                ],
+                [
+                    5,
+                    "14f40bf89590ecebe442b9bd97f430ae15407633"
+                ],
+                [
+                    6,
+                    "f8457d5155b9e8fbda7ca6d2af5a09f174bdf805"
+                ],
+                [
+                    7,
+                    "749c17630658747d7bc525a7870d472579f46598"
+                ]
+            ]
+        },
+        {
+            "fileName": "main2.txt",
+            "directory": "folder1/folder3",
+            "hash": "347c5ca9ea3b40affbc449a8d60e447d88c194e4",
+            "slices": [
+                [
+                    0,
+                    "347c5ca9ea3b40affbc449a8d60e447d88c194e4"
+                ]
+            ]
+        },
+        {
+            "fileName": "main3.txt",
+            "directory": "folder1/folder3",
+            "hash": "05858cdd1ba8cbb64244ec9db30c8c97e3187a37",
+            "slices": [
+                [
+                    0,
+                    "05858cdd1ba8cbb64244ec9db30c8c97e3187a37"
+                ]
+            ]
+        },
+        {
+            "fileName": "main2.txt",
+            "directory": "folder2",
+            "hash": "41f59c89461ef4df19d20b2e4c943c5d3c9ea518",
+            "slices": [
+                [
+                    0,
+                    "41f59c89461ef4df19d20b2e4c943c5d3c9ea518"
+                ]
+            ]
+        },
+        {
+            "fileName": "main3.txt",
+            "directory": "folder2",
+            "hash": "05858cdd1ba8cbb64244ec9db30c8c97e3187a37",
+            "slices": [
+                [
+                    0,
+                    "05858cdd1ba8cbb64244ec9db30c8c97e3187a37"
+                ]
+            ]
+        },
+        {
+            "fileName": "main2.txt",
+            "directory": "folder3",
+            "hash": "41f59c89461ef4df19d20b2e4c943c5d3c9ea518",
+            "slices": [
+                [
+                    0,
+                    "41f59c89461ef4df19d20b2e4c943c5d3c9ea518"
+                ]
+            ]
+        },
+        {
+            "fileName": "main3.txt",
+            "directory": "folder3",
+            "hash": "05858cdd1ba8cbb64244ec9db30c8c97e3187a37",
+            "slices": [
+                [
+                    0,
+                    "05858cdd1ba8cbb64244ec9db30c8c97e3187a37"
+                ]
+            ]
+        }
+    ]
+}
