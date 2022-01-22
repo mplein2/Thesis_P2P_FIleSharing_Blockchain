@@ -1,9 +1,23 @@
-import json
-from hashlib import sha256
 import time
+from hashlib import sha256
+import json
 
+
+class Block:
+    def __init__(self, index, transactions, timestamp, previous_hash, nonce=0):
+        self.index = index
+        self.transactions = transactions
+        self.timestamp = timestamp
+        self.previous_hash = previous_hash
+        self.nonce = nonce
+
+    def compute_hash(self):
+        block_string = json.dumps(self.__dict__, sort_keys=True)
+        return sha256(block_string.encode()).hexdigest()
 
 class Blockchain:
+    difficulty = 6
+
     def __init__(self):
         self.unconfirmed_transactions = []
         self.chain = []
@@ -18,14 +32,14 @@ class Blockchain:
     def last_block(self):
         return self.chain[-1]
 
-    difficulty = 2
-
     def proof_of_work(self, block):
         block.nonce = 0
         computed_hash = block.compute_hash()
+        print("Starting Mining")
         while not computed_hash.startswith('0' * Blockchain.difficulty):
             block.nonce += 1
             computed_hash = block.compute_hash()
+        print("Mining Ended Nonce :", block.nonce)
         return computed_hash
 
     def add_block(self, block, proof):
@@ -62,15 +76,26 @@ class Blockchain:
         return new_block.index
 
 
-class Block:
-    def __init__(self, index, transactions, timestamp, previous_hash, nonce=0):
-        self.index = index
-        self.transactions = transactions
-        self.timestamp = timestamp
-        self.previous_hash = previous_hash
-        self.nonce = nonce
-        pass
-
-    def compute_hash(self):
-        block_string = json.dumps(self.__dict__, sort_keys=True)
-        return sha256(block_string.encode()).hexdigest()
+if __name__ == '__main__':
+    blockchain = Blockchain()
+    blockchain.add_new_transaction("A INVITED 8.8.8.8")
+    blockchain.add_new_transaction("8.8.8.8 Joined")
+    mine_response = blockchain.mine()
+    print(mine_response)
+    print(blockchain.last_block.transactions)
+    blockchain.add_new_transaction("8.8.8.8 Joined")
+    blockchain.add_new_transaction("8.8.8.8 Shared File asdasdasdasd")
+    mine_response = blockchain.mine()
+    print(mine_response)
+    print(blockchain.last_block.transactions)
+    blockchain.add_new_transaction("B ivited 1.1.1.1")
+    blockchain.add_new_transaction("8.8.8.8 Joined")
+    blockchain.add_new_transaction("8.8.8.8 Joined")
+    mine_response = blockchain.mine()
+    print(mine_response)
+    print(blockchain.last_block.transactions)
+    blockchain.add_new_transaction("8.8.8.8 Joined")
+    blockchain.add_new_transaction("8.8.8.8 Joined")
+    mine_response = blockchain.mine()
+    print(mine_response)
+    print(blockchain.last_block.transactions)
