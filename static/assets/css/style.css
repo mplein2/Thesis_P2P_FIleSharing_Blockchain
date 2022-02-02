@@ -6544,7 +6544,9 @@ textarea.form-control-lg {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  outline: 0; }
+  outline: 0;
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */}
 
 .modal-dialog {
   position: relative;
@@ -13772,8 +13774,6 @@ dl {
     -moz-transition: width 0.25s ease;
     -ms-transition: width 0.25s ease;
     color: #9c9fa6;
-    padding-left: 24px;
-    padding-right: 24px;
     width: calc(100% - 260px);
     height: 70px; }
     @media (max-width: 991px) {
