@@ -76,12 +76,9 @@
                 </a>
                 <div class="collapse show" id="general-pages" style="">
                     <ul class="nav flex-column sub-menu">
-                        <li class="nav-item"><a class="nav-link" href="">Group 1</a></li>
-                        <li class="nav-item"><a class="nav-link" href="">Group 2</a></li>
-                        <li class="nav-item"><a class="nav-link" href="">Group 3</a></li>
-                        <li class="nav-item"><a class="nav-link" href="">Group 4</a></li>
-                        <li class="nav-item"><a class="nav-link" href="">Group 5</a></li>
-                        <!--                        <li class="nav-item active"><a class="nav-link" href="#" onclick="addGroup()">Add Group</a></li>-->
+                        {% for group in groups %}
+                        <li class="nav-item"><a class="nav-link" href="/groups?group={{group.name}}">{{group.name}}</a></li>
+                        {% endfor %}
                     </ul>
                 </div>
             </li>
@@ -234,19 +231,21 @@
             </div>
             <div class="modal-body">
                 <form class="forms-sample">
-                  <div class="form-group">
-                      <div class="input-group">
-                        <div class="input-group-prepend">
-                          <span class="input-group-text">@</span>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Group Name" aria-label="Group Name"
+                                   aria-describedby="basic-addon1" id="name" name="name">
                         </div>
-                        <input type="text" class="form-control" placeholder="Group Name" aria-label="Group Name" aria-describedby="basic-addon1" id="name" name="name">
-                      </div>
                     </div>
                     <div class="form-check form-check-flat form-check-primary">
                         <label class="form-check-label">
-                            <input type="checkbox" class="form-check-input" id="private" name="private">Private<i class="input-helper"></i></label>
+                            <input type="checkbox" class="form-check-input" id="private" name="private">Private<i
+                                class="input-helper"></i></label>
                     </div>
-                    <button class="btn btn-gradient-primary me-2" onclick="createGroup()" >Create</button>
+                    <button class="btn btn-gradient-primary me-2" onclick="createGroup()">Create</button>
                     <button class="btn btn-light">Cancel</button>
                 </form>
             </div>

@@ -15,12 +15,13 @@ log.disabled = False
 # Routes
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", groups=groupManager.groups)
 
 
-@app.route("/groups")
+@app.route("/groups", methods=['GET'])
 def groups():
-    return render_template("groups.html")
+    print(request.args.get('group'))
+    return render_template("groups.html", groups=groupManager.groups)
 
 
 @app.route('/start', methods=['POST', 'GET'])
@@ -38,7 +39,7 @@ def createGroup():
             private = 1
         else:
             private = 0
-    if groupManager.createGroup(name, private, [client.publicIP ]):
+    if groupManager.createGroup(name, private, [client.publicIP]):
         # True
         return "0"
     else:
