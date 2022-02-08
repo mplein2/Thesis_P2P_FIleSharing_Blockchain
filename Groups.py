@@ -56,7 +56,7 @@ class GroupManager:
             group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
                           json_load_group["peers"], json_load_group["timestamp"])
             self.groups.append(group)
-        except:
+        except :
             print("Error Opening Group file :", fileName)
 
     def loadGroups(self):

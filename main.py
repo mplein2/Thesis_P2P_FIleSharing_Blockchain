@@ -1,8 +1,11 @@
 import json
 import logging
+import threading
+
 from flask import Flask, render_template, request, redirect
 import compress
 
+from Receiver import receiver
 from Groups import GroupManager
 from Client import Client
 
@@ -74,5 +77,7 @@ def createGroup():
 
 if __name__ == "__main__":
     client = Client()
+    x = threading.Thread(target=receiver())
+    x.start()
     groupManager = GroupManager()
     app.run(host='127.0.0.1', port=6969)
