@@ -39,7 +39,7 @@
         </div>
         <ul class="navbar-nav navbar-nav-right">
             <li class="nav-item d-none d-lg-block">
-                <a class="nav-link" href="#" onclick="joinGroup()">
+                <a class="nav-link" href="#" onclick="joinGroupModal()">
                     <i class="mdi mdi-account-key"></i>
                 </a>
             </li>
@@ -201,6 +201,27 @@
                         <textarea class="form-control" id="invite" rows="2" disabled="disabled"></textarea>
                     </div>
                     <button class="btn btn-gradient-primary me-2" onclick='generateInvite("{{ group }}")'>Generate</button>
+                    <button class="btn btn-light">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="joinGroupModal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Join Group</h5>
+            </div>
+            <div class="modal-body">
+                <div class="forms-sample">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Invite" aria-label="Invite"
+                                   aria-describedby="basic-addon1" id="inviteHash" name="inviteHash">
+                        </div>
+                    </div>
+                    <button class="btn btn-gradient-primary me-2" onclick="joinGroup()">Join</button>
                     <button class="btn btn-light">Cancel</button>
                 </div>
             </div>

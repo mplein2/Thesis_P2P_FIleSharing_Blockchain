@@ -3,6 +3,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 import json
+from typing import Type
 
 
 class Group:
@@ -26,6 +27,12 @@ class GroupManager:
         self.loadGroups()
         print("GroupManager Initialized")
 
+    def getGroup(self, name):
+        group: Group
+        for group in self.groups:
+            if group.name == name:
+                return group
+
     def createGroup(self, name, private, admin):
         timeNow = time()
         newGroup = Group(name, private, [admin, ], [admin, ], timeNow)
@@ -41,13 +48,16 @@ class GroupManager:
         json_file.close()
 
     def loadGroup(self, file):
-        file = open(self.DIR_PATH_GROUPS + file)
-        json_load_group = json.load(file)
-        file.close()
-        group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
-                      json_load_group["peers"], json_load_group["timestamp"])
-        self.groups.append(group)
-
+        fileName = file
+        try:
+            file = open(self.DIR_PATH_GROUPS + file)
+            json_load_group = json.load(file)
+            file.close()
+            group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
+                          json_load_group["peers"], json_load_group["timestamp"])
+            self.groups.append(group)
+        except:
+            print("Error Opening Group file :", fileName)
 
     def loadGroups(self):
         files = [f for f in listdir(self.DIR_PATH_GROUPS) if isfile(join(self.DIR_PATH_GROUPS, f))]

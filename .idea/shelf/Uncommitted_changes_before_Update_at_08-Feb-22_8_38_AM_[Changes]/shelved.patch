@@ -1,0 +1,144 @@
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM_[Changes]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM_[Changes]/shelved.patch b/.idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM_[Changes]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM_[Changes]/shelved.patch	(revision 204d08569dda605f981bf96b435bdf1dcd148dab)
++++ /dev/null	(revision 204d08569dda605f981bf96b435bdf1dcd148dab)
+@@ -1,125 +0,0 @@
+-Index: static/index.css
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>html, body{height: 100%;overflow: hidden;}\r\nbody{\r\n  margin: 0;\r\n  background-image: linear-gradient(to right, #141e30, #243b55);\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/static/index.css b/static/index.css
+---- a/static/index.css	(revision 4a4d56f622e247ef187bdf310782755e8ce34f5b)
+-+++ b/static/index.css	(date 1643194007877)
+-@@ -1,5 +1,76 @@
+- html, body{height: 100%;overflow: hidden;}
+- body{
+--  margin: 0;
+-+  overflow: hidden;
+-   background-image: linear-gradient(to right, #141e30, #243b55);
+-+}
+-+* {
+-+  margin: 0;
+-+  padding: 0;
+-+  list-style: none;
+-+  font-family: "Lato", sans-serif;
+-+  line-height: 1;
+-+}
+-+
+-+body {
+-+  background-color: #f5f6f8;
+-+  overflow: hidden;
+-+}
+-+
+-+.sidebar-navigation {
+-+  display: inline-block;
+-+  min-height: 100vh;
+-+  width: 80px;
+-+  background-color: #313443;
+-+  float: left;
+-+}
+-+.sidebar-navigation ul {
+-+  text-align: center;
+-+  color: white;
+-+}
+-+.sidebar-navigation ul li {
+-+  padding: 28px 0;
+-+  cursor: pointer;
+-+  transition: all ease-out 120ms;
+-+}
+-+.sidebar-navigation ul li i {
+-+  display: block;
+-+  font-size: 24px;
+-+  transition: all ease 450ms;
+-+}
+-+.sidebar-navigation ul li .tooltip {
+-+  display: inline-block;
+-+  position: absolute;
+-+  background-color: #313443;
+-+  padding: 8px 15px;
+-+  border-radius: 3px;
+-+  margin-top: -26px;
+-+  left: 90px;
+-+  opacity: 0;
+-+  visibility: hidden;
+-+  font-size: 13px;
+-+  letter-spacing: 0.5px;
+-+}
+-+.sidebar-navigation ul li .tooltip:before {
+-+  content: "";
+-+  display: block;
+-+  position: absolute;
+-+  left: -4px;
+-+  top: 10px;
+-+  transform: rotate(45deg);
+-+  width: 10px;
+-+  height: 10px;
+-+  background-color: inherit;
+-+}
+-+.sidebar-navigation ul li:hover {
+-+  background-color: #22252e;
+-+}
+-+.sidebar-navigation ul li:hover .tooltip {
+-+  visibility: visible;
+-+  opacity: 1;
+-+}
+-+.sidebar-navigation ul li.active {
+-+  background-color: #22252e;
+-+}
+-+.sidebar-navigation ul li.active i {
+-+  color: #98d7ec;
+- }
+-\ No newline at end of file
+-Index: templates/index.html
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><!DOCTYPE html>\r\n<html lang=\"en\">\r\n\r\n<head>\r\n    <meta charset=\"UTF-8\">\r\n    <!--TODO-->\r\n    <title>p2p toreent app title</title>\r\n    <!--CSS FOR INDEX PAGE-->\r\n    <link rel=\"stylesheet\" href=\"../static/index.css\">\r\n</head>\r\n\r\n<body>\r\n\r\n</body>\r\n\r\n</html>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/templates/index.html b/templates/index.html
+---- a/templates/index.html	(revision 4a4d56f622e247ef187bdf310782755e8ce34f5b)
+-+++ b/templates/index.html	(date 1643192853872)
+-@@ -7,10 +7,23 @@
+-     <title>p2p toreent app title</title>
+-     <!--CSS FOR INDEX PAGE-->
+-     <link rel="stylesheet" href="../static/index.css">
+-+	<!--ICONS-->
+-+	<script src="https://kit.fontawesome.com/c5cd512f5f.js" crossorigin="anonymous"></script>
+- </head>
+- 
+- <body>
+--
+-+	<nav class="sidebar-navigation">
+-+		<ul>
+-+			<li class="active">
+-+				<i class="fa fa-share-alt"></i>
+-+				<span class="tooltip">Connections</span>
+-+			</li>
+-+			<li>
+-+				<i class="fa fa-sliders"></i>
+-+				<span class="tooltip">Settings</span>
+-+			</li>
+-+		</ul>
+-+	</nav>
+- </body>
+- 
+- </html>
+-\ No newline at end of file
+Index: .idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM__Changes_.xml
+===================================================================
+diff --git a/.idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM__Changes_.xml b/.idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM__Changes_.xml
+deleted file mode 100644
+--- a/.idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM__Changes_.xml	(revision 204d08569dda605f981bf96b435bdf1dcd148dab)
++++ /dev/null	(revision 204d08569dda605f981bf96b435bdf1dcd148dab)
+@@ -1,4 +0,0 @@
+-<changelist name="Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM_[Changes]" date="1643261345007" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_27-Jan-22_7_28_AM_[Changes]/shelved.patch" />
+-  <option name="DESCRIPTION" value="Uncommitted changes before Update at 27-Jan-22 7:28 AM [Changes]" />
+-</changelist>
+\ No newline at end of file

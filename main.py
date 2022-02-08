@@ -1,5 +1,7 @@
+import json
 import logging
 from flask import Flask, render_template, request, redirect
+import compress
 
 from Groups import GroupManager
 from Client import Client
@@ -38,8 +40,19 @@ def generateInvite():
         group = data["group"]
         print("Generate Invite for :", group)
         # TODO generate group invite
-        compressedInvite = "standard's"
-        return compressedInvite
+        group = groupManager.getGroup(group)
+        jsonPeers = json.dumps(group.peers)
+        return compress.compress(jsonPeers)
+
+
+@app.route('/joinGroup', methods=['POST'])
+def joinGroup():
+    if request.method == 'POST':
+        data = request.form
+        invite = data["invite"]
+        print("Join group with Invite:", invite)
+        inviteDecomp = compress.decompress(invite)
+        print("Peers to try:", inviteDecomp)
 
 
 @app.route('/createGroup', methods=['POST'])

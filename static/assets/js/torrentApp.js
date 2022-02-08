@@ -29,20 +29,41 @@ function generateInvite(groupName) {
             });
 
 }
-function joinGroup() {
-    alert("JS join group");
-    var modal = document.getElementById("myModal");
+function joinGroupModal() {
+    var modal = document.getElementById("joinGroupModal");
     modal.style.display = "block";
+}
+function joinGroup() {
+    var invite = document.getElementById("inviteHash").value;
+//    eJyLjlYyNDfTMzIyB2ITPUMDc6XYWAAzNASo
+    $.ajax({
+                data: {invite: invite}
+                , type: 'post'
+                , url: '/joinGroup'
+                , success: function (response) {
+                    if (response==0){
+                    window.location.replace("/groups?group="+name);
+                    }else{
+                    //TODO FAILED ALERT
+                    alert("Failed to Join Group")
+                    }
+                }
+            });
 }
 function createGroup() {
     var private = document.getElementById("private").value;
     var name = document.getElementById("name").value;
     $.ajax({
-                data: {private: private,name:name}/*keys you need to post (sweet: newsweet)*/
+                data: {private: private,name:name}
                 , type: 'post'
                 , url: '/createGroup'
                 , success: function (response) {
-//                TODO redirect succsess to group
+                    if (response==0){
+                    window.location.replace("/groups?group="+name);
+                    }else{
+                    //TODO FAILED ALERT
+                    alert("Failed to Create Group")
+                    }
                 }
             });
 
