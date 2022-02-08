@@ -20,14 +20,26 @@ def index():
 
 @app.route("/groups", methods=['GET'])
 def groups():
-    print(request.args.get('group'))
-    return render_template("groups.html", groups=groupManager.groups)
+    group = request.args.get('group')
+    print("Group page request :", group)
+    return render_template("groups.html", groups=groupManager.groups, group=group)
 
 
 @app.route('/start', methods=['POST', 'GET'])
 def start():
     print("Start Worked")
     return "fuck"
+
+
+@app.route('/generateInvite', methods=['POST'])
+def generateInvite():
+    if request.method == 'POST':
+        data = request.form
+        group = data["group"]
+        print("Generate Invite for :", group)
+        # TODO generate group invite
+        compressedInvite = "standard's"
+        return compressedInvite
 
 
 @app.route('/createGroup', methods=['POST'])
