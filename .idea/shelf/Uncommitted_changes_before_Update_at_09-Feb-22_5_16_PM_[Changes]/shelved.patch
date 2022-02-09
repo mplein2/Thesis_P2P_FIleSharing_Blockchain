@@ -1,0 +1,59 @@
+Index: Receiver.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from asyncio import sleep\r\nimport time\r\nimport socket\r\nimport sys\r\nimport socket\r\nimport binascii\r\nimport socket\r\nimport struct\r\n\r\n\r\ndef receiver():\r\n    import socket\r\n    import struct\r\n    MCAST_GRP = '224.1.1.1'\r\n    MCAST_PORT = 5004\r\n    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)\r\n    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\r\n    sock.bind(('', MCAST_PORT))\r\n    mreq = struct.pack(\"4sl\", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)\r\n    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)\r\n    while True:\r\n        print(sock.recv(10240))\r\n
+===================================================================
+diff --git a/Receiver.py b/Receiver.py
+--- a/Receiver.py	
++++ b/Receiver.py	
+@@ -6,17 +6,9 @@
+ import binascii
+ import socket
+ import struct
++import aioice
+ 
+ 
+ def receiver():
+-    import socket
+-    import struct
+-    MCAST_GRP = '224.1.1.1'
+-    MCAST_PORT = 5004
+-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+-    sock.bind(('', MCAST_PORT))
+-    mreq = struct.pack("4sl", socket.inet_aton(MCAST_GRP), socket.INADDR_ANY)
+-    sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+-    while True:
+-        print(sock.recv(10240))
++    pass
++
+Index: send.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import socket\r\nimport sys\r\n\r\naddr = '244.1.1.1'\r\nport = 6700\r\ndata = \"yolo\".encode()\r\n\r\nif __name__ == \"__main__\":\r\n    import socket\r\n\r\n    group = '224.1.1.1'\r\n    port = 5004\r\n    # 2-hop restriction in network\r\n    ttl = 2\r\n    sock = socket.socket(socket.AF_INET,\r\n                         socket.SOCK_DGRAM,\r\n                         socket.IPPROTO_UDP)\r\n    sock.setsockopt(socket.IPPROTO_IP,\r\n                    socket.IP_MULTICAST_TTL,\r\n                    ttl)\r\n    sock.sendto(b\"hello world\", (group, port))\r\n\r\n
+===================================================================
+diff --git a/send.py b/send.py
+--- a/send.py	
++++ b/send.py	
+@@ -6,17 +6,7 @@
+ data = "yolo".encode()
+ 
+ if __name__ == "__main__":
+-    import socket
+-
+-    group = '224.1.1.1'
+-    port = 5004
+-    # 2-hop restriction in network
+-    ttl = 2
+-    sock = socket.socket(socket.AF_INET,
+-                         socket.SOCK_DGRAM,
+-                         socket.IPPROTO_UDP)
+-    sock.setsockopt(socket.IPPROTO_IP,
+-                    socket.IP_MULTICAST_TTL,
+-                    ttl)
+-    sock.sendto(b"hello world", (group, port))
+-
++    client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
++    message = b'2'
++    addr = ("82.102.57.157", 6700)
++    client_socket.sendto(message, addr)
