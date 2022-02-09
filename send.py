@@ -1,13 +1,15 @@
 import socket
 import sys
 
-HOST = '127.0.0.1'
-PORT = 6700
+addr = '82.102.57.157'
+port = 6700
+data = "yolo".encode()
+
 if __name__ == "__main__":
-    # Create socket for server
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
-    # Let's send data through UDP protocol
-    send_data = "Test1"
-    s.sendto(send_data.encode('utf-8'), (HOST, PORT))
-    print("\n\n 1. Client Sent : ", send_data, "\n\n")
-    s.close()
+    # Create the socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # Make the socket multicast-aware, and set TTL.
+    s.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, 32)  # Change TTL (=20) to suit
+    # Send the data
+    s.sendto(data, (addr, port))
+
