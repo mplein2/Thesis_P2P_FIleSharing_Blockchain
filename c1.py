@@ -13,7 +13,6 @@ sock.sendto(b'0', rendezvous)
 
 while True:
     data = sock.recv(1024).decode()
-
     if data.strip() == 'ready':
         print('checked in with server, waiting')
         break
@@ -43,7 +42,7 @@ print('ready to exchange messages\n')
 # equiv: nc -u -l 50001
 def listen():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind(('0.0.0.0', sport))
+    sock.bind(('127.0.0.2', sport))
 
     while True:
         data = sock.recv(1024)
