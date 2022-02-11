@@ -8,7 +8,7 @@ rendezvous = ('82.102.57.157', 56700)
 print('connecting to rendezvous server')
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', 50001))
+sock.bind(('0.0.0.0', 6700))
 sock.sendto(b'0', rendezvous)
 
 while True:
@@ -38,6 +38,7 @@ sock.sendto(b'0', (ip, dport))
 
 print('ready to exchange messages\n')
 
+
 # listen for
 # equiv: nc -u -l 50001
 def listen():
@@ -47,6 +48,7 @@ def listen():
     while True:
         data = sock.recv(1024)
         print('\rpeer: {}\n> '.format(data.decode()), end='')
+
 
 listener = threading.Thread(target=listen, daemon=True);
 listener.start()
