@@ -60,7 +60,7 @@ def joinGroup():
 
 @app.route('/createGroup', methods=['POST'])
 def createGroup():
-    if request.method == 'POST':
+    if request.metho+d == 'POST':
         data = request.form
         name = data["name"]
         if data["private"]:
@@ -77,7 +77,7 @@ def createGroup():
 
 if __name__ == "__main__":
     client = Client()
-    # x = threading.Thread(target=receiver)
-    # x.start()
+    x = threading.Thread(target=receiver)
+    x.start()
     groupManager = GroupManager()
     app.run(host='127.0.0.1', port=6969)

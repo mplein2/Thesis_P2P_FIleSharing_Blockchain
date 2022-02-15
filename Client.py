@@ -1,6 +1,7 @@
 from requests import get
 import os
 
+
 class Client:
     def __init__(self):
         self.DIR_PATH_CLIENT = '%s\\TorrentApp\\' % os.environ['APPDATA']
