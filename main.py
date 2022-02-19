@@ -1,13 +1,14 @@
 import json
+from json import *
 import logging
 import threading
-
+from pickle import dumps,loads
 from flask import Flask, render_template, request, redirect
 import compress
-
-from Receiver import receiver
-from Groups import GroupManager
+from Receiver import receiver,sendRequest
+from Groups import GroupManager,Invite
 from Client import Client
+from Requests import JoinRequest
 
 app = Flask(__name__)
 
@@ -41,11 +42,12 @@ def generateInvite():
     if request.method == 'POST':
         data = request.form
         group = data["group"]
+        #TODO IP SPECIFIC BLOCKCHAIN
+        ip = data["ip"]
         print("Generate Invite for :", group)
-        # TODO generate group invite
         group = groupManager.getGroup(group)
-        jsonPeers = json.dumps(group.peers)
-        return compress.compress(jsonPeers)
+        invite = group.generateInvite()
+        return compress.compress(invite.toJSON())
 
 
 @app.route('/joinGroup', methods=['POST'])
@@ -53,14 +55,21 @@ def joinGroup():
     if request.method == 'POST':
         data = request.form
         invite = data["invite"]
-        print("Join group with Invite:", invite)
         inviteDecomp = compress.decompress(invite)
-        print("Peers to try:", inviteDecomp)
+        inviteLoad = json.loads(inviteDecomp)
+        invite = Invite(inviteLoad["name"], inviteLoad["timestamp"], inviteLoad["peers"])
+        joinReq = JoinRequest(invite.name,invite.timestamp)
+        #TODO PORTS
+        for peer in invite.peers:
+            sendRequest(peer,6700,dumps(joinReq))
+        return "1"
+
+
 
 
 @app.route('/createGroup', methods=['POST'])
 def createGroup():
-    if request.metho+d == 'POST':
+    if request.method == 'POST':
         data = request.form
         name = data["name"]
         if data["private"]:
@@ -80,4 +89,4 @@ if __name__ == "__main__":
     x = threading.Thread(target=receiver)
     x.start()
     groupManager = GroupManager()
-    app.run(host='127.0.0.1', port=6969)
+    app.run(host='', port=6969)

@@ -5,6 +5,15 @@ from os.path import isfile, join
 import json
 from typing import Type
 
+class Invite:
+    def __init__(self,name,timestamp,peers):
+        self.name = name
+        self.timestamp = timestamp
+        self.peers = peers
+
+    def toJSON(self):
+        return json.dumps(self.__dict__)
+
 
 class Group:
     def __init__(self, name, private, admin, peers, time):
@@ -13,6 +22,10 @@ class Group:
         self.admins = admin
         self.peers = peers
         self.timestamp = time
+
+    def generateInvite(self):
+        invite = Invite(self.name,self.timestamp,self.peers)
+        return invite
 
     def toJSON(self):
         return json.dumps(self.__dict__)

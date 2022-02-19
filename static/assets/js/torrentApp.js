@@ -18,9 +18,10 @@ function createInvite() {
     modal.style.display = "block";
 }
 function generateInvite(groupName) {
+    var ip = document.getElementById("ip").value;
     var inviteTextArea = document.getElementById("invite");
     $.ajax({
-                data: {group:groupName}
+                data: {group:groupName,ip:ip}
                 , type: 'post'
                 , url: '/generateInvite'
                 , success: function (response) {

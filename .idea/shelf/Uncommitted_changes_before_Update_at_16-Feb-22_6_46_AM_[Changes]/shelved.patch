@@ -1,0 +1,71 @@
+Index: c1.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import socket\r\nimport sys\r\nimport threading\r\n\r\nrendezvous = ('82.102.57.157', 56700)\r\n\r\n# connect to rendezvous\r\nprint('connecting to rendezvous server')\r\n\r\nsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\r\nsock.bind(('0.0.0.0', 6700))\r\nsock.sendto(b'0', rendezvous)\r\n\r\nwhile True:\r\n    data = sock.recv(1024).decode()\r\n    if data.strip() == 'ready':\r\n        print('checked in with server, waiting')\r\n        break\r\n\r\ndata = sock.recv(1024).decode()\r\nip, sport, dport = data.split(' ')\r\nsport = int(sport)\r\ndport = int(dport)\r\n\r\nprint('\\ngot peer')\r\nprint('  ip:          {}'.format(ip))\r\nprint('  source port: {}'.format(sport))\r\nprint('  dest port:   {}\\n'.format(dport))\r\n\r\n# punch hole\r\n# equiv: echo 'punch hole' | nc -u -p 50001 x.x.x.x 50002\r\nprint('punching hole')\r\n\r\nsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\r\nsock.bind(('0.0.0.0', sport))\r\nsock.sendto(b'0', (ip, dport))\r\n\r\nprint('ready to exchange messages\\n')\r\n\r\n\r\n# listen for\r\n# equiv: nc -u -l 50001\r\ndef listen():\r\n    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\r\n    sock.bind(('127.0.0.2', sport))\r\n\r\n    while True:\r\n        data = sock.recv(1024)\r\n        print('\\rpeer: {}\\n> '.format(data.decode()), end='')\r\n\r\n\r\nlistener = threading.Thread(target=listen, daemon=True);\r\nlistener.start()\r\n\r\n# send messages\r\n# equiv: echo 'xxx' | nc -u -p 50002 x.x.x.x 50001\r\nsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\r\nsock.bind(('0.0.0.0', dport))\r\n\r\nwhile True:\r\n    msg = input('> ')\r\n    sock.sendto(msg.encode(), (ip, sport))\r\n
+===================================================================
+diff --git a/c1.py b/c1.py
+--- a/c1.py	
++++ b/c1.py	
+@@ -8,11 +8,12 @@
+ print('connecting to rendezvous server')
+ 
+ sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+-sock.bind(('0.0.0.0', 6700))
++sock.bind(('0.0.0.0', 50001))
+ sock.sendto(b'0', rendezvous)
+ 
+ while True:
+     data = sock.recv(1024).decode()
++
+     if data.strip() == 'ready':
+         print('checked in with server, waiting')
+         break
+@@ -42,8 +43,7 @@
+ # equiv: nc -u -l 50001
+ def listen():
+     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+-    sock.bind(('127.0.0.2', sport))
+-
++    sock.bind(('0.0.0.0', sport))
+     while True:
+         data = sock.recv(1024)
+         print('\rpeer: {}\n> '.format(data.decode()), end='')
+Index: server.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import socket\r\n\r\nknown_port = 50002\r\n\r\nsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)\r\nsock.bind(('0.0.0.0', 56700))\r\n\r\nwhile True:\r\n    clients = []\r\n\r\n    while True:\r\n        data, address = sock.recvfrom(128)\r\n\r\n        print('connection from: {}'.format(address))\r\n        clients.append(address)\r\n\r\n        sock.sendto(b'ready', address)\r\n\r\n        if len(clients) == 2:\r\n            print('got 2 clients, sending details to each')\r\n            break\r\n\r\n    c1 = clients.pop()\r\n    c1_addr, c1_port = c1\r\n    c2 = clients.pop()\r\n    c2_addr, c2_port = c2\r\n\r\n    sock.sendto('{} {} {}'.format(c1_addr, c1_port, known_port).encode(), c2)\r\n    sock.sendto('{} {} {}'.format(c2_addr, c2_port, known_port).encode(), c1)
+===================================================================
+diff --git a/server.py b/server.py
+--- a/server.py	
++++ b/server.py	
+@@ -1,29 +1,0 @@
+-import socket
+-
+-known_port = 50002
+-
+-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+-sock.bind(('0.0.0.0', 56700))
+-
+-while True:
+-    clients = []
+-
+-    while True:
+-        data, address = sock.recvfrom(128)
+-
+-        print('connection from: {}'.format(address))
+-        clients.append(address)
+-
+-        sock.sendto(b'ready', address)
+-
+-        if len(clients) == 2:
+-            print('got 2 clients, sending details to each')
+-            break
+-
+-    c1 = clients.pop()
+-    c1_addr, c1_port = c1
+-    c2 = clients.pop()
+-    c2_addr, c2_port = c2
+-
+-    sock.sendto('{} {} {}'.format(c1_addr, c1_port, known_port).encode(), c2)
+-    sock.sendto('{} {} {}'.format(c2_addr, c2_port, known_port).encode(), c1)
+\ No newline at end of file
