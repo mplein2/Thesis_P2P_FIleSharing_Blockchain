@@ -60,8 +60,10 @@ def joinGroup():
         invite = Invite(inviteLoad["name"], inviteLoad["timestamp"], inviteLoad["peers"])
         joinReq = JoinRequest(invite.name,invite.timestamp)
         #TODO PORTS
+        print(invite.peers)
         for peer in invite.peers:
-            sendRequest(peer,6700,dumps(joinReq))
+            print(peer[0])
+            sendRequest(peer[0],6700,dumps(joinReq))
         return "1"
 
 
