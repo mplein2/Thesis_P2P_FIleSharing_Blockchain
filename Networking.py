@@ -23,11 +23,13 @@ class JoinResponse(Request):
         super().__init__(1)
         self.group = group
 
-def requestHandler(data,groupManager):
+def requestHandler(data,addr,groupManager):
     req = pickle.loads(data)
     # Response to JoinRequest
     if req.type == 1:
         req = JoinRequest(req.name,req.timestamp)
+        #TODO If this is allowed add peer and respond
+        groupManager.addPeerGroup(req.name,addr[0])
         group = groupManager.getGroup(req.name)
         return pickle.dumps(JoinResponse(group))
 
@@ -42,7 +44,7 @@ def receiver(groupManager):
         #RECEIVE AND RESPOND.
         data, addr = sock.recvfrom(65507)
         print(addr,data)
-        response = requestHandler(data,groupManager)
+        response = requestHandler(data,addr,groupManager)
         sock.sendto(response,addr)
 
 def sendRequest(address, port, request,groupManager):
