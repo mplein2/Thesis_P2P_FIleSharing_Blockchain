@@ -2,6 +2,9 @@ import socket
 from socket import *
 import pickle
 
+import Groups
+
+
 class Request:
     def __init__(self,type):
         self.type = type
@@ -53,5 +56,7 @@ def responseHandler(data, groupManager):
     res = pickle.loads(data)
     if res.type == 1:
         res = JoinResponse(res.group)
-        print(res)
+        group = res.group
+        group = Groups.Group(group.name,group.private,group.admins,group.peers,group.timestamp)
+        groupManager.addGroup(group)
 

@@ -16,12 +16,12 @@ class Invite:
 
 
 class Group:
-    def __init__(self, name, private, admin, peers, time):
+    def __init__(self, name, private, admin, peers, timestamp):
         self.name = name
         self.private = private
         self.admins = admin
         self.peers = peers
-        self.timestamp = time
+        self.timestamp = timestamp
 
     def generateInvite(self):
         invite = Invite(self.name,self.timestamp,self.peers)
@@ -40,11 +40,22 @@ class GroupManager:
         self.loadGroups()
         print("GroupManager Initialized")
 
+    def addGroup(self,group):
+        self.saveGroup(group)
+        self.groups.append(group)
+
     def getGroup(self, name):
         group: Group
         for group in self.groups:
             if group.name == name:
                 return group
+    def addPeerGroup(self, name , peer):
+        group: Group
+        for group in self.groups:
+            if group.name == name:
+                group.peers.append(peer)
+                self.saveGroup(group)
+                return
 
     def createGroup(self, name, private, admin):
         timeNow = time()
