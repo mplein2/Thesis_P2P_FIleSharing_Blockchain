@@ -62,7 +62,7 @@ def joinGroup():
         print(invite.peers)
         for peer in invite.peers:
             print(peer[0])
-            sendRequest(peer[0],6700,dumps(joinReq))
+            sendRequest(peer[0],6700,dumps(joinReq),groupManager)
         return "1"
 
 

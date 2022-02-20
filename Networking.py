@@ -21,14 +21,12 @@ class JoinResponse(Request):
         self.group = group
 
 def requestHandler(data,groupManager):
-    print(data)
     req = pickle.loads(data)
-    #Response to JoinRequest
-    # if req.type == 1:
-    #     req = JoinRequest(req.name,req.timestamp)
-    #     group = groupManager.getGroup(req.name)
-    #     return pickle.dumps(JoinResponse(group))
-
+    # Response to JoinRequest
+    if req.type == 1:
+        req = JoinRequest(req.name,req.timestamp)
+        group = groupManager.getGroup(req.name)
+        return pickle.dumps(JoinResponse(group))
 
 
 def receiver(groupManager):
@@ -38,15 +36,15 @@ def receiver(groupManager):
     sock.bind((UDP_IP, UDP_PORT))
     print("Listening on ", UDP_IP, ":", UDP_PORT)
     while True:
-        data, addr = sock.recvfrom(65507)  #max
+        #RECEIVE AND RESPOND.
+        data, addr = sock.recvfrom(65507)
         print(addr,data)
-        response = requestHandler(data, groupManager)
-        # sock.send(response,addr)
+        response = requestHandler(data,groupManager)
+        sock.sendto(response,addr)
 
-
-def sendRequest(address, port, request):
+def sendRequest(address, port, request,groupManager):
     # Create a socket for sending files
     clientSocket = socket(AF_INET, SOCK_DGRAM)
-    print("Sending")
     clientSocket.sendto(request, (address, port))
-
+    data, addr = clientSocket.recvfrom(65507)
+    responseHandler(data, groupManager)
