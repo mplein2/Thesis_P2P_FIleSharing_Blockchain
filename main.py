@@ -5,10 +5,9 @@ import threading
 from pickle import dumps,loads
 from flask import Flask, render_template, request, redirect
 import compress
-from Receiver import receiver,sendRequest
+from Networking import receiver,sendRequest,JoinRequest
 from Groups import GroupManager,Invite
 from Client import Client
-from Requests import JoinRequest
 
 app = Flask(__name__)
 
@@ -88,7 +87,7 @@ def createGroup():
 
 if __name__ == "__main__":
     client = Client()
-    x = threading.Thread(target=receiver)
-    x.start()
     groupManager = GroupManager()
+    receiver = threading.Thread(target=receiver, args=[groupManager])
+    receiver.start()
     app.run(host='', port=6969)
