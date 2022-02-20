@@ -17,7 +17,7 @@ class JoinRequest(Request):
 
 class JoinResponse(Request):
     def __init__(self,group):
-        super().__init__(2)
+        super().__init__(1)
         self.group = group
 
 def requestHandler(data,groupManager):
@@ -48,3 +48,10 @@ def sendRequest(address, port, request,groupManager):
     clientSocket.sendto(request, (address, port))
     data, addr = clientSocket.recvfrom(65507)
     responseHandler(data, groupManager)
+
+def responseHandler(data, groupManager):
+    res = pickle.loads(data)
+    if res.type == 1:
+        res = JoinResponse(res.group)
+        print(res)
+
