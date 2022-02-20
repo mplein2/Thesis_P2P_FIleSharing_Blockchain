@@ -29,7 +29,8 @@ def requestHandler(data,addr,groupManager):
     if req.type == 1:
         req = JoinRequest(req.name,req.timestamp)
         #TODO If this is allowed add peer and respond
-        groupManager.addPeerGroup(req.name,addr[0])
+        #TODO Peer Port
+        groupManager.addPeerGroup(req.name,[addr[0]])
         group = groupManager.getGroup(req.name)
         return pickle.dumps(JoinResponse(group))
 
