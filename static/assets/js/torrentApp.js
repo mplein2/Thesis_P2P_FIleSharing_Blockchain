@@ -9,14 +9,27 @@ function start() {
     xhttp.send();
 
 }
+
 function addGroup() {
     var modal = document.getElementById("myModal");
-  modal.style.display = "block";
+    modal.style.display = "block";
 }
+
+function closeGroup() {
+    var modal = document.getElementById("myModal");
+    modal.style.display = "none";
+}
+
 function createInvite() {
     var modal = document.getElementById("createInviteModal");
     modal.style.display = "block";
 }
+
+function closeInvite() {
+    var modal = document.getElementById("createInviteModal");
+    modal.style.display = "none";
+}
+
 function generateInvite(groupName) {
     var ip = document.getElementById("ip").value;
     var inviteTextArea = document.getElementById("invite");
@@ -30,13 +43,41 @@ function generateInvite(groupName) {
             });
 
 }
+function quitGroup(groupName) {
+    $.ajax({
+                data: {group:groupName}
+                , type: 'post'
+                , url: '/quitGroup'
+                , success: function (response) {
+                    if (response==0){
+                                    window.location.replace("/");
+                                    }
+
+                }
+            });
+
+}
 function joinGroupModal() {
     var modal = document.getElementById("joinGroupModal");
     modal.style.display = "block";
 }
+
+function openShareModal() {
+    var modal = document.getElementById("shareModal");
+    modal.style.display = "block";
+}
+
+function closeGroupModal() {
+    var modal = document.getElementById("joinGroupModal");
+    modal.style.display = "none";
+}
+function closeShareBundle() {
+    var modal = document.getElementById("shareModal");
+    modal.style.display = "none";
+}
+
 function joinGroup() {
     var invite = document.getElementById("inviteHash").value;
-//    eJyLjlYyNDfTMzIyB2ITPUMDc6XYWAAzNASo
     $.ajax({
                 data: {invite: invite}
                 , type: 'post'
@@ -51,6 +92,7 @@ function joinGroup() {
                 }
             });
 }
+
 function createGroup() {
     var private = document.getElementById("private").value;
     var name = document.getElementById("name").value;
@@ -64,6 +106,25 @@ function createGroup() {
                     }else{
                     //TODO FAILED ALERT
                     alert("Failed to Create Group")
+                    }
+                }
+            });
+
+}
+
+function shareBundle() {
+//    var private = document.getElementById("private").value;
+//    var name = document.getElementById("name").value;
+    $.ajax({
+                data: {}
+                , type: 'post'
+                , url: '/shareBundle'
+                , success: function (response) {
+                    if (response==0){
+                    alert("0");
+                    }else{
+                    //TODO FAILED ALERT
+                    alert("Failed to Create Group");
                     }
                 }
             });

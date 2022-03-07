@@ -103,9 +103,9 @@
                                 </button>
                                 <div class="dropdown-menu" data-popper-placement="bottom-start"
                                      style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 57px);">
-                                    <a class="dropdown-item">Share</a>
+                                    <a class="dropdown-item" onclick="openShareModal()">Share</a>
                                     <a class="dropdown-item" onclick="createInvite()">Invite</a>
-                                    <a class="dropdown-item">Quit</a>
+                                    <a class="dropdown-item" onclick='quitGroup("{{ group }}")'>Quit</a>
                                 </div>
                             </div>
                         </li>
@@ -113,19 +113,33 @@
                 </nav>
             </div>
             <div class="row">
-
+                <div class="col-lg-6 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Bundles Shared</h4>
+                            </p>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Created</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>Jacob</td>
+                                    <td>12 May 2017</td>
+                                    <td><label class="badge badge-danger">Pending</label></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
-        <footer class="footer">
-            <div class="container-fluid d-flex justify-content-between">
-                <span class="text-muted d-block text-center text-sm-start d-sm-inline-block">Copyright © bootstrapdash.com 2021</span>
-                <span class="float-none float-sm-end mt-1 mt-sm-0 text-end"> Free <a
-                        href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin template</a> from Bootstrapdash.com</span>
-            </div>
-        </footer>
-        <!-- partial -->
     </div>
     <!-- main-panel ends -->
 </div>
@@ -148,6 +162,7 @@
 <script src="static/assets/js/dashboard.js"></script>
 <script src="static/assets/js/todolist.js"></script>
 <script src="static/assets/js/torrentApp.js"></script>
+<script src="static/assets/js/file-upload.js"></script>
 <!-- End custom js for this page -->
 <div id="myModal" class="modal">
     <div class="modal-dialog" role="document">
@@ -171,38 +186,9 @@
                             <input type="checkbox" class="form-check-input" id="private" name="private">Private<i
                                 class="input-helper"></i></label>
                     </div>
-                    <button class="btn btn-gradient-primary me-2" onclick="createGroup()">Create</button>
-                    <button class="btn btn-light">Cancel</button>
+                    <div class="btn btn-gradient-primary me-2" onclick="createGroup()">Create</div>
+                    <div class="btn btn-light" onclick="closeGroup()">Cancel</div>
                 </form>
-            </div>
-        </div>
-    </div>
-</div>
-<div id="createInviteModal" class="modal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create Invite</h5>
-            </div>
-            <div class="modal-body">
-                <div class="forms-sample">
-                    <div class="form-group">
-                        <label for="ip">IP Address</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">@</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="255.255.255.255" aria-label="Group Name"
-                                   aria-describedby="basic-addon1" id="ip" name="ip">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="invite">Invite</label>
-                        <textarea class="form-control" id="invite" rows="2" disabled="disabled"></textarea>
-                    </div>
-                    <button class="btn btn-gradient-primary me-2" onclick='generateInvite("{{ group }}")'>Generate</button>
-                    <button class="btn btn-light">Cancel</button>
-                </div>
             </div>
         </div>
     </div>
@@ -221,13 +207,67 @@
                                    aria-describedby="basic-addon1" id="inviteHash" name="inviteHash">
                         </div>
                     </div>
-                    <button class="btn btn-gradient-primary me-2" onclick="joinGroup()">Join</button>
-                    <button class="btn btn-light">Cancel</button>
+                    <div class="btn btn-gradient-primary me-2" onclick="joinGroup()">Join</div>
+                    <div class="btn btn-light" onclick="closeGroupModal()">Cancel</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</body>
+<div id="createInviteModal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Invite</h5>
+            </div>
+            <div class="modal-body">
+                <div class="forms-sample">
+                    <div class="form-group">
+                        <label for="ip">IP Address</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="255.255.255.255"
+                                   aria-label="Group Name"
+                                   aria-describedby="basic-addon1" id="ip" name="ip">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="invite">Invite</label>
+                        <textarea class="form-control" id="invite" rows="2" disabled="disabled"></textarea>
+                    </div>
+                    <div class="btn btn-gradient-primary me-2" onclick='generateInvite("{{ group }}")'>Generate</div>
+                    <div class="btn btn-light" onclick="closeInvite()">Cancel</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="shareModal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Share Bundle</h5>
+            </div>
+            <div class="modal-body">
+                <div class="forms-sample">
+                    <div class="form-group">
+                        <label for="bundleName">Bundle Name</label>
+                        <input type="text" class="form-control" id="bundleName" placeholder="Bundle Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="bundleDescription">Bundle Description</label>
+                        <textarea class="form-control" id="bundleDescription" placeholder="Bundle Description"
+                                  rows="3"></textarea>
+                    </div>
+                    <div class="btn btn-gradient-primary me-2" onclick='shareBundle()'>Share</div>
+                    <div class="btn btn-light" onclick="closeShareBundle()">Cancel</div>
+                </div>
 
+            </div>
+        </div>
+    </div>
+</div>
+</body>
 </html>

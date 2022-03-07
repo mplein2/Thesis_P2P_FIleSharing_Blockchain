@@ -8,6 +8,7 @@ import compress
 from Networking import receiver,sendRequest,JoinRequest
 from Groups import GroupManager,Invite
 from Client import Client
+import easygui
 
 app = Flask(__name__)
 
@@ -33,7 +34,8 @@ def groups():
 @app.route('/start', methods=['POST', 'GET'])
 def start():
     print("Start Worked")
-    return "fuck"
+    #TODO Start downloading
+    return "alright"
 
 
 @app.route('/generateInvite', methods=['POST'])
@@ -67,6 +69,23 @@ def joinGroup():
 
 
 
+@app.route('/shareBundle', methods=['POST'])
+def shareBundle():
+    path = easygui.diropenbox(msg="Select folder to share as bundle",title="Share Bundle",run=False)
+    print(path)
+    # if request.method == 'POST':
+    #     data = request.form
+    #     name = data["name"]
+    #     if data["private"]:
+    #         private = 1
+    #     else:
+    #         private = 0
+    # if groupManager.createGroup(name, private, [client.publicIP]):
+    #     # True
+    #     return "0"
+    # else:
+    #     # False
+    return "0"
 
 @app.route('/createGroup', methods=['POST'])
 def createGroup():
@@ -84,6 +103,18 @@ def createGroup():
         # False
         return "1"
 
+@app.route('/quitGroup', methods=['POST'])
+def quitGroup():
+    print('QUIT GROUP REQ')
+    if request.method == 'POST':
+        data = request.form
+        group = data["group"]
+        if groupManager.quitGroup(group):
+            # True
+            return "0"
+        else:
+            # False
+            return "1"
 
 if __name__ == "__main__":
     client = Client()
