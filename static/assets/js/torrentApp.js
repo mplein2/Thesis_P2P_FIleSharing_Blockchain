@@ -113,10 +113,14 @@ function createGroup() {
 }
 
 function shareBundle() {
-//    var private = document.getElementById("private").value;
-//    var name = document.getElementById("name").value;
+    var bundleName = document.getElementById("bundleName").value;
+    var bundleDescription = document.getElementById("bundleDescription").value;
+    alert("Select Folder Window is opened.");
     $.ajax({
-                data: {}
+                data: {
+                        bundleName:bundleName,
+                        bundleDescription:bundleDescription
+                      }
                 , type: 'post'
                 , url: '/shareBundle'
                 , success: function (response) {

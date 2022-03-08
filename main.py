@@ -2,11 +2,11 @@ import json
 from json import *
 import logging
 import threading
-from pickle import dumps,loads
+from pickle import dumps, loads
 from flask import Flask, render_template, request, redirect
 import compress
-from Networking import receiver,sendRequest,JoinRequest
-from Groups import GroupManager,Invite
+from Networking import receiver, sendRequest, JoinRequest
+from Groups import GroupManager, Invite
 from Client import Client
 import easygui
 
@@ -34,7 +34,7 @@ def groups():
 @app.route('/start', methods=['POST', 'GET'])
 def start():
     print("Start Worked")
-    #TODO Start downloading
+    # TODO Start downloading
     return "alright"
 
 
@@ -43,7 +43,7 @@ def generateInvite():
     if request.method == 'POST':
         data = request.form
         group = data["group"]
-        #TODO IP SPECIFIC BLOCKCHAIN
+        # TODO IP SPECIFIC BLOCKCHAIN
         ip = data["ip"]
         print("Generate Invite for :", group)
         group = groupManager.getGroup(group)
@@ -59,19 +59,24 @@ def joinGroup():
         inviteDecomp = compress.decompress(invite)
         inviteLoad = json.loads(inviteDecomp)
         invite = Invite(inviteLoad["name"], inviteLoad["timestamp"], inviteLoad["peers"])
-        joinReq = JoinRequest(invite.name,invite.timestamp)
-        #TODO PORTS
+        joinReq = JoinRequest(invite.name, invite.timestamp)
+        # TODO PORTS
         print(invite.peers)
         for peer in invite.peers:
             print(peer[0])
-            sendRequest(peer[0],6700,dumps(joinReq),groupManager)
+            sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
         return "1"
-
 
 
 @app.route('/shareBundle', methods=['POST'])
 def shareBundle():
-    path = easygui.diropenbox(msg="Select folder to share as bundle",title="Share Bundle",run=False)
+    if request.method == 'POST':
+        data = request.form
+        name = data["bundleName"]
+        desc = data["bundleDescription"]
+        print(name)
+        print(desc)
+    path = easygui.diropenbox(msg="Select folder to share as bundle", title="Share Bundle")
     print(path)
     # if request.method == 'POST':
     #     data = request.form
@@ -86,6 +91,7 @@ def shareBundle():
     # else:
     #     # False
     return "0"
+
 
 @app.route('/createGroup', methods=['POST'])
 def createGroup():
@@ -103,6 +109,7 @@ def createGroup():
         # False
         return "1"
 
+
 @app.route('/quitGroup', methods=['POST'])
 def quitGroup():
     print('QUIT GROUP REQ')
@@ -115,6 +122,7 @@ def quitGroup():
         else:
             # False
             return "1"
+
 
 if __name__ == "__main__":
     client = Client()

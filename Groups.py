@@ -8,7 +8,7 @@ import shutil
 
 
 class Invite:
-    def __init__(self,name,timestamp,peers):
+    def __init__(self, name, timestamp, peers):
         self.name = name
         self.timestamp = timestamp
         self.peers = peers
@@ -26,7 +26,7 @@ class Group:
         self.timestamp = timestamp
 
     def generateInvite(self):
-        invite = Invite(self.name,self.timestamp,self.peers)
+        invite = Invite(self.name, self.timestamp, self.peers)
         return invite
 
     def toJSON(self):
@@ -42,11 +42,11 @@ class GroupManager:
         self.loadGroups()
         print("GroupManager Initialized")
 
-    def addGroup(self,group):
+    def addGroup(self, group):
         self.saveGroup(group)
         self.groups.append(group)
 
-    def removeGroup(self,group):
+    def removeGroup(self, group):
         for x in self.groups:
             if x.name == group:
                 print(self.groups.remove(x))
@@ -58,7 +58,7 @@ class GroupManager:
             if group.name == name:
                 return group
 
-    def addPeerGroup(self, name , peer):
+    def addPeerGroup(self, name, peer):
         group: Group
         for group in self.groups:
             if group.name == name:
@@ -74,33 +74,37 @@ class GroupManager:
         return True
 
     def quitGroup(self, name):
-        shutil.rmtree(self.DIR_PATH_GROUPS+name)
+        shutil.rmtree(self.DIR_PATH_GROUPS + name)
         self.removeGroup(name)
         return True
 
     def saveGroup(self, group: Group):
         # Create JSON file
         json_file_name = group.name + ".json"
-        if not os.path.exists(self.DIR_PATH_GROUPS +group.name):
+        if not os.path.exists(self.DIR_PATH_GROUPS + group.name):
             # Create a new directory because it does not exist
-            os.makedirs(self.DIR_PATH_GROUPS +group.name)
-        json_file = open(self.DIR_PATH_GROUPS +group.name +'\\'+ json_file_name, "w")
+            print("Gonna Create Group Folder")
+            os.makedirs(self.DIR_PATH_GROUPS + group.name)
+        json_file = open(self.DIR_PATH_GROUPS + group.name + '\\' + json_file_name, "w")
         json_file.write(group.toJSON())
         json_file.close()
 
     def loadGroup(self, file):
         fileName = file
         try:
-            file = open(self.DIR_PATH_GROUPS +fileName+"\\"+ fileName+".json")
+            file = open(self.DIR_PATH_GROUPS + fileName + "\\" + fileName + ".json")
             json_load_group = json.load(file)
             file.close()
             group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
                           json_load_group["peers"], json_load_group["timestamp"])
             self.groups.append(group)
-        except :
+        except:
             print("Error Opening Group file :", fileName)
 
     def loadGroups(self):
-        groups = [group for group in listdir(self.DIR_PATH_GROUPS)]
-        for group in groups:
-            self.loadGroup(group)
+        try:
+            groups = [group for group in listdir(self.DIR_PATH_GROUPS)]
+            for group in groups:
+                self.loadGroup(group)
+        except:
+            print("Group Folder Not Found")
