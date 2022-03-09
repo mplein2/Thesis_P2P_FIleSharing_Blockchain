@@ -5,6 +5,7 @@ from os.path import isfile, join
 import json
 from typing import Type
 import shutil
+import hashlib
 
 
 class Invite:
@@ -18,15 +19,20 @@ class Invite:
 
 
 class Group:
-    def __init__(self, name, private, admin, peers, timestamp):
+    def __init__(self, name, private, admin, peers, timestamp,id=None):
         self.name = name
+        self.timestamp = timestamp
         self.private = private
         self.admins = admin
         self.peers = peers
-        self.timestamp = timestamp
+        if id is None:
+            self.id = hashlib.sha256((name+str(timestamp)).encode('utf-8')).hexdigest()
+        else:
+            self.id=id
+
 
     def generateInvite(self):
-        invite = Invite(self.name, self.timestamp, self.peers)
+        invite = Invite(self.name, self.timestamp, self.peers,self.id)
         return invite
 
     def toJSON(self):
@@ -96,7 +102,7 @@ class GroupManager:
             json_load_group = json.load(file)
             file.close()
             group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
-                          json_load_group["peers"], json_load_group["timestamp"])
+                          json_load_group["peers"], json_load_group["timestamp"],json_load_group["id"],)
             self.groups.append(group)
         except:
             print("Error Opening Group file :", fileName)

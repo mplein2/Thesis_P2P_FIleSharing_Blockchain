@@ -9,6 +9,7 @@ from Networking import receiver, sendRequest, JoinRequest
 from Groups import GroupManager, Invite
 from Client import Client
 import easygui
+from bundles import BundleManager
 
 app = Flask(__name__)
 
@@ -77,19 +78,7 @@ def shareBundle():
         print(name)
         print(desc)
     path = easygui.diropenbox(msg="Select folder to share as bundle", title="Share Bundle")
-    print(path)
-    # if request.method == 'POST':
-    #     data = request.form
-    #     name = data["name"]
-    #     if data["private"]:
-    #         private = 1
-    #     else:
-    #         private = 0
-    # if groupManager.createGroup(name, private, [client.publicIP]):
-    #     # True
-    #     return "0"
-    # else:
-    #     # False
+    bundleManager.createBundle(path)
     return "0"
 
 
@@ -126,6 +115,7 @@ def quitGroup():
 
 if __name__ == "__main__":
     client = Client()
+    bundleManager = BundleManager()
     groupManager = GroupManager()
     receiver = threading.Thread(target=receiver, args=[groupManager])
     receiver.start()
