@@ -6,7 +6,7 @@ import json
 from typing import Type
 import shutil
 import hashlib
-
+from bundles import Bundle
 
 class Invite:
     def __init__(self, name, timestamp, peers):
@@ -25,11 +25,11 @@ class Group:
         self.private = private
         self.admins = admin
         self.peers = peers
+        self.bundles = []
         if id is None:
             self.id = hashlib.sha256((name+str(timestamp)).encode('utf-8')).hexdigest()
         else:
             self.id=id
-
 
     def generateInvite(self):
         invite = Invite(self.name, self.timestamp, self.peers,self.id)
@@ -103,6 +103,11 @@ class GroupManager:
             file.close()
             group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
                           json_load_group["peers"], json_load_group["timestamp"],json_load_group["id"],)
+            #Load Bundles of Each group.
+
+
+
+
             self.groups.append(group)
         except:
             print("Error Opening Group file :", fileName)
@@ -114,3 +119,16 @@ class GroupManager:
                 self.loadGroup(group)
         except:
             print("Group Folder Not Found")
+
+    def addBundle(self, bundle: Bundle, group):
+        if not os.path.exists(self.DIR_PATH_GROUPS + group + "\\" + "Bundles"):
+            # Create a new directory because it does not exist
+            print("Gonna Create Group Folder")
+            os.makedirs(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
+        json_file_name = bundle.name + ".json"
+        json_file = open(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name, "w")
+        json_file.write(str(bundle.toJSON()))
+        json_file.close()
+        print("Added Bundle")
+        print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
+        print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name)

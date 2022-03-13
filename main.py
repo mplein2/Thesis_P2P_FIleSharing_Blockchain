@@ -29,6 +29,7 @@ def index():
 def groups():
     group = request.args.get('group')
     print("Group page request :", group)
+    group = groupManager.getGroup(group)
     return render_template("groups.html", groups=groupManager.groups, group=group)
 
 
@@ -75,11 +76,14 @@ def shareBundle():
         data = request.form
         name = data["bundleName"]
         desc = data["bundleDescription"]
+        groupName = data["groupName"]
         print(name)
         print(desc)
-    path = easygui.diropenbox(msg="Select folder to share as bundle", title="Share Bundle")
-    bundleManager.createBundle(path)
-    return "0"
+        print(groupName)
+        path = easygui.diropenbox(msg="Select folder to share as bundle", title="Share Bundle")
+        bundle = bundleManager.createBundle(path,name,desc)
+        groupManager.addBundle(bundle,groupName)
+        return "0"
 
 
 @app.route('/createGroup', methods=['POST'])

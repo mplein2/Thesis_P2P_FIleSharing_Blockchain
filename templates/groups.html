@@ -123,14 +123,12 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Created</th>
-                                    <th>Status</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
                                     <td>Jacob</td>
                                     <td>12 May 2017</td>
-                                    <td><label class="badge badge-danger">Pending</label></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -261,10 +259,9 @@
                         <textarea class="form-control" id="bundleDescription" placeholder="Bundle Description"
                                   rows="3"></textarea>
                     </div>
-                    <div class="btn btn-gradient-primary me-2" onclick='shareBundle()'>Share</div>
+                    <div class="btn btn-gradient-primary me-2" onclick='shareBundle("{{group.name}}")'>Share</div>
                     <div class="btn btn-light" onclick="closeShareBundle()">Cancel</div>
                 </div>
-
             </div>
         </div>
     </div>

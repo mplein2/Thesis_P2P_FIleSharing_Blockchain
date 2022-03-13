@@ -112,14 +112,15 @@ function createGroup() {
 
 }
 
-function shareBundle() {
+function shareBundle(groupName) {
     var bundleName = document.getElementById("bundleName").value;
     var bundleDescription = document.getElementById("bundleDescription").value;
     alert("Select Folder Window is opened.");
     $.ajax({
                 data: {
                         bundleName:bundleName,
-                        bundleDescription:bundleDescription
+                        bundleDescription:bundleDescription,
+                        groupName:groupName
                       }
                 , type: 'post'
                 , url: '/shareBundle'
