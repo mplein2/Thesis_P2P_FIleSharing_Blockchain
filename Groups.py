@@ -120,7 +120,9 @@ class GroupManager:
                 print(pathForBundleFile)
                 with open(pathForBundleFile) as json_file:
                     data = json.load(json_file)
-                    print(data)
+                    #    def __init__(self,name,desc,root,pieceSize=49152,files=[],path=None):
+                    bundleObj = Bundle(data["name"],data["description"],data["root"],data["pieceSize"],data["files"])
+                    group.bundles.append(bundleObj)
         self.groups.append(group)
 
     def loadGroups(self):

@@ -5,9 +5,17 @@ import json
 from functools import partial
 import hashlib
 
+class BundleManager:
+    def __init__(self):
+        self.bundles = []
+
+    def createBundle(self,name,desc,path):
+        bundle = Bundle(name,desc,path=path)
+        self.bundles.append(bundle)
+        return bundle
 
 class Bundle:
-    def __init__(self,name,desc,root,pieceSize,files,path=None):
+    def __init__(self,name,desc,root=None,pieceSize=49152,files=[],path=None):
         if path is None:
             #Load From File
             self.name=name
@@ -17,6 +25,7 @@ class Bundle:
             self.files = files
         else:
             #Create
+            print(2)
             self.name=name
             self.description=desc
             self.root = path

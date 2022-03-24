@@ -9,6 +9,7 @@ from Networking import receiver, sendRequest, JoinRequest
 from Groups import GroupManager, Invite
 from Client import Client
 import easygui
+from bundles import BundleManager
 
 app = Flask(__name__)
 
@@ -119,6 +120,7 @@ def quitGroup():
 if __name__ == "__main__":
     client = Client()
     groupManager = GroupManager()
+    bundleManager = BundleManager()
     receiver = threading.Thread(target=receiver, args=[groupManager])
     receiver.start()
     app.run(host='', port=6969)
