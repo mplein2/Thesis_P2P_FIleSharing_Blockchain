@@ -35,7 +35,7 @@ class Group:
             self.id=id
 
     def generateInvite(self):
-        invite = Invite(self.name, self.timestamp, self.peers,self.id)
+        invite = Invite(self.id,self.name, self.timestamp, self.peers)
         return invite
 
     def toJSON(self):
