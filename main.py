@@ -85,6 +85,30 @@ def shareBundle():
         groupManager.addBundle(bundle,groupName)
         return "0"
 
+@app.route('/searchBundles', methods=['POST'])
+def searchBundles():
+    print("Search Bundles Route")
+    if request.method == 'POST':
+        data = request.form
+
+        #Get Keywords from search
+        keywords = data["searchKeyWords"].split()
+        print(keywords)
+
+        #Get Group
+        group = data["group"]
+        group = groupManager.getGroup(group)
+        print(group)
+
+        for peer in group.peers:
+            print(peer[0])
+            sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
+
+
+
+
+        #Respond
+        return render_template("search.html", groups=groupManager.groups, group=group)
 
 @app.route('/createGroup', methods=['POST'])
 def createGroup():

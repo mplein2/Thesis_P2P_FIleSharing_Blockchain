@@ -4,7 +4,7 @@ import os
 import json
 from functools import partial
 import hashlib
-
+import time
 class BundleManager:
     def __init__(self):
         self.bundles = []
@@ -15,20 +15,23 @@ class BundleManager:
         return bundle
 
 class Bundle:
-    def __init__(self,name,desc,root=None,pieceSize=49152,files=[],path=None):
+    def __init__(self,name,desc,id=None,timestamp=None,root=None,pieceSize=49152,files=[],path=None):
         if path is None:
             #Load From File
             self.name=name
             self.description=desc
+            self.id = id
+            self.timestamp = time
             self.root = root
             self.pieceSize = pieceSize
             self.files = files
         else:
             #Create
-            print(2)
             self.name=name
             self.description=desc
             self.root = path
+            self.timestamp = time.time()
+            self.id =  self.id = hashlib.sha256((name+desc+str(self.timestamp)).encode('utf-8')).hexdigest()
             self.pieceSize = 49152
             self.files = []
             for root, dirs, files in os.walk(path, topdown=False):

@@ -7,6 +7,7 @@ from typing import Type
 import shutil
 import hashlib
 from bundles import Bundle
+import copy
 
 
 class Invite:
@@ -93,7 +94,9 @@ class GroupManager:
             print("Gonna Create Group Folder")
             os.makedirs(self.DIR_PATH_GROUPS + group.name)
         json_file = open(self.DIR_PATH_GROUPS + group.name + '\\' + json_file_name, "w")
-        json_file.write(group.toJSON())
+        saveCopy = copy.copy(group)
+        del saveCopy.bundles
+        json_file.write(saveCopy.toJSON())
         json_file.close()
 
     def loadGroup(self, groupName):
@@ -117,11 +120,10 @@ class GroupManager:
             bundles = [f for f in listdir(groupBundlePath) if isfile(join(groupBundlePath, f))]
             for bundle in bundles:
                 pathForBundleFile = join(groupBundlePath, bundle)
-                print(pathForBundleFile)
                 with open(pathForBundleFile) as json_file:
                     data = json.load(json_file)
                     #    def __init__(self,name,desc,root,pieceSize=49152,files=[],path=None):
-                    bundleObj = Bundle(data["name"],data["description"],data["root"],data["pieceSize"],data["files"])
+                    bundleObj = Bundle(data["name"],data["description"],data["id"],data["timestamp"],data["root"],data["pieceSize"],data["files"])
                     group.bundles.append(bundleObj)
         self.groups.append(group)
 
@@ -130,7 +132,7 @@ class GroupManager:
         for group in groups:
             self.loadGroup(group)
 
-    def addBundle(self, bundle: Bundle, group):
+    def addBundle(self, bundle, group):
         if not os.path.exists(self.DIR_PATH_GROUPS + group + "\\" + "Bundles"):
             # Create a new directory because it does not exist
             print("Gonna Create Group Folder")
@@ -139,6 +141,8 @@ class GroupManager:
         json_file = open(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name, "w")
         json_file.write(json.dumps(bundle.toJSON()))
         json_file.close()
+        self.getGroup(group).bundles.append(bundle)
         print("Added Bundle")
         print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
         print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name)
+

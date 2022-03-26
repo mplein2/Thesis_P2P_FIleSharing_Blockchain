@@ -28,12 +28,14 @@
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-stretch">
         <div class="search-field d-none d-md-block">
-            <form class="d-flex align-items-center h-100" action="#">
+            <form method="post" class="d-flex align-items-center h-100" action="/searchBundles">
                 <div class="input-group">
                     <div class="input-group-prepend bg-transparent">
                         <i class="input-group-text border-0 mdi mdi-magnify"></i>
                     </div>
-                    <input type="text" class="form-control bg-transparent border-0" placeholder="Search files">
+                    <input type="text" id="searchKeyWords" name ="searchKeyWords" class="form-control bg-transparent border-0" placeholder="Search Bundles">
+                    <input type="text" id="group" name ="group" value = "{{group.name}}"hidden>
+                    <input type="submit" hidden>
                 </div>
             </form>
         </div>
@@ -122,14 +124,16 @@
                                 <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Created</th>
+                                    <th>Description</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>Jacob</td>
-                                    <td>12 May 2017</td>
+                                 {% for bundle in group.bundles %}
+                               <tr>
+                                    <td>{{bundle.name}}</td>
+                                    <td>{{bundle.description}}</td>
                                 </tr>
+                                {% endfor %}
                                 </tbody>
                             </table>
                         </div>

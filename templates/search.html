@@ -27,6 +27,18 @@
                                                               alt="logo"/></a>
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-stretch">
+        <div class="search-field d-none d-md-block">
+            <form method="post" class="d-flex align-items-center h-100" action="/searchBundles">
+                <div class="input-group">
+                    <div class="input-group-prepend bg-transparent">
+                        <i class="input-group-text border-0 mdi mdi-magnify"></i>
+                    </div>
+                    <input type="text" id="searchKeyWords" name ="searchKeyWords" class="form-control bg-transparent border-0" placeholder="Search Bundles">
+                    <input type="text" id="group" name ="group" value = "{{group.name}}"hidden>
+                    <input type="submit" hidden>
+                </div>
+            </form>
+        </div>
         <ul class="navbar-nav navbar-nav-right">
             <li class="nav-item d-none d-lg-block">
                 <a class="nav-link" href="#" onclick="joinGroupModal()">
@@ -51,13 +63,13 @@
     <!-- partial:partials/_sidebar.html -->
     <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
-            <li class="nav-item active">
+            <li class="nav-item ">
                 <a class="nav-link" href="/">
                     <span class="menu-title">Dashboard</span>
                     <i class="mdi mdi-home menu-icon"></i>
                 </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item active">
                 <a class="nav-link" data-bs-toggle="collapse" href="#general-pages" aria-expanded="true"
                    aria-controls="general-pages">
                     <span class="menu-title">Groups</span>
@@ -81,116 +93,39 @@
             <div class="page-header">
                 <h3 class="page-title">
                 <span class="page-title-icon bg-gradient-primary text-white me-2">
-                  <i class="mdi mdi-home"></i>
-                </span> Dashboard
+                    <i class="mdi mdi-account-multiple menu-icon"></i>
+                </span> Search Results
                 </h3>
             </div>
             <div class="row">
-                <div class="grid-margin stretch-card">
+                <div class="col-lg-12 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="card-title">Project Status</h4>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                    <tr>
-                                        <th> #</th>
-                                        <th> Name</th>
-                                        <th> Due Date</th>
-                                        <th> Progress</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        <td> 1</td>
-                                        <td> Herman Beck</td>
-                                        <td> May 15, 2015</td>
-                                        <td>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-gradient-success" role="progressbar"
-                                                     style="width: 25%" aria-valuenow="25" aria-valuemin="0"
-                                                     aria-valuemax="100"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> 2</td>
-                                        <td> Messsy Adam</td>
-                                        <td> Jul 01, 2015</td>
-                                        <td>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-gradient-danger" role="progressbar"
-                                                     style="width: 75%" aria-valuenow="75" aria-valuemin="0"
-                                                     aria-valuemax="100"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> 3</td>
-                                        <td> John Richards</td>
-                                        <td> Apr 12, 2015</td>
-                                        <td>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-gradient-warning" role="progressbar"
-                                                     style="width: 90%" aria-valuenow="90" aria-valuemin="0"
-                                                     aria-valuemax="100"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> 4</td>
-                                        <td> Peter Meggik</td>
-                                        <td> May 15, 2015</td>
-                                        <td>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-gradient-primary" role="progressbar"
-                                                     style="width: 50%" aria-valuenow="50" aria-valuemin="0"
-                                                     aria-valuemax="100"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> 5</td>
-                                        <td> Edward</td>
-                                        <td> May 03, 2015</td>
-                                        <td>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-gradient-danger" role="progressbar"
-                                                     style="width: 35%" aria-valuenow="35" aria-valuemin="0"
-                                                     aria-valuemax="100"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td> 5</td>
-                                        <td> Ronald</td>
-                                        <td> Jun 05, 2015</td>
-                                        <td>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-gradient-info" role="progressbar"
-                                                     style="width: 65%" aria-valuenow="65" aria-valuemin="0"
-                                                     aria-valuemax="100"></div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            <h4 class="card-title">Search Results</h4>
+                            </p>
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Download</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                 {% for bundle in group.bundles %}
+                               <tr>
+                                    <td>{{bundle.name}}</td>
+                                    <td>{{bundle.description}}</td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
-        <footer class="footer">
-            <div class="container-fluid d-flex justify-content-between">
-                <span class="text-muted d-block text-center text-sm-start d-sm-inline-block">Copyright © bootstrapdash.com 2021</span>
-                <span class="float-none float-sm-end mt-1 mt-sm-0 text-end"> Free <a
-                        href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin template</a> from Bootstrapdash.com</span>
-            </div>
-        </footer>
-        <!-- partial -->
     </div>
     <!-- main-panel ends -->
 </div>
@@ -213,6 +148,7 @@
 <script src="static/assets/js/dashboard.js"></script>
 <script src="static/assets/js/todolist.js"></script>
 <script src="static/assets/js/torrentApp.js"></script>
+<script src="static/assets/js/file-upload.js"></script>
 <!-- End custom js for this page -->
 <div id="myModal" class="modal">
     <div class="modal-dialog" role="document">
@@ -264,6 +200,59 @@
         </div>
     </div>
 </div>
+<div id="createInviteModal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Invite</h5>
+            </div>
+            <div class="modal-body">
+                <div class="forms-sample">
+                    <div class="form-group">
+                        <label for="ip">IP Address</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">@</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="255.255.255.255"
+                                   aria-label="Group Name"
+                                   aria-describedby="basic-addon1" id="ip" name="ip">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="invite">Invite</label>
+                        <textarea class="form-control" id="invite" rows="2" disabled="disabled"></textarea>
+                    </div>
+                    <div class="btn btn-gradient-primary me-2" onclick='generateInvite("{{ group }}")'>Generate</div>
+                    <div class="btn btn-light" onclick="closeInvite()">Cancel</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="shareModal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Share Bundle</h5>
+            </div>
+            <div class="modal-body">
+                <div class="forms-sample">
+                    <div class="form-group">
+                        <label for="bundleName">Bundle Name</label>
+                        <input type="text" class="form-control" id="bundleName" placeholder="Bundle Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="bundleDescription">Bundle Description</label>
+                        <textarea class="form-control" id="bundleDescription" placeholder="Bundle Description"
+                                  rows="3"></textarea>
+                    </div>
+                    <div class="btn btn-gradient-primary me-2" onclick='shareBundle("{{group.name}}")'>Share</div>
+                    <div class="btn btn-light" onclick="closeShareBundle()">Cancel</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
-
 </html>
