@@ -11,7 +11,8 @@ import copy
 
 
 class Invite:
-    def __init__(self, name, timestamp, peers):
+    def __init__(self,id, name, timestamp, peers):
+        self.id = id
         self.name = name
         self.timestamp = timestamp
         self.peers = peers

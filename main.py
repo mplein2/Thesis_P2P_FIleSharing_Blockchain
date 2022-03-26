@@ -45,10 +45,12 @@ def generateInvite():
     if request.method == 'POST':
         data = request.form
         group = data["group"]
+        print(str(group))
         # TODO IP SPECIFIC BLOCKCHAIN
         ip = data["ip"]
         print("Generate Invite for :", group)
         group = groupManager.getGroup(group)
+        print(group)
         invite = group.generateInvite()
         return compress.compress(invite.toJSON())
 
@@ -60,7 +62,7 @@ def joinGroup():
         invite = data["invite"]
         inviteDecomp = compress.decompress(invite)
         inviteLoad = json.loads(inviteDecomp)
-        invite = Invite(inviteLoad["name"], inviteLoad["timestamp"], inviteLoad["peers"])
+        invite = Invite(inviteLoad["id"],inviteLoad["name"], inviteLoad["timestamp"], inviteLoad["peers"])
         joinReq = JoinRequest(invite.name, invite.timestamp)
         # TODO PORTS
         print(invite.peers)
