@@ -71,9 +71,10 @@ class GroupManager:
         group: Group
         for group in self.groups:
             if group.name == name:
-                group.peers.append(peer)
-                self.saveGroup(group)
-                return
+                if peer not in group.peers:
+                    group.peers.append(peer)
+                    self.saveGroup(group)
+                    return
 
     def createGroup(self, name, private, admin):
         timeNow = time()

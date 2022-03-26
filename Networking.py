@@ -1,7 +1,7 @@
 import socket
 from socket import *
 import pickle
-
+import copy
 import Groups
 
 
@@ -32,7 +32,10 @@ def requestHandler(data,addr,groupManager):
         #TODO Peer Port
         groupManager.addPeerGroup(req.name,[addr[0]])
         group = groupManager.getGroup(req.name)
-        return pickle.dumps(JoinResponse(group))
+        groupCpy = copy.copy(group)
+        del groupCpy.bundles
+        joinResponse = JoinResponse(groupCpy)
+        return pickle.dumps(joinResponse)
 
 
 def receiver(groupManager):
