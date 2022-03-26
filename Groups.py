@@ -129,6 +129,10 @@ class GroupManager:
         self.groups.append(group)
 
     def loadGroups(self):
+        if not os.path.exists(self.DIR_PATH_GROUPS):
+            # Create a new directory because it does not exist
+            print("Gonna Create Group Folder")
+            os.makedirs(self.DIR_PATH_GROUPS)
         groups = [group for group in listdir(self.DIR_PATH_GROUPS)]
         for group in groups:
             self.loadGroup(group)
