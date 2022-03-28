@@ -107,7 +107,6 @@ def searchBundles():
         joinReq = SearchBundleRequest(group.id,keywords)
         responses = []
         for peer in group.peers:
-            print(peer[0])
             res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
             #if other peer is responded.
             if res is not False:
@@ -115,11 +114,9 @@ def searchBundles():
             else:
                 print("No Response from",peer[0])
 
-        responseBundles = []
         #Merge all responses to single list
         for x in responses:
-            responseBundles = responseBundles + x.responseBundles
-        print(responseBundles)
+            print("Response:",x)
 
         #WITH RESPONSES DO STUFF.
 

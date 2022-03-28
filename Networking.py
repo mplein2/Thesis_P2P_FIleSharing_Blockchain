@@ -94,7 +94,7 @@ def receiver(groupManager):
     while True:
         # RECEIVE AND RESPOND.
         data, addr = sock.recvfrom(65507)
-        print(addr, data)
+        print("Received from :",addr, " data:",data)
         response = requestHandler(data, addr, groupManager)
         sock.sendto(response, addr)
 
@@ -106,8 +106,9 @@ def sendRequest(address, port, request, groupManager):
     try:
         clientSocket.sendto(request, (address, port))
         data, addr = clientSocket.recvfrom(65507)
-        res = responseHandler(data, addr, groupManager)
+        res = responseHandler(data, groupManager)
     # TODO except socket.timeout
     # TODO for better exception handling fix later.
-    except:
+    except Exception as exception:
+        print("Exception on SendRequest:",exception)
         return False
