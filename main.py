@@ -5,8 +5,8 @@ import threading
 from pickle import dumps, loads
 from flask import Flask, render_template, request, redirect
 import compress
-from Networking import receiver, sendRequest, JoinRequest
-from Groups import GroupManager, Invite
+from Networking import receiver, sendRequest, JoinRequest,SearchBundleRequest
+from Groups import GroupManager, Invite,Group
 from Client import Client
 import easygui
 from bundles import BundleManager
@@ -70,7 +70,7 @@ def joinGroup():
             print(peer[0])
             res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
             group = res.group
-            group = Groups.Group(group.name,group.private,group.admins,group.peers,group.timestamp)
+            group = Group(group.name,group.private,group.admins,group.peers,group.timestamp)
             groupManager.addGroup(group)
         return "1"
 
@@ -98,24 +98,30 @@ def searchBundles():
 
         #Get Keywords from search
         keywords = data["searchKeyWords"].split()
-        print(keywords)
+        print("Search for :",keywords)
 
         #Get Group
         group = data["group"]
         group = groupManager.getGroup(group)
-        print(group)
 
         joinReq = SearchBundleRequest(group.id,keywords)
         responses = []
         for peer in group.peers:
             print(peer[0])
             res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
-            responses.append(res)
-        #WITH RESPONSES DO STUFF.
+            #if other peer is responded.
+            if res is not False:
+                responses.append([peer[0],res])
+            else:
+                print("No Response from",peer[0])
+
+        responseBundles = []
+        #Merge all responses to single list
         for x in responses:
-            print(x)
+            responseBundles = responseBundles + x.responseBundles
+        print(responseBundles)
 
-
+        #WITH RESPONSES DO STUFF.
 
 
         #Respond

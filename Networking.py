@@ -33,7 +33,7 @@ class SearchBundleRequest(Request):
 class SearchBundleResponse(Request):
     def __init__(self,groups):
         super().__init__(2)
-        self.responseBundles = responseBundles
+        self.responseBundles = groups
 
 def requestHandler(data, addr, groupManager: Groups.GroupManager):
     req = pickle.loads(data)
@@ -65,16 +65,13 @@ def requestHandler(data, addr, groupManager: Groups.GroupManager):
                 responseBundles.append({"id":bundle.id,"name":bundle.name,"description":bundle.description})
         #Create Response and return it to be used as answer
         searchResponse = SearchBundleResponse(responseBundles)
-        return pickle.dumps(joinResponse)
+        return addr,pickle.dumps(searchResponse)
 
 def responseHandler(data, groupManager):
     res = pickle.loads(data)
 
     if res.type == 1:
         res = JoinResponse(res.group)
-        # group = res.group
-        # group = Groups.Group(group.name,group.private,group.admins,group.peers,group.timestamp)
-        # groupManager.addGroup(group)
         return res
 
     elif res.type == 2:
@@ -97,9 +94,18 @@ def receiver(groupManager):
 def sendRequest(address, port, request,groupManager):
     # Create a socket for sending files
     clientSocket = socket(AF_INET, SOCK_DGRAM)
-    clientSocket.sendto(request, (address, port))
-    data, addr = clientSocket.recvfrom(65507)
-    return responseHandler(data, groupManager)
+    clientSocket.settimeout(1)
+    try:
+        clientSocket.sendto(request, (address, port))
+        data, addr = clientSocket.recvfrom(65507)
+        res =  responseHandler(data, addr, groupManager)
+    #TODO except socket.timeout
+    #TODO for better exception handling fix later.
+    except:
+        return False
+
+
+
 
 
 
