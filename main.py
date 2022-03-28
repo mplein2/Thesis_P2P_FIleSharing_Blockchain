@@ -68,7 +68,10 @@ def joinGroup():
         print(invite.peers)
         for peer in invite.peers:
             print(peer[0])
-            sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
+            res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
+            group = res.group
+            group = Groups.Group(group.name,group.private,group.admins,group.peers,group.timestamp)
+            groupManager.addGroup(group)
         return "1"
 
 
@@ -103,9 +106,12 @@ def searchBundles():
         print(group)
 
         joinReq = SearchBundleRequest(group.id,keywords)
+        responses = []
         for peer in group.peers:
             print(peer[0])
-            sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
+            res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
+            responses.append(res)
+
 
 
 

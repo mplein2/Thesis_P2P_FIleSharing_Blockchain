@@ -72,13 +72,14 @@ def responseHandler(data, groupManager):
 
     if res.type == 1:
         res = JoinResponse(res.group)
-        group = res.group
-        group = Groups.Group(group.name,group.private,group.admins,group.peers,group.timestamp)
-        groupManager.addGroup(group)
+        # group = res.group
+        # group = Groups.Group(group.name,group.private,group.admins,group.peers,group.timestamp)
+        # groupManager.addGroup(group)
+        return res
 
     elif res.type == 2:
         res = SearchBundleResponse(res.responseBundles)
-        return res.responseBundles
+        return res
 
 def receiver(groupManager):
     UDP_IP = '0.0.0.0'
@@ -98,7 +99,7 @@ def sendRequest(address, port, request,groupManager):
     clientSocket = socket(AF_INET, SOCK_DGRAM)
     clientSocket.sendto(request, (address, port))
     data, addr = clientSocket.recvfrom(65507)
-    responseHandler(data, groupManager)
+    return responseHandler(data, groupManager)
 
 
 
