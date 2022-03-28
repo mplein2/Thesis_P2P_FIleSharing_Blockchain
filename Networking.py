@@ -3,6 +3,7 @@ from socket import *
 import pickle
 import copy
 import Groups
+from Groups import Group
 
 
 class Request:
@@ -23,7 +24,18 @@ class JoinResponse(Request):
         super().__init__(1)
         self.group = group
 
-def requestHandler(data,addr,groupManager):
+class SearchBundleRequest(Request):
+    def __init__(self, groupId, keyword):
+        super().__init__(2)
+        self.groupID = groupId
+        self.keywords = keyword
+
+class SearchBundleResponse(Request):
+    def __init__(self,groups):
+        super().__init__(2)
+        self.responseBundles = responseBundles
+
+def requestHandler(data, addr, groupManager: Groups.GroupManager):
     req = pickle.loads(data)
     # Response to JoinRequest
     if req.type == 1:
@@ -37,6 +49,36 @@ def requestHandler(data,addr,groupManager):
         joinResponse = JoinResponse(groupCpy)
         return pickle.dumps(joinResponse)
 
+    elif req.type == 2:
+        #Create The Request again for local use
+        req = SearchBundleRequest(req.groupID,req.keywords)
+        #Get All Bundles User has
+        bundlesOfGroup = groupManager.getGroupWithID(req.groupID).bundles
+        #Bundles to reply
+        responseBundles = []
+        for bundle in bundlesOfGroup:
+            #For each bundle make a single list (bundleKeywords) and search if any of the keywords other user send are in there then send back
+            name = bundle.name.split()
+            desc = bundle.description.split()
+            bundleKeywords = name + desc
+            if any(keyword in req.keywords for keyword in bundleKeywords):
+                responseBundles.append({"id":bundle.id,"name":bundle.name,"description":bundle.description})
+        #Create Response and return it to be used as answer
+        searchResponse = SearchBundleResponse(responseBundles)
+        return pickle.dumps(joinResponse)
+
+def responseHandler(data, groupManager):
+    res = pickle.loads(data)
+
+    if res.type == 1:
+        res = JoinResponse(res.group)
+        group = res.group
+        group = Groups.Group(group.name,group.private,group.admins,group.peers,group.timestamp)
+        groupManager.addGroup(group)
+
+    elif res.type == 2:
+        res = SearchBundleResponse(res.responseBundles)
+        return res.responseBundles
 
 def receiver(groupManager):
     UDP_IP = '0.0.0.0'
@@ -58,11 +100,5 @@ def sendRequest(address, port, request,groupManager):
     data, addr = clientSocket.recvfrom(65507)
     responseHandler(data, groupManager)
 
-def responseHandler(data, groupManager):
-    res = pickle.loads(data)
-    if res.type == 1:
-        res = JoinResponse(res.group)
-        group = res.group
-        group = Groups.Group(group.name,group.private,group.admins,group.peers,group.timestamp)
-        groupManager.addGroup(group)
+
 

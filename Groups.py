@@ -67,6 +67,12 @@ class GroupManager:
             if group.name == name:
                 return group
 
+    def getGroupWithID(self, id):
+        group: Group
+        for group in self.groups:
+            if group.id == id:
+                return group
+
     def addPeerGroup(self, name, peer):
         group: Group
         for group in self.groups:

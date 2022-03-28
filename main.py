@@ -102,6 +102,7 @@ def searchBundles():
         group = groupManager.getGroup(group)
         print(group)
 
+        joinReq = SearchBundleRequest(group.id,keywords)
         for peer in group.peers:
             print(peer[0])
             sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
