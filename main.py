@@ -111,7 +111,9 @@ def searchBundles():
             print(peer[0])
             res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
             responses.append(res)
-
+        #WITH RESPONSES DO STUFF.
+        for x in responses:
+            print(x)
 
 
 
