@@ -5,7 +5,7 @@ import threading
 from pickle import dumps, loads
 from flask import Flask, render_template, request, redirect
 import compress
-from Networking import receiver, sendRequest, JoinRequest,SearchBundleRequest
+from Networking import receiver, sendRequest, JoinRequest,SearchBundleRequest,receiveBundle,GetBundleRequest
 from Groups import GroupManager, Invite,Group
 from Client import Client
 import easygui
