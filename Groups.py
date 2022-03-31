@@ -41,6 +41,14 @@ class Group:
     def toJSON(self):
         return json.dumps(self.__dict__)
 
+    def getBundleWithId(self,bundleid):
+            group: Bundle
+            for bundle in self.bundles:
+                if bundle.id == bundleid:
+                    return bundle
+
+
+
 
 class GroupManager:
 

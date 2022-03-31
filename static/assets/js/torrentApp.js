@@ -135,3 +135,25 @@ function shareBundle(groupName) {
             });
 
 }
+
+function getBundle(bundleId,groupId,userIp) {
+alert("JS OK");
+    $.ajax({
+                data: {
+                        bundleId:bundleId,
+                        groupId:groupId,
+                        userIp:userIp
+                      }
+                , type: 'post'
+                , url: '/getBundle'
+                , success: function (response) {
+                    if (response==0){
+                    alert("0");
+                    }else{
+                    //TODO FAILED ALERT
+                  alert("not 0");
+                    }
+                }
+            });
+
+}

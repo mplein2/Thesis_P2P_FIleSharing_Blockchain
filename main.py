@@ -104,25 +104,23 @@ def searchBundles():
         group = data["group"]
         group = groupManager.getGroup(group)
 
-        joinReq = SearchBundleRequest(group.id,keywords)
+        searchReq = SearchBundleRequest(group.id,keywords)
         responses = []
+        # SEND TO ALL PEERS COLLECT RESPONSES AND PRESENT
         for peer in group.peers:
-            res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
+            res = sendRequest(peer[0], 6700, dumps(searchReq), groupManager)
             #if other peer is responded.
             if res is not False:
+                # print(res)
                 responses.append([peer[0],res])
             else:
                 print("No Response from",peer[0])
-
         #Merge all responses to single list
         for x in responses:
-            print("Response:",x)
-
+            print("Response:",x[0],x[1],x[1].responseBundles)
         #WITH RESPONSES DO STUFF.
-
-
         #Respond
-        return render_template("search.html", groups=groupManager.groups, group=group)
+        return render_template("search.html", groups=groupManager.groups, group=group , responses = responses)
 
 @app.route('/createGroup', methods=['POST'])
 def createGroup():
@@ -139,6 +137,26 @@ def createGroup():
     else:
         # False
         return "1"
+
+@app.route('/getBundle', methods=['POST'])
+def getBundle():
+    if request.method == 'POST':
+        data = request.form
+        bundleId = data["bundleId"]
+        groupId = data["groupId"]
+        userIp = data["userIp"]
+        #TODO dynamic port on receiver for bundle
+        portForBundleReceiver = 6701
+        bundleReceiver = threading.Thread(target=receiveBundle, args=[portForBundleReceiver])
+        bundleReceiver.start()
+        getBundleReq = GetBundleRequest(bundleId,groupId,portForBundleReceiver)
+        res = sendRequest(userIp, 6700, dumps(getBundleReq), groupManager)
+        # if other peer is responded.
+        if res is not False:
+            #Responded decide what to do
+            pass
+        else:
+            print("No Response from", userIp)
 
 
 @app.route('/quitGroup', methods=['POST'])

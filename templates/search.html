@@ -27,18 +27,6 @@
                                                               alt="logo"/></a>
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-stretch">
-        <div class="search-field d-none d-md-block">
-            <form method="post" class="d-flex align-items-center h-100" action="/searchBundles">
-                <div class="input-group">
-                    <div class="input-group-prepend bg-transparent">
-                        <i class="input-group-text border-0 mdi mdi-magnify"></i>
-                    </div>
-                    <input type="text" id="searchKeyWords" name ="searchKeyWords" class="form-control bg-transparent border-0" placeholder="Search Bundles">
-                    <input type="text" id="group" name ="group" value = "{{group.name}}"hidden>
-                    <input type="submit" hidden>
-                </div>
-            </form>
-        </div>
         <ul class="navbar-nav navbar-nav-right">
             <li class="nav-item d-none d-lg-block">
                 <a class="nav-link" href="#" onclick="joinGroupModal()">
@@ -112,12 +100,16 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                 {% for bundle in group.bundles %}
-                               <tr>
+                                {% for response in responses %}
+                                {% for bundle in response[1].responseBundles %}
+                                <tr>
                                     <td>{{bundle.name}}</td>
                                     <td>{{bundle.description}}</td>
+                                    <td><a class="nav-link" href="#" onclick="getBundle('{{bundle.id}}','{{group.id}}','{{response[0]}}')"><i class="mdi mdi-download"></i></a></td>
                                 </tr>
                                 {% endfor %}
+                                {% endfor %}
+
                                 </tbody>
                             </table>
                         </div>
