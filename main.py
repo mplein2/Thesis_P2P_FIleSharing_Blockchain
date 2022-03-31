@@ -157,6 +157,7 @@ def getBundle():
             pass
         else:
             print("No Response from", userIp)
+    return "1"
 
 
 @app.route('/quitGroup', methods=['POST'])

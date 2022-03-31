@@ -5,6 +5,7 @@ import copy
 import Groups
 from threading import Thread
 from Groups import Group
+import threading
 
 
 class Request:
@@ -95,9 +96,9 @@ def requestHandler(data, addr, groupManager: Groups.GroupManager):
         return pickle.dumps(searchResponse)
 
     elif req.type == 3:
-        req = GetBundleRequest(req.bundleId,req.groupID,portForBundleReceiver)
+        req = GetBundleRequest(req.bundleId,req.groupId,req.portForBundleReceiver)
         bundle = groupManager.getGroupWithID(req.groupId).getBundleWithId(req.bundleId)
-        bundleReceiver = threading.Thread(target=sendBundle, args=[addr,portForBundleReceiver,bundle])
+        bundleReceiver = threading.Thread(target=sendBundle, args=[addr,req.portForBundleReceiver,bundle])
         bundleReceiver.start()
         #TODO refactor use it to determine if user ok to send bundle
         return GetBundleResponse(1)
@@ -166,7 +167,7 @@ def receiveBundle(port):
 
 def sendBundle(addr,port,bundle):
     print("SENDING BUNDLE THREAD")
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    with socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((addr, port))
         print("Bundle Receiver Ready")
         s.listen()
