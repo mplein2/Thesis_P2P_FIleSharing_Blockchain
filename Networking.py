@@ -167,15 +167,7 @@ def receiveBundle(port):
 
 def sendBundle(addr,port,bundle):
     print("SENDING BUNDLE THREAD")
-    with socket(AF_INET,SOCK_STREAM) as s:
-        s.bind((addr, port))
-        print("Bundle Receiver Ready")
-        s.listen()
-        conn, addr = s.accept()
-        with conn:
-            print(f"Connected by {addr}")
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
-                conn.sendall(data)
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((addr, port))
+        s.send(b"Hello, world")
+    print(f"Received {data!r}")
