@@ -41,8 +41,9 @@ class SearchBundleResponse(Request):
         super().__init__(2)
         self.responseBundles = responseBundles
 
+
 class GetBundleRequest(Request):
-    def __init__(self, bundleId,groupId,portForBundleReceiver):
+    def __init__(self, bundleId, groupId, portForBundleReceiver):
         super().__init__(3)
         self.bundleId = bundleId
         self.groupId = groupId
@@ -50,10 +51,9 @@ class GetBundleRequest(Request):
 
 
 class GetBundleResponse(Request):
-    def __init__(self,answer):
+    def __init__(self, answer):
         super().__init__(3)
         self.answer = answer
-
 
 
 def requestHandler(data, addr, groupManager: Groups.GroupManager):
@@ -70,7 +70,7 @@ def requestHandler(data, addr, groupManager: Groups.GroupManager):
         joinResponse = JoinResponse(groupCpy)
         return pickle.dumps(joinResponse)
 
-    #Response to search req
+    # Response to search req
     elif req.type == 2:
         # Create The Request again for local use
         req = SearchBundleRequest(req.groupID, req.keywords)
@@ -96,12 +96,13 @@ def requestHandler(data, addr, groupManager: Groups.GroupManager):
         return pickle.dumps(searchResponse)
 
     elif req.type == 3:
-        req = GetBundleRequest(req.bundleId,req.groupId,req.portForBundleReceiver)
+        req = GetBundleRequest(req.bundleId, req.groupId, req.portForBundleReceiver)
         bundle = groupManager.getGroupWithID(req.groupId).getBundleWithId(req.bundleId)
-        bundleReceiver = threading.Thread(target=sendBundle, args=[addr,req.portForBundleReceiver,bundle])
+        bundleReceiver = threading.Thread(target=sendBundle, args=[addr, req.portForBundleReceiver, bundle])
         bundleReceiver.start()
-        #TODO refactor use it to determine if user ok to send bundle
-        return GetBundleResponse(1)
+        # TODO refactor use it to determine if user ok to send bundle
+        return pickle.dumps(GetBundleResponse(1))
+
 
 def responseHandler(data, groupManager):
     res = pickle.loads(data)
@@ -129,7 +130,7 @@ def receiver(groupManager):
         # RECEIVE AND RESPOND.
         data, addr = sock.recvfrom(65537)
         # data, addr = sock.recvfrom(65507)
-        print("Received from :",addr, " data:",data)
+        print("Received from :", addr, " data:", data)
         response = requestHandler(data, addr, groupManager)
         sock.sendto(response, addr)
 
@@ -147,8 +148,9 @@ def sendRequest(address, port, request, groupManager):
     # TODO except socket.timeout
     # TODO for better exception handling fix later.
     except Exception as exception:
-        print("Exception on SendRequest:",exception)
+        print("Exception on SendRequest:", exception)
         return False
+
 
 def receiveBundle(port):
     print("RECEIVING BUNDLE THREAD")
@@ -165,9 +167,10 @@ def receiveBundle(port):
                     break
                 conn.sendall(data)
 
-def sendBundle(addr,port,bundle):
+
+def sendBundle(addr, port, bundle):
     print("SENDING BUNDLE THREAD")
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect((addr, port))
+    with socket(AF_INET, SOCK_STREAM) as s:
+        s.connect((addr[0], port))
         print("SENDING DATA")
         s.send(b"Hello, world")
