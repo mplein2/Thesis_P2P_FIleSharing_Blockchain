@@ -1,11 +1,10 @@
-import socket
-from socket import *
-import pickle
 import copy
-import Groups
-from threading import Thread
-from Groups import Group
+import json
+import pickle
+import socket
 import threading
+from socket import *
+from Groups import GroupManager, Group
 
 
 class Request:
@@ -56,7 +55,7 @@ class GetBundleResponse(Request):
         self.answer = answer
 
 
-def requestHandler(data, addr, groupManager: Groups.GroupManager):
+def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
     # Response to JoinRequest
     if req.type == 1:
@@ -97,8 +96,10 @@ def requestHandler(data, addr, groupManager: Groups.GroupManager):
 
     elif req.type == 3:
         req = GetBundleRequest(req.bundleId, req.groupId, req.portForBundleReceiver)
-        bundle = groupManager.getGroupWithID(req.groupId).getBundleWithId(req.bundleId)
-        bundleReceiver = threading.Thread(target=sendBundle, args=[addr, req.portForBundleReceiver, bundle])
+        group = groupManager.getGroupWithID(req.groupId)
+        bundle = group.getBundleWithId(req.bundleId)
+        bundleReceiver = threading.Thread(target=sendBundle,
+                                          args=[addr, req.portForBundleReceiver, groupManager, group, bundle])
         bundleReceiver.start()
         # TODO refactor use it to determine if user ok to send bundle
         return pickle.dumps(GetBundleResponse(1))
@@ -168,9 +169,21 @@ def receiveBundle(port):
                 conn.sendall(data)
 
 
-def sendBundle(addr, port, bundle):
+def sendBundle(addr, port, groupManager, group, bundle):
     print("SENDING BUNDLE THREAD")
+    group: Group
     with socket(AF_INET, SOCK_STREAM) as s:
         s.connect((addr[0], port))
         print("SENDING DATA")
-        s.send(b"Hello, world")
+        groupManager: GroupManager
+        json_file_name = bundle.name + ".json"
+        bundleDir = groupManager.DIR_PATH_GROUPS + group.name + "\\" + "Bundles" + "\\" + json_file_name
+        print(bundleDir)
+        print(json_file_name)
+        with open(bundleDir) as f:
+            bundleContent = f.read()
+            bundleObj = json.loads(bundleContent)
+            bundleObj["root"] = ""
+            bundleStr = json.dumps(bundleObj)
+            print(bundleStr)
+        s.sendall(bundleStr.encode())
