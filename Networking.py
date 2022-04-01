@@ -155,6 +155,7 @@ def sendRequest(address, port, request, groupManager):
 
 def receiveBundle(port):
     print("RECEIVING BUNDLE THREAD")
+    bundleBytes = b""
     with socket(AF_INET, SOCK_STREAM) as s:
         s.bind(("0.0.0.0", port))
         print("Bundle Receiver Ready")
@@ -164,9 +165,17 @@ def receiveBundle(port):
             print(f"Connected by {addr}")
             while True:
                 data = conn.recv(1024)
+                print(data)
+                bundleBytes = bundleBytes + data
+                #TODO save Bytes to group and downloads also start downloading.
                 if not data:
+                    # print("Break")
                     break
-                conn.sendall(data)
+#                print("Break2")
+#             print("Break3")
+#       print("Break4")
+
+
 
 
 def sendBundle(addr, port, groupManager, group, bundle):
