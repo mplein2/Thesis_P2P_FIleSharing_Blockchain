@@ -169,5 +169,5 @@ def sendBundle(addr,port,bundle):
     print("SENDING BUNDLE THREAD")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((addr, port))
+        print("SENDING DATA")
         s.send(b"Hello, world")
-    print(f"Received {data!r}")
