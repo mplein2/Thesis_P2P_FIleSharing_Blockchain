@@ -84,6 +84,21 @@
                   <i class="mdi mdi-home"></i>
                 </span> Dashboard
                 </h3>
+                <nav aria-label="breadcrumb">
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-gradient-primary btn-fw dropdown-toggle"
+                                        data-bs-toggle="dropdown" aria-expanded="true">Settings
+                                </button>
+                                <div class="dropdown-menu" data-popper-placement="bottom-start"
+                                     style="position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(0px, 57px);">
+                                    <a class="dropdown-item" onclick="openSettingsModal()">Downloads</a>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
             </div>
             <div class="row">
                 <div class="grid-margin stretch-card">
@@ -182,15 +197,6 @@
             </div>
         </div>
         <!-- content-wrapper ends -->
-        <!-- partial:partials/_footer.html -->
-        <footer class="footer">
-            <div class="container-fluid d-flex justify-content-between">
-                <span class="text-muted d-block text-center text-sm-start d-sm-inline-block">Copyright © bootstrapdash.com 2021</span>
-                <span class="float-none float-sm-end mt-1 mt-sm-0 text-end"> Free <a
-                        href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin template</a> from Bootstrapdash.com</span>
-            </div>
-        </footer>
-        <!-- partial -->
     </div>
     <!-- main-panel ends -->
 </div>
@@ -259,6 +265,31 @@
                     </div>
                     <div class="btn btn-gradient-primary me-2" onclick="joinGroup()">Join</div>
                     <div class="btn btn-light" onclick="closeGroupModal()">Cancel</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="settingsModal" class="modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Download Settings</h5>
+            </div>
+            <div class="modal-body">
+                <div class="forms-sample">
+                    <div class="form-group">
+                        <label>Download Location</label>
+                        <input type="file" name="" class="file-upload-default">
+                        <div class="input-group col-xs-12">
+                          <input type="text" id="downloadLocation" class="form-control file-upload-info" disabled value="{{client.DIR_PATH_DOWNLOADS}}">
+                          <span class="input-group-append">
+                            <button class="file-upload-browse btn btn-gradient-primary" type="button" onclick="selectDownloadLocation()">Select</button>
+                          </span>
+                        </div>
+
+                      </div>
+                    <div class="btn btn-light" onclick="closeSettingsModal()">Close</div>
                 </div>
             </div>
         </div>

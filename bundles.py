@@ -21,17 +21,19 @@ class Bundle:
             self.name=name
             self.description=desc
             self.id = id
-            self.timestamp = time
+            self.timestamp = timestamp
             self.root = root
             self.pieceSize = pieceSize
             self.files = files
+            print("Loading Bundle",self.name)
         else:
             #Create
             self.name=name
+            print("Creating Bundle",self.name)
             self.description=desc
             self.root = path
-            self.timestamp = time.time()
-            self.id =  self.id = hashlib.sha256((name+desc+str(self.timestamp)).encode('utf-8')).hexdigest()
+            self.timestamp = str(time.time())
+            self.id = hashlib.sha256((name+desc+str(self.timestamp)).encode('utf-8')).hexdigest()
             self.pieceSize = 49152
             self.files = []
             for root, dirs, files in os.walk(path, topdown=False):

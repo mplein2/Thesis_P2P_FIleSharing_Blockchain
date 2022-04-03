@@ -22,7 +22,7 @@ log.disabled = False
 # Routes
 @app.route("/")
 def index():
-    return render_template("index.html", groups=groupManager.groups)
+    return render_template("index.html", groups=groupManager.groups,client=client)
 
 
 @app.route("/groups", methods=['GET'])
@@ -90,6 +90,17 @@ def shareBundle():
         groupManager.addBundle(bundle,groupName)
         return "0"
 
+@app.route('/selectDownloadLocation', methods=['POST'])
+def selectDownloadLocation():
+    if request.method == 'POST':
+        path = easygui.diropenbox(msg="Select folder to download bundles", title="Select Bundle Download Location")
+        print(path)
+        #Update Download Path in Config
+        client.DIR_PATH_DOWNLOADS=path
+        client.saveConfig()
+        #Return path to browser and update it in modal
+        return path
+
 @app.route('/searchBundles', methods=['POST'])
 def searchBundles():
     print("Search Bundles Route")
@@ -147,7 +158,7 @@ def getBundle():
         userIp = data["userIp"]
         #TODO dynamic port on receiver for bundle
         portForBundleReceiver = 6701
-        bundleReceiver = threading.Thread(target=receiveBundle, args=[portForBundleReceiver])
+        bundleReceiver = threading.Thread(target=receiveBundle, args=[portForBundleReceiver,client,groupManager,groupId])
         bundleReceiver.start()
         getBundleReq = GetBundleRequest(bundleId,groupId,portForBundleReceiver)
         res = sendRequest(userIp, 6700, dumps(getBundleReq), groupManager)

@@ -4,6 +4,8 @@ import pickle
 import socket
 import threading
 from socket import *
+from bundles import Bundle
+import Client
 from Groups import GroupManager, Group
 
 
@@ -153,7 +155,7 @@ def sendRequest(address, port, request, groupManager):
         return False
 
 
-def receiveBundle(port):
+def receiveBundle(port,client,groupManager,groupId):
     print("RECEIVING BUNDLE THREAD")
     bundleBytes = b""
     with socket(AF_INET, SOCK_STREAM) as s:
@@ -165,17 +167,21 @@ def receiveBundle(port):
             print(f"Connected by {addr}")
             while True:
                 data = conn.recv(1024)
-                print(data)
+                # print(data)
                 bundleBytes = bundleBytes + data
                 #TODO save Bytes to group and downloads also start downloading.
                 if not data:
                     # print("Break")
                     break
-#                print("Break2")
-#             print("Break3")
-#       print("Break4")
-
-
+            # print("Break3")
+    # print("Bundle Str",bundleBytes.decode())
+    bundleObj = json.loads(bundleBytes.decode())
+    #Fix Bundle Root to be downloaded and location
+    client : Client.Client
+    bundleObj["root"] =client.DIR_PATH_DOWNLOADS
+    bundle = Bundle(bundleObj["name"],bundleObj["description"],bundleObj["id"],bundleObj["timestamp"],bundleObj["root"],bundleObj["pieceSize"],bundleObj["files"])
+    group = groupManager.getGroupWithID(groupId)
+    groupManager.addBundle(bundle,group.name)
 
 
 def sendBundle(addr, port, groupManager, group, bundle):
@@ -194,5 +200,5 @@ def sendBundle(addr, port, groupManager, group, bundle):
             bundleObj = json.loads(bundleContent)
             bundleObj["root"] = ""
             bundleStr = json.dumps(bundleObj)
-            print(bundleStr)
+
         s.sendall(bundleStr.encode())

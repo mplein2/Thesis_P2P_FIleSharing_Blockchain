@@ -66,6 +66,14 @@ function openShareModal() {
     var modal = document.getElementById("shareModal");
     modal.style.display = "block";
 }
+function openSettingsModal() {
+    var modal = document.getElementById("settingsModal");
+    modal.style.display = "block";
+}
+function closeSettingsModal() {
+    var modal = document.getElementById("settingsModal");
+    modal.style.display = "none";
+}
 
 function closeGroupModal() {
     var modal = document.getElementById("joinGroupModal");
@@ -152,6 +160,24 @@ alert("JS OK");
                     }else{
                     //TODO FAILED ALERT
                   alert("not 0");
+                    }
+                }
+            });
+
+}
+function selectDownloadLocation() {
+    var downloadLocationElement = document.getElementById("downloadLocation");
+    alert("Select Folder Window is opened.");
+    $.ajax({
+                data: {
+                      }
+                , type: 'post'
+                , url: '/selectDownloadLocation'
+                , success: function (response) {
+                    if (response==0){
+                    alert("0");
+                    }else{
+                        downloadLocationElement.value = response;
                     }
                 }
             });
