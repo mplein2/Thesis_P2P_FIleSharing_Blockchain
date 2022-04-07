@@ -4,12 +4,13 @@ import logging
 import threading
 from pickle import dumps, loads
 from flask import Flask, render_template, request, redirect
-import compress
+import Compress
 from Networking import receiver, sendRequest, JoinRequest,SearchBundleRequest,receiveBundle,GetBundleRequest
 from Groups import GroupManager, Invite,Group
 from Client import Client
 import easygui
-from bundles import BundleManager
+from Bundles import BundleManager
+from Downloads import DownloadManager
 
 app = Flask(__name__)
 
@@ -22,7 +23,8 @@ log.disabled = False
 # Routes
 @app.route("/")
 def index():
-    return render_template("index.html", groups=groupManager.groups,client=client)
+    progress = downloadManager.getDownloadProgress()
+    return render_template("index.html", groups=groupManager.groups,client=client,progress=progress)
 
 
 @app.route("/groups", methods=['GET'])
@@ -52,7 +54,7 @@ def generateInvite():
         group = groupManager.getGroup(group)
         print(group)
         invite = group.generateInvite()
-        return compress.compress(invite.toJSON())
+        return Compress.compress(invite.toJSON())
 
 
 @app.route('/joinGroup', methods=['POST'])
@@ -60,7 +62,7 @@ def joinGroup():
     if request.method == 'POST':
         data = request.form
         invite = data["invite"]
-        inviteDecomp = compress.decompress(invite)
+        inviteDecomp = Compress.decompress(invite)
         inviteLoad = json.loads(inviteDecomp)
         invite = Invite(inviteLoad["id"],inviteLoad["name"], inviteLoad["timestamp"], inviteLoad["peers"])
         joinReq = JoinRequest(invite.name, invite.timestamp)
@@ -158,7 +160,7 @@ def getBundle():
         userIp = data["userIp"]
         #TODO dynamic port on receiver for bundle
         portForBundleReceiver = 6701
-        bundleReceiver = threading.Thread(target=receiveBundle, args=[portForBundleReceiver,client,groupManager,groupId])
+        bundleReceiver = threading.Thread(target=receiveBundle, args=[portForBundleReceiver,client,groupManager,groupId,downloadManager])
         bundleReceiver.start()
         getBundleReq = GetBundleRequest(bundleId,groupId,portForBundleReceiver)
         res = sendRequest(userIp, 6700, dumps(getBundleReq), groupManager)
@@ -189,6 +191,7 @@ if __name__ == "__main__":
     client = Client()
     groupManager = GroupManager()
     bundleManager = BundleManager()
+    downloadManager = DownloadManager(groupManager)
     receiver = threading.Thread(target=receiver, args=[groupManager])
     receiver.start()
     app.run(host='', port=6969)

@@ -4,7 +4,7 @@ import pickle
 import socket
 import threading
 from socket import *
-from bundles import Bundle
+from Bundles import Bundle
 import Client
 from Groups import GroupManager, Group
 
@@ -155,7 +155,7 @@ def sendRequest(address, port, request, groupManager):
         return False
 
 
-def receiveBundle(port,client,groupManager,groupId):
+def receiveBundle(port,client,groupManager,groupId,downloadManager):
     print("RECEIVING BUNDLE THREAD")
     bundleBytes = b""
     with socket(AF_INET, SOCK_STREAM) as s:
@@ -182,6 +182,8 @@ def receiveBundle(port,client,groupManager,groupId):
     bundle = Bundle(bundleObj["name"],bundleObj["description"],bundleObj["id"],bundleObj["timestamp"],bundleObj["root"],bundleObj["pieceSize"],bundleObj["files"])
     group = groupManager.getGroupWithID(groupId)
     groupManager.addBundle(bundle,group.name)
+    downloadManager.downloadBundle(bundle,group)
+
 
 
 def sendBundle(addr, port, groupManager, group, bundle):

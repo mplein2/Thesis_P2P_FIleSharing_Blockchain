@@ -6,7 +6,7 @@ import json
 from typing import Type
 import shutil
 import hashlib
-from bundles import Bundle
+from Bundles import Bundle
 import copy
 
 
@@ -55,6 +55,10 @@ class GroupManager:
     def __init__(self):
         self.groups = []
         self.DIR_PATH_GROUPS = '%s\\TorrentApp\\Groups\\' % os.environ['APPDATA']
+        if not os.path.exists(self.DIR_PATH_GROUPS):
+            # Create a new directory because it does not exist
+            print("Gonna Create Group Folder")
+            os.makedirs(self.DIR_PATH_GROUPS)
         # Load Groups
         self.loadGroups()
         print("GroupManager Initialized")
@@ -144,10 +148,6 @@ class GroupManager:
         self.groups.append(group)
 
     def loadGroups(self):
-        if not os.path.exists(self.DIR_PATH_GROUPS):
-            # Create a new directory because it does not exist
-            print("Gonna Create Group Folder")
-            os.makedirs(self.DIR_PATH_GROUPS)
         groups = [group for group in listdir(self.DIR_PATH_GROUPS)]
         for group in groups:
             self.loadGroup(group)
