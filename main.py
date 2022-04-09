@@ -1,5 +1,4 @@
 import json
-from json import *
 import logging
 import threading
 from pickle import dumps, loads
@@ -31,7 +30,7 @@ def index():
 def groups():
     group = request.args.get('group')
     print("Group page request :", group)
-    group = groupManager.getGroup(group)
+    group = groupManager.getGroupWithName(group)
     return render_template("groups.html", groups=groupManager.groups, group=group)
 
 
@@ -51,7 +50,7 @@ def generateInvite():
         # TODO IP SPECIFIC BLOCKCHAIN
         ip = data["ip"]
         print("Generate Invite for :", group)
-        group = groupManager.getGroup(group)
+        group = groupManager.getGroupWithName(group)
         print(group)
         invite = group.generateInvite()
         return Compress.compress(invite.toJSON())
@@ -115,7 +114,7 @@ def searchBundles():
 
         #Get Group
         group = data["group"]
-        group = groupManager.getGroup(group)
+        group = groupManager.getGroupWithName(group)
 
         searchReq = SearchBundleRequest(group.id,keywords)
         responses = []
@@ -191,7 +190,7 @@ if __name__ == "__main__":
     client = Client()
     groupManager = GroupManager()
     bundleManager = BundleManager()
-    downloadManager = DownloadManager(groupManager)
+    downloadManager = DownloadManager(groupManager,client)
     receiver = threading.Thread(target=receiver, args=[groupManager])
     receiver.start()
     app.run(host='', port=6969)

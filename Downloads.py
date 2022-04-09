@@ -5,12 +5,13 @@ import os
 import copy
 import json
 import threading
-from Networking import CheckBundleAvailabilityRequest,CheckBundleAvailabilityResponse
-
+from Networking import CheckBundleAvailabilityRequest,CheckBundleAvailabilityResponse,sendRequest
+from pickle import dumps,loads
+from time import sleep
 
 class DownloadManager:
-    def __init__(self, groupManager):
-
+    def __init__(self, groupManager,client):
+        self.client = client
         self.STATUS = True
         self.DIR_PATH_DOWNLOADS = '%s\\TorrentApp\\Downloads\\' % os.environ['APPDATA']
         if not os.path.exists(self.DIR_PATH_DOWNLOADS):
@@ -25,8 +26,8 @@ class DownloadManager:
         #used from downloader()
         #List of list with thread and bundle id its downlaoding [[bundleid,threadObj],[bundleid,threadObj],[bundleid,threadObj]]
         self.activeThreads=[]
-
         self.downloader()
+        print("DownloadManager Initialized")
 
 
 
@@ -52,7 +53,16 @@ class DownloadManager:
         #All Peers that i have found at past that have it . Focus them first .
         allPeers = bundle.peers
 
-        print("Thread for ",bundle," started.")
+
+        #Get Group
+        group = self.groupManager.getGroupWithId(bundle.groupId)
+        group: Group
+
+
+        # print("Thread for ",bundle," started.")
+
+
+
         while self.STATUS:
             #From Previously Found Peers (allPeers) Check If active and start transfer .
             #Put them in activePeers if active . (Start downloading immediately)
@@ -78,33 +88,33 @@ class DownloadManager:
 
             #Find New Peers that have bundle by asking group Peers
             # Ones that have it append to all Peers And Active Peers
-            group = self.groupManager.getGroup(bundle.groupId)
-            group : Group
             for peer in group.peers:
-                checkAvailabilityReq = CheckBundleAvailabilityRequest(bundleId, groupId)
-                res = sendRequest(peer, 6700, dumps(checkAvailabilityReq), groupManager)
-                # if other peer is responded.
-                if res is not False:
-                    res : CheckBundleAvailabilityResponse
-                    if res.response == 0:
-                        #Peer Dosent Have it
-                        #fuck this below
-                        #TODO PUT PEER IN IGNORE LIST don't send to him again.
-                    elif res.response == 1:
-                        allPeers.append(peer)
-                        activePeers.append(peer)
-                else:
-                    #Dead peer
-                    # print("No Response from", userIp)
-                    pass
+                #IF PEER IS ME DONT SEND TO MYSELF
+                # print("PEER IP ",peer[0])
+                # print("MYSELF ",self.client.publicIP)
+                if peer[0]!=self.client.publicIP:
+                    # print(peer[0])
+                    # print(self.client.publicIP)
+                    checkAvailabilityReq = CheckBundleAvailabilityRequest(bundle.bundleId, bundle.groupId)
+                    res = sendRequest(peer[0], 6700, dumps(checkAvailabilityReq), self.groupManager)
+                    # if other peer is responded.
+                    if res is not False:
+                        res : CheckBundleAvailabilityResponse
+                        if res.answer == 0:
+                            #Peer Dosent Have it
+                            #fuck this below
+                            #TODO PUT PEER IN IGNORE LIST don't send to him again.
+                            pass
+                        elif res.answer == 1:
+                            allPeers.append(peer)
+                            activePeers.append((peer,0))
+                    else:
+                        #Dead peer
+                        # print("No Response from", userIp)
+                        pass
 
-            print(allPeers)
-            print(activePeers)
-
-
-
-
-
+            # print(allPeers)
+            # print(activePeers)
 
             #From peers that i found and are not already used
             #Downlaod From the Also .
@@ -113,7 +123,8 @@ class DownloadManager:
             #Time delay until next iteration .
             #If status changed it will be paused.
             #Sleep()
-            print("CONTINUING TO DOWNLOAD")
+            # print("CONTINUING TO DOWNLOAD")
+            sleep(30)
 
     def downloadFromPeer(self):
         pass
@@ -136,9 +147,9 @@ class DownloadManager:
     def loadBundles(self):
         bundles = [bundle for bundle in os.listdir(self.DIR_PATH_DOWNLOADS)]
         for bundle in bundles:
-            print("DOWNLAOD BUNDLE NAME:", bundle)
+            # print("DOWNLAOD BUNDLE NAME:", bundle)
             self.loadBundle(self.DIR_PATH_DOWNLOADS + bundle)
-        print(self.bundlesDownloading)
+        # print(self.bundlesDownloading)
 
     def loadBundle(self, groupDir):
         # try:

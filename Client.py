@@ -34,7 +34,7 @@ class Client:
                 cfgObj = json.loads(data)
                 self.DIR_PATH_DOWNLOADS = cfgObj["DIR_PATH_DOWNLOADS"]
                 self.DOWNLOAD_PEER_CONNECTIONS = cfgObj["DOWNLOAD_PEER_CONNECTIONS"]
-
+        print("Client Initialized")
 
     def saveConfig(self):
         saveCpy = copy.copy(self)

@@ -5,6 +5,7 @@ import json
 from functools import partial
 import hashlib
 import time
+#This Useless .
 class BundleManager:
     def __init__(self):
         self.bundles = []
@@ -25,11 +26,11 @@ class Bundle:
             self.root = root
             self.pieceSize = pieceSize
             self.files = files
-            print("Loading Bundle",self.name)
+            # print("Loading Bundle",self.name)
         else:
             #Create
             self.name=name
-            print("Creating Bundle",self.name)
+            # print("Creating Bundle",self.name)
             self.description=desc
             self.root = path
             self.timestamp = str(time.time())

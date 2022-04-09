@@ -44,6 +44,7 @@ class Group:
     def getBundleWithId(self,bundleid):
             group: Bundle
             for bundle in self.bundles:
+                print("trying to match",bundle.id)
                 if bundle.id == bundleid:
                     return bundle
             #If Nothing Proked return in for loop return false for not having the bundle .
@@ -75,13 +76,13 @@ class GroupManager:
                 print(self.groups.remove(x))
         print(self.groups)
 
-    def getGroup(self, name):
+    def getGroupWithName(self, name):
         group: Group
         for group in self.groups:
             if group.name == name:
                 return group
 
-    def getGroupWithID(self, id):
+    def getGroupWithId(self, id):
         group: Group
         for group in self.groups:
             if group.id == id:
@@ -163,7 +164,7 @@ class GroupManager:
         json_file = open(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name, "w")
         json_file.write(json.dumps(bundle.toJSON()))
         json_file.close()
-        self.getGroup(group).bundles.append(bundle)
+        self.getGroupWithName(group).bundles.append(bundle)
         print("Added Bundle")
         print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
         print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name)

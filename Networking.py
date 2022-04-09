@@ -67,7 +67,7 @@ class CheckBundleAvailabilityRequest(Request):
 class CheckBundleAvailabilityResponse(Request):
     def __init__(self,answer):
         super().__init__(4)
-        self.response = answer
+        self.answer = answer
 
 
 def requestHandler(data, addr, groupManager: GroupManager):
@@ -78,7 +78,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
         # TODO If this is allowed add peer and respond
         # TODO Peer Port
         groupManager.addPeerGroup(req.name, [addr[0]])
-        group = groupManager.getGroup(req.name)
+        group = groupManager.getGroupWithName(req.name)
         groupCpy = copy.copy(group)
         del groupCpy.bundles
         joinResponse = JoinResponse(groupCpy)
@@ -89,7 +89,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
         # Create The Request again for local use
         req = SearchBundleRequest(req.groupID, req.keywords)
         # Get All Bundles User has
-        bundlesOfGroup = groupManager.getGroupWithID(req.groupID).bundles
+        bundlesOfGroup = groupManager.getGroupWithId(req.groupID).bundles
         # Bundles to reply
         responseBundles = []
         print(responseBundles)
@@ -111,7 +111,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
 
     elif req.type == 3:
         req = GetBundleRequest(req.bundleId, req.groupId, req.portForBundleReceiver)
-        group = groupManager.getGroupWithID(req.groupId)
+        group = groupManager.getGroupWithId(req.groupId)
         bundle = group.getBundleWithId(req.bundleId)
         bundleReceiver = threading.Thread(target=sendBundle,
                                           args=[addr, req.portForBundleReceiver, groupManager, group, bundle])
@@ -122,7 +122,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
 
     elif req.type == 4:
         req = CheckBundleAvailabilityRequest(req.bundleId, req.groupId)
-        group = groupManager.getGroupWithID(req.groupId)
+        group = groupManager.getGroupWithId(req.groupId)
         bundle = group.getBundleWithId(req.bundleId)
         if bundle is False:
             #Not Found
@@ -179,7 +179,7 @@ def sendRequest(address, port, request, groupManager):
     # TODO except socket.timeout
     # TODO for better exception handling fix later.
     except Exception as exception:
-        print("Exception on SendRequest:", exception)
+        # print("Exception on SendRequest:", exception)
         return False
 
 
@@ -208,7 +208,7 @@ def receiveBundle(port,client,groupManager,groupId,downloadManager):
     client : Client.Client
     bundleObj["root"] =client.DIR_PATH_DOWNLOADS
     bundle = Bundle(bundleObj["name"],bundleObj["description"],bundleObj["id"],bundleObj["timestamp"],bundleObj["root"],bundleObj["pieceSize"],bundleObj["files"])
-    group = groupManager.getGroupWithID(groupId)
+    group = groupManager.getGroupWithId(groupId)
     groupManager.addBundle(bundle,group.name)
     downloadManager.downloadBundle(bundle,group)
 
