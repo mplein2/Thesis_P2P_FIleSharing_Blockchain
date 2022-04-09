@@ -161,7 +161,7 @@ def receiver(groupManager):
         # RECEIVE AND RESPOND.
         data, addr = sock.recvfrom(65537)
         # data, addr = sock.recvfrom(65507)
-        print("Received from :", addr, " data:", data)
+        print("Received from :", addr)
         response = requestHandler(data, addr, groupManager)
         sock.sendto(response, addr)
 
