@@ -16,6 +16,7 @@ class Request:
     def toJSON(self):
         return json.dumps(self.__dict__)
 
+#All Classes extended Request even Response Classes just for type and toJSON method.
 
 class JoinRequest(Request):
     def __init__(self, name, timestamp):
@@ -55,6 +56,18 @@ class GetBundleResponse(Request):
     def __init__(self, answer):
         super().__init__(3)
         self.answer = answer
+
+
+class CheckBundleAvailabilityRequest(Request):
+    def __init__(self,bundleId, groupId):
+        super().__init__(4)
+        self.bundleId = bundleId
+        self.groupId = groupId
+
+class CheckBundleAvailabilityResponse(Request):
+    def __init__(self,answer):
+        super().__init__(4)
+        self.response = answer
 
 
 def requestHandler(data, addr, groupManager: GroupManager):
@@ -104,8 +117,19 @@ def requestHandler(data, addr, groupManager: GroupManager):
                                           args=[addr, req.portForBundleReceiver, groupManager, group, bundle])
         bundleReceiver.start()
         # TODO refactor use it to determine if user ok to send bundle
+        #TODO 9/4 ????
         return pickle.dumps(GetBundleResponse(1))
 
+    elif req.type == 4:
+        req = CheckBundleAvailabilityRequest(req.bundleId, req.groupId)
+        group = groupManager.getGroupWithID(req.groupId)
+        bundle = group.getBundleWithId(req.bundleId)
+        if bundle is False:
+            #Not Found
+            return pickle.dumps(CheckBundleAvailabilityResponse(0))
+        else :
+            #Found
+            return pickle.dumps(CheckBundleAvailabilityResponse(1))
 
 def responseHandler(data, groupManager):
     res = pickle.loads(data)
@@ -120,6 +144,10 @@ def responseHandler(data, groupManager):
 
     elif res.type == 3:
         res = SearchBundleResponse(res.answer)
+        return res
+
+    elif res.type == 4:
+        res = CheckBundleAvailabilityResponse(res.answer)
         return res
 
 
@@ -183,7 +211,6 @@ def receiveBundle(port,client,groupManager,groupId,downloadManager):
     group = groupManager.getGroupWithID(groupId)
     groupManager.addBundle(bundle,group.name)
     downloadManager.downloadBundle(bundle,group)
-
 
 
 def sendBundle(addr, port, groupManager, group, bundle):
