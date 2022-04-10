@@ -192,7 +192,7 @@ class DownloadManager:
         file.close()
         bundle = BundleToDownload(name=json_load_bundle["name"], bundleId=json_load_bundle["bundleId"],
                                   groupId=json_load_bundle["groupId"],
-                                  root=json_load_bundle["root"], peers=json_load_bundle["peers"],
+                                  root=json_load_bundle["root"],pieceSize=json_load_bundle["pieceSize"], peers=json_load_bundle["peers"],
                                   files=json_load_bundle["files"])
 
         self.bundlesDownloading.append(bundle)
@@ -236,13 +236,14 @@ class DownloadManager:
 
 
 class BundleToDownload:
-    def __init__(self, bundle=None, group=None, name=None, bundleId=None, groupId=None, root=None, peers=None,
+    def __init__(self, bundle=None, group=None, name=None, bundleId=None, groupId=None, root=None, pieceSize=None,peers=None,
                  files=None):
         if bundleId is None:
             # If Creating From bundle and group.
             self.name = bundle.name
             self.bundleId = bundle.id
             self.groupId = group.id
+            self.pieceSize= bundle.pieceSize
             self.root = bundle.root
             self.peers = []
             # Get a copy i can manipulate to create BundleToDownload File List.
@@ -263,6 +264,7 @@ class BundleToDownload:
             self.bundleId = bundleId
             self.groupId = groupId
             self.root = root
+            self.pieceSize = pieceSize
             self.peers = peers
             self.files = files
 

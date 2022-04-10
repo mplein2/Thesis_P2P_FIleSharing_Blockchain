@@ -285,20 +285,35 @@ def downloadBundle(port, peer, file, bundle, usedPeers, freeFiles):
             break
     # pieceList = [[0, '5920572cf97d3711a77a9b7a3469a5fd03bb2a8a', 0]]
     print("DOWNLOADING BUNDLE THREAD")
-    with socket(AF_INET, SOCK_STREAM) as s:
-        s.bind(("0.0.0.0", port))
-        print("Bundle Receiver Ready")
-        s.listen()
-        conn, addr = s.accept()
-        with conn:
-            print(f"Connected by {addr} to download file.")
-            data = conn.recv(1024)
-            if data.decode() == "OK":
-                for piece in pieceList:
-                    if piece[2] == 0:
-                        s.sendall(piece[0])
-                        data = s.recv(100000)
-                        print(data)
+    filePath = bundle.root +f"\\{bundle.name}"+ file[0]
+    dir = filePath.rsplit('\\', 1)[0]
+    print(dir)
+    #Create Directory's that don't exist.
+    isExist = os.path.exists(dir)
+    if not isExist:
+        # Create a new directory because it does not exist
+        os.makedirs(dir)
+
+    with open(filePath, 'ab+') as openfileobject:
+        with socket(AF_INET, SOCK_STREAM) as s:
+            s.bind(("0.0.0.0", port))
+            print("Bundle Receiver Ready")
+            s.listen()
+            conn, addr = s.accept()
+            with conn:
+                print(f"Connected by {addr} to download file.")
+                data = conn.recv(1024)
+                if data.decode() == "OK":
+                    print("Received Ok")
+                    for piece in pieceList:
+                        if piece[2] == 0:
+                            print(f"Sending Piece num {piece[0]} ")
+                            conn.sendall(str(piece[0]).encode())
+                            openfileobject.seek(piece[0]*bundle.pieceSize)
+                            data = conn.recv(100000)
+                            print(f"Received {data}")
+                            openfileobject.write(data)
+
 
 
 def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
