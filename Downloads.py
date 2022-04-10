@@ -152,7 +152,7 @@ class DownloadManager:
                             downloadReceiver.start()
 
                             downloadBundleReq = DownloadBundleRequest(bundle.bundleId, bundle.groupId,file, port)
-                            res = sendRequest(peer, 6700, dumps(downloadBundleReq), self.groupManager)
+                            res = sendRequest(peer[0], 6700, dumps(downloadBundleReq), self.groupManager)
                             # if other peer is responded.
                             if res is not False:
                                 # Responded decide what to do
