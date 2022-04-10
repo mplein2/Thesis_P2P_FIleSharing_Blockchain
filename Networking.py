@@ -8,6 +8,7 @@ from Bundles import Bundle
 import Client
 from Groups import GroupManager, Group
 import os
+import hashlib
 
 
 class Request:
@@ -275,7 +276,7 @@ def is_port_in_use(port: int) -> bool:
         return s.connect_ex(('localhost', port)) == 0
 
 
-def downloadBundle(port, peer, file, bundle, usedPeers, freeFiles):
+def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFiles):
     bundle: BundleToDownload
     pieceList = []
     # Find pieces missing
@@ -294,7 +295,13 @@ def downloadBundle(port, peer, file, bundle, usedPeers, freeFiles):
         # Create a new directory because it does not exist
         os.makedirs(dir)
 
-    with open(filePath, 'ab+') as openfileobject:
+    if os.path.exists(filePath) is False:
+        print("CreatingFIle")
+        file = open(filePath, 'x')
+        file.close()
+
+
+    with open(filePath, 'rb+') as openfileobject:
         with socket(AF_INET, SOCK_STREAM) as s:
             s.bind(("0.0.0.0", port))
             print("Bundle Receiver Ready")
@@ -312,7 +319,19 @@ def downloadBundle(port, peer, file, bundle, usedPeers, freeFiles):
                             openfileobject.seek(piece[0]*bundle.pieceSize)
                             data = conn.recv(100000)
                             print(f"Received {data}")
-                            openfileobject.write(data)
+                            if hashlib.sha1(data).hexdigest() == piece[1]:
+                                print("HASH OK")
+                                openfileobject.write(data)
+                                piece[2]=1
+                                print(piece)
+                            else:
+                                pass
+                                # print("hashes dont match")
+                    # delimmiter for data
+                    conn.sendall("🥭🍓🍇🍉🍐🥧🍊🍍🍏🥑🍑🍌🍎🍐🍉🍇🍓🥭🥝🍒🍅".encode())
+                    usedPeers.remove(peer)
+                    downloadManager.saveBundle(bundle)
+    print(f"Thread Exit {file}")
 
 
 
@@ -327,12 +346,16 @@ def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
             s.sendall("OK".encode())
             while True:
                 piece = s.recv(1024)
-                if piece == b'':
-                    # print("Empty")
-                    pass
+                #delimmiter for data
+                if piece == "🥭🍓🍇🍉🍐🥧🍊🍍🍏🥑🍑🍌🍎🍐🍉🍇🍓🥭🥝🍒🍅".encode():
+                    break
                 else:
-                    piece = int(piece.decode())
-                    print(f"Trying to send {piece}")
-                    openfileobject.seek(piece * bundle.pieceSize)
-                    readData = openfileobject.read(bundle.pieceSize)
-                    s.sendall(readData)
+                    if piece == b'':
+                        # print("Empty")
+                        pass
+                    else:
+                        piece = int(piece.decode())
+                        print(f"Trying to send {piece}")
+                        openfileobject.seek(piece * bundle.pieceSize)
+                        readData = openfileobject.read(bundle.pieceSize)
+                        s.sendall(readData)

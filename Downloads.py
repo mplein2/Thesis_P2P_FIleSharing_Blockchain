@@ -147,7 +147,7 @@ class DownloadManager:
                             # ADD PEER TO USED PEERS.
                             usedPeers.append(peer)
                             downloadReceiver = threading.Thread(target=downloadBundle,
-                                                                args=[port, peer,file,bundle,usedPeers,freeFiles])
+                                                                args=[self,port, peer,file,bundle,usedPeers,freeFiles])
                             downloadReceiver.start()
 
                             downloadBundleReq = DownloadBundleRequest(bundle.bundleId, bundle.groupId,file[0], port)
