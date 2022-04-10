@@ -7,6 +7,7 @@ from socket import *
 from Bundles import Bundle
 import Client
 from Groups import GroupManager, Group
+import os
 
 
 class Request:
