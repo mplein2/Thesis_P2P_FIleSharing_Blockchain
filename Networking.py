@@ -311,9 +311,13 @@ def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
             print("SENDING DATA")
             s.sendall("OK".encode())
             while True:
-                piece = s.recv(1024).decode()
-                if piece != b'':
-                    print(piece)
+                piece = s.recv(1024)
+                if piece == b'':
+                    # print("Empty")
+                    pass
+                else:
+                    piece = int(piece.decode())
+                    print(f"Trying to send {piece}")
                     openfileobject.seek(piece * bundle.pieceSize)
                     readData = openfileobject.read(bundle.pieceSize)
                     s.sendall(readData)
