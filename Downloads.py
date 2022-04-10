@@ -5,7 +5,7 @@ import os
 import copy
 import json
 import threading
-from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use
+from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use,downloadBundle
 from pickle import dumps, loads
 from time import sleep
 
