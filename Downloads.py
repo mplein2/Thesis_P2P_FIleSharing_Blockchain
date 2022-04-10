@@ -66,7 +66,7 @@ class DownloadManager:
         # print("Thread for ",bundle," started.")
 
         while self.STATUS:
-            print(usedPeers)
+            # print(usedPeers)
             # Find New Peers that have bundle by asking group Peers
             for peer in group.peers:
                 # if he already is a peer of this group dont do the rest go to other peer thats not confirmed.
