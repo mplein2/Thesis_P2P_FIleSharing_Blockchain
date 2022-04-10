@@ -277,6 +277,13 @@ def is_port_in_use(port: int) -> bool:
 
 def downloadBundle(port, peer, file, bundle, usedPeers, freeFiles):
     bundle: BundleToDownload
+    pieceList = []
+    #Find pieces missing
+    for x in bundle.files:
+        if x["path"] == file[0]:
+            pieceList = x["pieces"]
+            break
+    # pieceList = [[0, '5920572cf97d3711a77a9b7a3469a5fd03bb2a8a', 0]]
     print("DOWNLOADING BUNDLE THREAD")
     with socket(AF_INET, SOCK_STREAM) as s:
         s.bind(("0.0.0.0", port))
@@ -287,8 +294,13 @@ def downloadBundle(port, peer, file, bundle, usedPeers, freeFiles):
             print(f"Connected by {addr} to download file.")
             data = conn.recv(1024)
             if data.decode() == "OK":
-                for piece in file["pieces"]:
-                    print(piece)
+                for piece in pieceList:
+                    if piece[2]==0:
+                        s.sendall(piece[0])
+                        data = s.recv(100000)
+                        print(data)
+
+
 
 
 def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
@@ -301,5 +313,9 @@ def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
             print("SENDING DATA")
             s.sendall("OK".encode())
             while True:
-                piece = s.recv(1024)
+                piece = s.recv(1024).decode()
                 print(piece)
+                if piece!=b'':
+                    openfileobject.seek(piece*bundle.pieceSize)
+                    readData = openfileobject.read(bundle.pieceSize)
+                    s.sendall(readData)
