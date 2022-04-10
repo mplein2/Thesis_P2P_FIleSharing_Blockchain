@@ -148,12 +148,11 @@ def requestHandler(data, addr, groupManager: GroupManager):
             return pickle.dumps(CheckBundleAvailabilityResponse(1))
 
     elif req.type == 5:
+        print("Received Request To Send File")
         req = DownloadBundleRequest(req.bundleId, req.groupId, req.file,req.port)
-        group = groupManager.getGroupWithId(req.groupId)
-        bundle = group.getBundleWithId(req.bundleId)
-        bundleReceiver = threading.Thread(target=uploadBundle,
+        uploadThread = threading.Thread(target=uploadBundle,
                                           args=[addr, req.port,])
-        bundleReceiver.start()
+        uploadThread.start()
         # TODO refactor use it to determine if user ok to send bundle
         #TODO 9/4 ????
         return pickle.dumps(DownloadBundleResponse(1))
