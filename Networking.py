@@ -76,7 +76,7 @@ class DownloadBundleRequest(Request):
         self.bundleId = bundleId
         self.groupId = groupId
         self.file = file
-        self.portForBundleReceiver = port
+        self.port = port
 
 
 class DownloadBundleResponse(Request):

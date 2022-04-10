@@ -11,7 +11,7 @@ import copy
 
 
 class Invite:
-    def __init__(self,id, name, timestamp, peers):
+    def __init__(self, id, name, timestamp, peers):
         self.id = id
         self.name = name
         self.timestamp = timestamp
@@ -22,7 +22,7 @@ class Invite:
 
 
 class Group:
-    def __init__(self, name, private, admin, peers, timestamp,id=None):
+    def __init__(self, name, private, admin, peers, timestamp, id=None):
         self.name = name
         self.timestamp = timestamp
         self.private = private
@@ -30,27 +30,25 @@ class Group:
         self.peers = peers
         self.bundles = []
         if id is None:
-            self.id = hashlib.sha256((name+str(timestamp)).encode('utf-8')).hexdigest()
+            self.id = hashlib.sha256((name + str(timestamp)).encode('utf-8')).hexdigest()
         else:
-            self.id=id
+            self.id = id
 
     def generateInvite(self):
-        invite = Invite(self.id,self.name, self.timestamp, self.peers)
+        invite = Invite(self.id, self.name, self.timestamp, self.peers)
         return invite
 
     def toJSON(self):
         return json.dumps(self.__dict__)
 
-    def getBundleWithId(self,bundleid):
-            group: Bundle
-            for bundle in self.bundles:
-                # print("trying to match",bundle.id)
-                if bundle.id == bundleid:
-                    return bundle
-            #If Nothing Proked return in for loop return false for not having the bundle .
-            return False
-
-
+    def getBundleWithId(self, bundleid):
+        group: Bundle
+        for bundle in self.bundles:
+            # print("trying to match",bundle.id)
+            if bundle.id == bundleid:
+                return bundle
+        # If Nothing Proked return in for loop return false for not having the bundle .
+        return False
 
 
 class GroupManager:
@@ -128,25 +126,25 @@ class GroupManager:
             json_load_group = json.load(file)
             file.close()
             group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
-                          json_load_group["peers"], json_load_group["timestamp"],json_load_group["id"],)
+                          json_load_group["peers"], json_load_group["timestamp"], json_load_group["id"], )
         except:
             print("Error Opening Group file :", groupName)
 
-
-        #Load Bundles of Each group.
+        # Load Bundles of Each group.
         groupBundlePath = self.DIR_PATH_GROUPS + groupName + "\\" + "Bundles\\"
-        #Make the folder if it dosent exist .
+        # Make the folder if it dosent exist .
         if not os.path.exists(groupBundlePath):
             os.makedirs(groupBundlePath)
         else:
-        #if exists search all the files
+            # if exists search all the files
             bundles = [f for f in listdir(groupBundlePath) if isfile(join(groupBundlePath, f))]
             for bundle in bundles:
                 pathForBundleFile = join(groupBundlePath, bundle)
                 with open(pathForBundleFile) as json_file:
                     data = json.load(json_file)
                     #    def __init__(self,name,desc,root,pieceSize=49152,files=[],path=None):
-                    bundleObj = Bundle(data["name"],data["description"],data["id"],data["timestamp"],data["root"],data["pieceSize"],data["files"])
+                    bundleObj = Bundle(data["name"], data["description"], data["id"], data["timestamp"], data["root"],
+                                       data["pieceSize"], data["files"])
                     group.bundles.append(bundleObj)
         self.groups.append(group)
 
@@ -168,4 +166,3 @@ class GroupManager:
         print("Added Bundle")
         print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
         print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name)
-
