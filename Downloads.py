@@ -5,12 +5,13 @@ import os
 import copy
 import json
 import threading
-from Networking import CheckBundleAvailabilityRequest,CheckBundleAvailabilityResponse,sendRequest
-from pickle import dumps,loads
+from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use
+from pickle import dumps, loads
 from time import sleep
 
+
 class DownloadManager:
-    def __init__(self, groupManager,client):
+    def __init__(self, groupManager, client):
         self.client = client
         self.STATUS = True
         self.DIR_PATH_DOWNLOADS = '%s\\TorrentApp\\Downloads\\' % os.environ['APPDATA']
@@ -23,115 +24,148 @@ class DownloadManager:
         self.bundlesDownloading = []
         self.loadBundles()
 
-        #used from downloader()
-        #List of list with thread and bundle id its downlaoding [[bundleid,threadObj],[bundleid,threadObj],[bundleid,threadObj]]
-        self.activeThreads=[]
+        # used from downloader()
+        # List of list with thread and bundle id its downlaoding [[bundleid,threadObj],[bundleid,threadObj],[bundleid,threadObj]]
+        self.activeThreads = []
         self.downloader()
         print("DownloadManager Initialized")
 
-
-
-
-
-
     def downloader(self):
-
         for bundle in self.bundlesDownloading:
-            bundle : BundleToDownload
-            if bundle.getStatus()==0:
-                #Start 1 thread for each bundle not downloaded
+            bundle: BundleToDownload
+            # if not completed
+            if bundle.getStatus() == 0:
+                # Start 1 thread for each bundle not downloaded
                 thread = threading.Thread(target=self.downloadThread, args=[bundle])
                 self.activeThreads.append([bundle.bundleId, thread])
                 thread.start()
 
+    def downloadThread(self, bundle):
+        bundle: BundleToDownload
+        usedPeers = []
+        # Files that are not complete and can be downloaded
+        freeFiles = []
+        for file in bundle.files:
+            complete = True
+            for piece in file["pieces"]:
+                # 0 = not downloaded yet file is not complete
+                if piece[2] == 0:
+                    complete = False
+                    break
+            if complete is False:
+                freeFiles.append([file["path"], 0])
 
-    def downloadThread(self,bundle):
-        bundle : BundleToDownload
-        #Peers im going to start connections with
+        # Peers im going to start connections with
         activePeers = []
-
-        #All Peers that i have found at past that have it . Focus them first .
-        allPeers = bundle.peers
-
-
-        #Get Group
+        # All Peers that i have found at past that have it . Focus them first .
+        seeders = bundle.peers
+        # Get Group
         group = self.groupManager.getGroupWithId(bundle.groupId)
         group: Group
-
-
         # print("Thread for ",bundle," started.")
 
-
-
         while self.STATUS:
-            #From Previously Found Peers (allPeers) Check If active and start transfer .
-            #Put them in activePeers if active . (Start downloading immediately)
-            # print(allPeers)
-            # if len(allPeers):
-            #     for peer in allPeers:
-            #         checkAvailabilityReq = CheckBundleAvailabilityRequest(bundleId, groupId)
-            #         res = sendRequest(peer, 6700, dumps(checkAvailabilityReq), groupManager)
-            #         # if other peer is responded.
-            #         if res is not False:
-            #             res : CheckBundleAvailabilityResponse
-            #             if res.response == 0:
-            #                 #Peer Dosent Have it
-            #                 #FUCK
-            #                 pass
-            #             elif res.response == 1:
-            #                 #Peer has it
-            #                 pass
-            #         else:
-            #             #Dead peer
-            #             print("No Response from", userIp)
-
-
-            #Find New Peers that have bundle by asking group Peers
-            # Ones that have it append to all Peers And Active Peers
+            print(usedPeers)
+            # Find New Peers that have bundle by asking group Peers
             for peer in group.peers:
-                #IF PEER IS ME DONT SEND TO MYSELF
+                # if he already is a peer of this group dont do the rest go to other peer thats not confirmed.
+                potentiallyNewPeer = True
+                for x in seeders:
+                    if x[0] == peer[0]:
+                        potentiallyNewPeer = False
+                if not potentiallyNewPeer:
+                    continue
+
+                # IF PEER IS ME DONT SEND TO MYSELF
                 # print("PEER IP ",peer[0])
                 # print("MYSELF ",self.client.publicIP)
-                if peer[0]!=self.client.publicIP:
+                if peer[0] != self.client.publicIP:
                     # print(peer[0])
                     # print(self.client.publicIP)
                     checkAvailabilityReq = CheckBundleAvailabilityRequest(bundle.bundleId, bundle.groupId)
                     res = sendRequest(peer[0], 6700, dumps(checkAvailabilityReq), self.groupManager)
                     # if other peer is responded.
                     if res is not False:
-                        res : CheckBundleAvailabilityResponse
+                        res: CheckBundleAvailabilityResponse
                         if res.answer == 0:
-                            #Peer Dosent Have it
-                            #fuck this below
-                            #TODO PUT PEER IN IGNORE LIST don't send to him again.
+                            # Peer Dosent Have it
+                            # fuck this below
+                            # TODO PUT PEER IN IGNORE LIST don't send to him again.
                             pass
                         elif res.answer == 1:
-                            allPeers.append(peer)
-                            activePeers.append((peer,0))
+                            # Check if he already is in
+                            seeders.append(peer)
+                            # new peer found update bundle download file.
+                            print("new peep found")
+                            bundle.peers.append(peer)
+                            self.saveBundle(bundle)
+
                     else:
-                        #Dead peer
+                        # Dead peer
                         # print("No Response from", userIp)
                         pass
 
-            # print(allPeers)
-            # print(activePeers)
+            # Even though request is same as above no need to chance something
+            # reuse code for saem task lead to download from peer with tcp in pieces .
 
-            #From peers that i found and are not already used
-            #Downlaod From the Also .
+            # From peers that i found and are not already used
+            # Downlaod From the Also .
+            for peer in bundle.peers:
+                # TODO AD IF IF USER IS NOT ALREADY BEING USED.
+                if peer not in usedPeers:
 
+                    checkAvailabilityReq = CheckBundleAvailabilityRequest(bundle.bundleId, bundle.groupId)
+                    res = sendRequest(peer[0], 6700, dumps(checkAvailabilityReq), self.groupManager)
+                    # if other peer is responded.
+                    if res is not False:
+                        res: CheckBundleAvailabilityResponse
+                        if res.answer == 0:
+                            # Peer Dosent Have it
+                            # fuck this below
+                            # TODO PUT PEER IN IGNORE LIST don't send to him again.
+                            pass
+                        elif res.answer == 1:
+                            print("Have peer with bundle to use . ")
 
-            #Time delay until next iteration .
-            #If status changed it will be paused.
-            #Sleep()
+                            # Find free port.
+                            freePort = False
+                            port = 6702
+                            while freePort is False:
+                                if is_port_in_use(port) is True:
+                                    port = port + 1
+                                else:
+                                    freePort = True
+
+                            # Assign File
+                            file = []
+                            for fileToDownload in freeFiles:
+                                if fileToDownload[1] == 0:
+                                    file = fileToDownload
+                                    # Block others use the same file
+                                    fileToDownload[1] = 1
+                                    break
+                            # ADD PEER TO USED PEERS.
+                            usedPeers.append(peer)
+                            downloadReceiver = threading.Thread(target=downloadBundle,
+                                                                args=[port, peer,file,bundle,usedPeers,freeFiles])
+                            downloadReceiver.start()
+
+                            downloadBundleReq = DownloadBundleRequest(bundle.bundleId, bundle.groupId,file, port)
+                            res = sendRequest(peer, 6700, dumps(downloadBundleReq), self.groupManager)
+                            # if other peer is responded.
+                            if res is not False:
+                                # Responded decide what to do
+                                pass
+                            else:
+                                print("No Response from", userIp)
+
+            # Time delay until next iteration .
+            # If status changed it will be paused.
+            # Sleep()
             # print("CONTINUING TO DOWNLOAD")
-            sleep(30)
-
-    def downloadFromPeer(self):
-        pass
-
-
-
-
+            sleep(10)
+            # print("All Peers :",seeders)
+            # print("Active Peers :",activePeers)
 
     def downloadBundle(self, bundle: Bundle, group: Group):
         print("Download Manager Creating Download Class for ", bundle.name)
@@ -139,10 +173,8 @@ class DownloadManager:
         self.saveBundle(bundleToDownload)
         self.bundlesDownloading.append(bundleToDownload)
 
-
     def findPeers(self):
         pass
-
 
     def loadBundles(self):
         bundles = [bundle for bundle in os.listdir(self.DIR_PATH_DOWNLOADS)]
@@ -166,11 +198,11 @@ class DownloadManager:
     # except:
     #     print("Error Opening Bundle file for download:", groupDir)
 
-    def saveBundle(self, bundleToDownload):
+    def saveBundle(self, bundle):
         # Create JSON file
-        json_file_name = bundleToDownload.name + ".json"
+        json_file_name = bundle.name + ".json"
         json_file = open(self.DIR_PATH_DOWNLOADS + json_file_name, "w")
-        json_file.write(json.dumps(bundleToDownload.toJSON()))
+        json_file.write(json.dumps(bundle.toJSON()))
         json_file.close()
 
     def findPeers(self, bundleId, groupId):
@@ -192,10 +224,11 @@ class DownloadManager:
                     totalPieces = totalPieces + 1
                     if piece[2] == 1:
                         completedPieces = completedPieces + 1
-            pieces = str(completedPieces)+"/"+str(totalPieces)
-            progress = completedPieces//totalPieces
-            #TODO Status
-            progressOfBundle = {"index":indexNum,"name": x.name, "pieces":pieces,"progress":progress,"status":"TODOTHIS"}
+            pieces = str(completedPieces) + "/" + str(totalPieces)
+            progress = completedPieces // totalPieces
+            # TODO Status
+            progressOfBundle = {"index": indexNum, "name": x.name, "pieces": pieces, "progress": progress,
+                                "status": "TODOTHIS"}
             progressOfBundles.append(progressOfBundle)
         return progressOfBundles
 
@@ -232,19 +265,18 @@ class BundleToDownload:
             self.files = files
 
     def getStatus(self):
-        #Status = 0 if not completed 1 if completed
+        # Status = 0 if not completed 1 if completed
         totalPieces = 0
         completedPieces = 0
         for file in self.files:
             for piece in file["pieces"]:
                 totalPieces = totalPieces + 1
-                if piece[2]==1:
+                if piece[2] == 1:
                     completedPieces = completedPieces + 1
-        if totalPieces==completedPieces:
+        if totalPieces == completedPieces:
             return 1
         else:
             return 0
-
 
     def toJSON(self):
         return self.__dict__

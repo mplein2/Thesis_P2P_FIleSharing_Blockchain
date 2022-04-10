@@ -70,6 +70,22 @@ class CheckBundleAvailabilityResponse(Request):
         self.answer = answer
 
 
+class DownloadBundleRequest(Request):
+    def __init__(self, bundleId, groupId,file, port):
+        super().__init__(5)
+        self.bundleId = bundleId
+        self.groupId = groupId
+        self.file = file
+        self.portForBundleReceiver = port
+
+
+class DownloadBundleResponse(Request):
+    def __init__(self, answer):
+        super().__init__(5)
+        self.answer = answer
+
+
+
 def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
     # Response to JoinRequest
@@ -131,6 +147,17 @@ def requestHandler(data, addr, groupManager: GroupManager):
             #Found
             return pickle.dumps(CheckBundleAvailabilityResponse(1))
 
+    elif req.type == 5:
+        req = DownloadBundleRequest(req.bundleId, req.groupId, req.file,req.port)
+        group = groupManager.getGroupWithId(req.groupId)
+        bundle = group.getBundleWithId(req.bundleId)
+        bundleReceiver = threading.Thread(target=sendBundle,
+                                          args=[addr, req.port, groupManager, group, bundle])
+        bundleReceiver.start()
+        # TODO refactor use it to determine if user ok to send bundle
+        #TODO 9/4 ????
+        return pickle.dumps(GetBundleResponse(1))
+
 def responseHandler(data, groupManager):
     res = pickle.loads(data)
 
@@ -148,6 +175,10 @@ def responseHandler(data, groupManager):
 
     elif res.type == 4:
         res = CheckBundleAvailabilityResponse(res.answer)
+        return res
+
+    elif res.type == 5:
+        res = DownloadBundleResponse(res.answer)
         return res
 
 
@@ -231,3 +262,31 @@ def sendBundle(addr, port, groupManager, group, bundle):
             bundleStr = json.dumps(bundleObj)
 
         s.sendall(bundleStr.encode())
+
+def is_port_in_use(port: int) -> bool:
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', port)) == 0
+
+
+def downloadBundle(port, peer,file,bundle,usedPeers,freeFiles):
+    print("DOWNLOADING BUNDLE THREAD")
+    with socket(AF_INET, SOCK_STREAM) as s:
+        s.bind(("0.0.0.0", port))
+        print("Bundle Receiver Ready")
+        s.listen()
+        conn, addr = s.accept()
+        with conn:
+            print(f"Connected by {addr} to download file.")
+            while True:
+                data = conn.recv(1024)
+
+
+
+def uploadBundle(addr, port):
+    print("SENDING BUNDLE THREAD")
+    group: Group
+    with socket(AF_INET, SOCK_STREAM) as s:
+        s.connect((addr[0], port))
+        print("SENDING DATA")
+        s.sendall("Test Sent".encode())
