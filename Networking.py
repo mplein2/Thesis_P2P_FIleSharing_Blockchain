@@ -88,6 +88,8 @@ class DownloadBundleResponse(Request):
 
 def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
+    print(req)
+
     # Response to JoinRequest
     if req.type == 1:
         req = JoinRequest(req.name, req.timestamp)
