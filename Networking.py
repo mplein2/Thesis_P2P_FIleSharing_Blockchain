@@ -153,7 +153,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
         print("Received Request To Send File")
         req = DownloadBundleRequest(req.bundleId, req.groupId, req.file,req.port)
         uploadThread = threading.Thread(target=uploadBundle,
-                                          args=[addr, req.port,])
+                                          args=[addr, req.port,req.bundleId,req.groupId,req.file,groupManager])
         uploadThread.start()
         # TODO refactor use it to determine if user ok to send bundle
         #TODO 9/4 ????
@@ -271,6 +271,7 @@ def is_port_in_use(port: int) -> bool:
 
 
 def downloadBundle(port, peer,file,bundle,usedPeers,freeFiles):
+    bundle : BundleToDownload
     print("DOWNLOADING BUNDLE THREAD")
     with socket(AF_INET, SOCK_STREAM) as s:
         s.bind(("0.0.0.0", port))
@@ -279,15 +280,22 @@ def downloadBundle(port, peer,file,bundle,usedPeers,freeFiles):
         conn, addr = s.accept()
         with conn:
             print(f"Connected by {addr} to download file.")
-            while True:
-                data = conn.recv(1024)
+            data = conn.recv(1024)
+            if data.decode() == "OK":
+                for piece in file["pieces"]:
+                    print(piece)
 
 
 
-def uploadBundle(addr, port):
+
+def uploadBundle(addr, port,bundleId,groupId,file,groupManager):
     print("SENDING BUNDLE THREAD")
-    group: Group
-    with socket(AF_INET, SOCK_STREAM) as s:
-        s.connect((addr[0], port))
-        print("SENDING DATA")
-        s.sendall("Test Sent".encode())
+    group = groupManager.getGroupWithId(groupId)
+    bundle = group.getBundleWithId(bundleId)
+    with open(os.path.join(bundle.root, file), 'rb') as openfileobject:
+        with socket(AF_INET, SOCK_STREAM) as s:
+            s.connect((addr[0], port))
+            print("SENDING DATA")
+            s.sendall("OK".encode())
+            while True:
+                piece = s.recv(1024)
