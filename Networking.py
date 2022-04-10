@@ -293,6 +293,8 @@ def uploadBundle(addr, port,bundleId,groupId,file,groupManager):
     print("SENDING BUNDLE THREAD")
     group = groupManager.getGroupWithId(groupId)
     bundle = group.getBundleWithId(bundleId)
+    print( file)
+    print(bundle.root)
     with open(os.path.join(bundle.root, file), 'rb') as openfileobject:
         with socket(AF_INET, SOCK_STREAM) as s:
             s.connect((addr[0], port))
@@ -300,3 +302,4 @@ def uploadBundle(addr, port,bundleId,groupId,file,groupManager):
             s.sendall("OK".encode())
             while True:
                 piece = s.recv(1024)
+                print(piece)

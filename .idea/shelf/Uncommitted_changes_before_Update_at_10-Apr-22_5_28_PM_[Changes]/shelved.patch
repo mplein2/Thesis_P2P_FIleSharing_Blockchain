@@ -1,0 +1,159 @@
+Index: Networking.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import copy\r\nimport json\r\nimport pickle\r\nimport socket\r\nimport threading\r\nfrom socket import *\r\nfrom Bundles import Bundle\r\nimport Client\r\nfrom Groups import GroupManager, Group\r\n\r\n\r\nclass Request:\r\n    def __init__(self, type):\r\n        self.type = type\r\n\r\n    def toJSON(self):\r\n        return json.dumps(self.__dict__)\r\n\r\n#All Classes extended Request even Response Classes just for type and toJSON method.\r\n\r\nclass JoinRequest(Request):\r\n    def __init__(self, name, timestamp):\r\n        super().__init__(1)\r\n        self.name = name\r\n        self.timestamp = timestamp\r\n\r\n\r\nclass JoinResponse(Request):\r\n    def __init__(self, group):\r\n        super().__init__(1)\r\n        self.group = group\r\n\r\n\r\nclass SearchBundleRequest(Request):\r\n    def __init__(self, groupId, keyword):\r\n        super().__init__(2)\r\n        self.groupID = groupId\r\n        self.keywords = keyword\r\n\r\n\r\nclass SearchBundleResponse(Request):\r\n    def __init__(self, responseBundles):\r\n        super().__init__(2)\r\n        self.responseBundles = responseBundles\r\n\r\n\r\nclass GetBundleRequest(Request):\r\n    def __init__(self, bundleId, groupId, portForBundleReceiver):\r\n        super().__init__(3)\r\n        self.bundleId = bundleId\r\n        self.groupId = groupId\r\n        self.portForBundleReceiver = portForBundleReceiver\r\n\r\n\r\nclass GetBundleResponse(Request):\r\n    def __init__(self, answer):\r\n        super().__init__(3)\r\n        self.answer = answer\r\n\r\n\r\nclass CheckBundleAvailabilityRequest(Request):\r\n    def __init__(self,bundleId, groupId):\r\n        super().__init__(4)\r\n        self.bundleId = bundleId\r\n        self.groupId = groupId\r\n\r\nclass CheckBundleAvailabilityResponse(Request):\r\n    def __init__(self,answer):\r\n        super().__init__(4)\r\n        self.answer = answer\r\n\r\n\r\nclass DownloadBundleRequest(Request):\r\n    def __init__(self, bundleId, groupId,file, port):\r\n        super().__init__(5)\r\n        self.bundleId = bundleId\r\n        self.groupId = groupId\r\n        self.file = file\r\n        self.port = port\r\n\r\n\r\nclass DownloadBundleResponse(Request):\r\n    def __init__(self, answer):\r\n        super().__init__(5)\r\n        self.answer = answer\r\n\r\n\r\n\r\ndef requestHandler(data, addr, groupManager: GroupManager):\r\n    req = pickle.loads(data)\r\n    print(req)\r\n\r\n    # Response to JoinRequest\r\n    if req.type == 1:\r\n        req = JoinRequest(req.name, req.timestamp)\r\n        # TODO If this is allowed add peer and respond\r\n        # TODO Peer Port\r\n        groupManager.addPeerGroup(req.name, [addr[0]])\r\n        group = groupManager.getGroupWithName(req.name)\r\n        groupCpy = copy.copy(group)\r\n        del groupCpy.bundles\r\n        joinResponse = JoinResponse(groupCpy)\r\n        return pickle.dumps(joinResponse)\r\n\r\n    # Response to search req\r\n    elif req.type == 2:\r\n        # Create The Request again for local use\r\n        req = SearchBundleRequest(req.groupID, req.keywords)\r\n        # Get All Bundles User has\r\n        bundlesOfGroup = groupManager.getGroupWithId(req.groupID).bundles\r\n        # Bundles to reply\r\n        responseBundles = []\r\n        print(responseBundles)\r\n        for bundle in bundlesOfGroup:\r\n            # For each bundle make a single list (bundleKeywords) and search if any of the keywords other user send are in there then send back\r\n            name = bundle.name.split()\r\n            desc = bundle.description.split()\r\n            bundleKeywords = name + desc\r\n            # print(\"Bundle Keywords : \",bundleKeywords)\r\n            # print(\"Request Keywords : \",req.keywords)\r\n            if any(keyword in req.keywords for keyword in bundleKeywords):\r\n                # print(\"HIT\")\r\n                responseBundles.append({\"id\": bundle.id, \"name\": bundle.name, \"description\": bundle.description})\r\n        # Create Response and return it to be used as answer\r\n        # print(responseBundles)\r\n        searchResponse = SearchBundleResponse(responseBundles)\r\n        # print(\"Search Response :\",searchResponse)\r\n        return pickle.dumps(searchResponse)\r\n\r\n    elif req.type == 3:\r\n        req = GetBundleRequest(req.bundleId, req.groupId, req.portForBundleReceiver)\r\n        group = groupManager.getGroupWithId(req.groupId)\r\n        bundle = group.getBundleWithId(req.bundleId)\r\n        bundleReceiver = threading.Thread(target=sendBundle,\r\n                                          args=[addr, req.portForBundleReceiver, groupManager, group, bundle])\r\n        bundleReceiver.start()\r\n        # TODO refactor use it to determine if user ok to send bundle\r\n        #TODO 9/4 ????\r\n        return pickle.dumps(GetBundleResponse(1))\r\n\r\n    elif req.type == 4:\r\n        req = CheckBundleAvailabilityRequest(req.bundleId, req.groupId)\r\n        group = groupManager.getGroupWithId(req.groupId)\r\n        bundle = group.getBundleWithId(req.bundleId)\r\n        if bundle is False:\r\n            #Not Found\r\n            return pickle.dumps(CheckBundleAvailabilityResponse(0))\r\n        else :\r\n            #Found\r\n            return pickle.dumps(CheckBundleAvailabilityResponse(1))\r\n\r\n    elif req.type == 5:\r\n        print(\"Received Request To Send File\")\r\n        req = DownloadBundleRequest(req.bundleId, req.groupId, req.file,req.port)\r\n        uploadThread = threading.Thread(target=uploadBundle,\r\n                                          args=[addr, req.port,])\r\n        uploadThread.start()\r\n        # TODO refactor use it to determine if user ok to send bundle\r\n        #TODO 9/4 ????\r\n        return pickle.dumps(DownloadBundleResponse(1))\r\n\r\ndef responseHandler(data, groupManager):\r\n    res = pickle.loads(data)\r\n\r\n    if res.type == 1:\r\n        res = JoinResponse(res.group)\r\n        return res\r\n\r\n    elif res.type == 2:\r\n        res = SearchBundleResponse(res.responseBundles)\r\n        return res\r\n\r\n    elif res.type == 3:\r\n        res = SearchBundleResponse(res.answer)\r\n        return res\r\n\r\n    elif res.type == 4:\r\n        res = CheckBundleAvailabilityResponse(res.answer)\r\n        return res\r\n\r\n    elif res.type == 5:\r\n        res = DownloadBundleResponse(res.answer)\r\n        return res\r\n\r\n\r\ndef receiver(groupManager):\r\n    UDP_IP = '0.0.0.0'\r\n    UDP_PORT = 6700\r\n    sock = socket(AF_INET, SOCK_DGRAM)\r\n    sock.bind((UDP_IP, UDP_PORT))\r\n    print(\"Listening on \", UDP_IP, \":\", UDP_PORT)\r\n    while True:\r\n        # RECEIVE AND RESPOND.\r\n        data, addr = sock.recvfrom(65537)\r\n        # data, addr = sock.recvfrom(65507)\r\n        print(\"Received from :\", addr)\r\n        response = requestHandler(data, addr, groupManager)\r\n        sock.sendto(response, addr)\r\n\r\n\r\ndef sendRequest(address, port, request, groupManager):\r\n    # Create a socket for sending files\r\n    clientSocket = socket(AF_INET, SOCK_DGRAM)\r\n    clientSocket.settimeout(1)\r\n    try:\r\n        clientSocket.sendto(request, (address, port))\r\n        data, addr = clientSocket.recvfrom(65537)\r\n        # data, addr = clientSocket.recvfrom(65507)\r\n        res = responseHandler(data, groupManager)\r\n        return res\r\n    # TODO except socket.timeout\r\n    # TODO for better exception handling fix later.\r\n    except Exception as exception:\r\n        # print(\"Exception on SendRequest:\", exception)\r\n        return False\r\n\r\n\r\ndef receiveBundle(port,client,groupManager,groupId,downloadManager):\r\n    print(\"RECEIVING BUNDLE THREAD\")\r\n    bundleBytes = b\"\"\r\n    with socket(AF_INET, SOCK_STREAM) as s:\r\n        s.bind((\"0.0.0.0\", port))\r\n        print(\"Bundle Receiver Ready\")\r\n        s.listen()\r\n        conn, addr = s.accept()\r\n        with conn:\r\n            print(f\"Connected by {addr}\")\r\n            while True:\r\n                data = conn.recv(1024)\r\n                # print(data)\r\n                bundleBytes = bundleBytes + data\r\n                #TODO save Bytes to group and downloads also start downloading.\r\n                if not data:\r\n                    # print(\"Break\")\r\n                    break\r\n            # print(\"Break3\")\r\n    # print(\"Bundle Str\",bundleBytes.decode())\r\n    bundleObj = json.loads(bundleBytes.decode())\r\n    #Fix Bundle Root to be downloaded and location\r\n    client : Client.Client\r\n    bundleObj[\"root\"] =client.DIR_PATH_DOWNLOADS\r\n    bundle = Bundle(bundleObj[\"name\"],bundleObj[\"description\"],bundleObj[\"id\"],bundleObj[\"timestamp\"],bundleObj[\"root\"],bundleObj[\"pieceSize\"],bundleObj[\"files\"])\r\n    group = groupManager.getGroupWithId(groupId)\r\n    groupManager.addBundle(bundle,group.name)\r\n    downloadManager.downloadBundle(bundle,group)\r\n\r\n\r\ndef sendBundle(addr, port, groupManager, group, bundle):\r\n    print(\"SENDING BUNDLE THREAD\")\r\n    group: Group\r\n    with socket(AF_INET, SOCK_STREAM) as s:\r\n        s.connect((addr[0], port))\r\n        print(\"SENDING DATA\")\r\n        groupManager: GroupManager\r\n        json_file_name = bundle.name + \".json\"\r\n        bundleDir = groupManager.DIR_PATH_GROUPS + group.name + \"\\\\\" + \"Bundles\" + \"\\\\\" + json_file_name\r\n        print(bundleDir)\r\n        print(json_file_name)\r\n        with open(bundleDir) as f:\r\n            bundleContent = f.read()\r\n            bundleObj = json.loads(bundleContent)\r\n            bundleObj[\"root\"] = \"\"\r\n            bundleStr = json.dumps(bundleObj)\r\n\r\n        s.sendall(bundleStr.encode())\r\n\r\ndef is_port_in_use(port: int) -> bool:\r\n    import socket\r\n    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:\r\n        return s.connect_ex(('localhost', port)) == 0\r\n\r\n\r\ndef downloadBundle(port, peer,file,bundle,usedPeers,freeFiles):\r\n    print(\"DOWNLOADING BUNDLE THREAD\")\r\n    with socket(AF_INET, SOCK_STREAM) as s:\r\n        s.bind((\"0.0.0.0\", port))\r\n        print(\"Bundle Receiver Ready\")\r\n        s.listen()\r\n        conn, addr = s.accept()\r\n        with conn:\r\n            print(f\"Connected by {addr} to download file.\")\r\n            while True:\r\n                data = conn.recv(1024)\r\n\r\n\r\n\r\ndef uploadBundle(addr, port):\r\n    print(\"SENDING BUNDLE THREAD\")\r\n    group: Group\r\n    with socket(AF_INET, SOCK_STREAM) as s:\r\n        s.connect((addr[0], port))\r\n        print(\"SENDING DATA\")\r\n        s.sendall(\"Test Sent\".encode())
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Networking.py b/Networking.py
+--- a/Networking.py	(revision beb9fd7da096846436c5d953789c54e431ddaf25)
++++ b/Networking.py	(date 1649597627838)
+@@ -16,7 +16,8 @@
+     def toJSON(self):
+         return json.dumps(self.__dict__)
+ 
+-#All Classes extended Request even Response Classes just for type and toJSON method.
++
++# All Classes extended Request even Response Classes just for type and toJSON method.
+ 
+ class JoinRequest(Request):
+     def __init__(self, name, timestamp):
+@@ -59,19 +60,20 @@
+ 
+ 
+ class CheckBundleAvailabilityRequest(Request):
+-    def __init__(self,bundleId, groupId):
++    def __init__(self, bundleId, groupId):
+         super().__init__(4)
+         self.bundleId = bundleId
+         self.groupId = groupId
+ 
++
+ class CheckBundleAvailabilityResponse(Request):
+-    def __init__(self,answer):
++    def __init__(self, answer):
+         super().__init__(4)
+         self.answer = answer
+ 
+ 
+ class DownloadBundleRequest(Request):
+-    def __init__(self, bundleId, groupId,file, port):
++    def __init__(self, bundleId, groupId, file, port):
+         super().__init__(5)
+         self.bundleId = bundleId
+         self.groupId = groupId
+@@ -85,7 +87,6 @@
+         self.answer = answer
+ 
+ 
+-
+ def requestHandler(data, addr, groupManager: GroupManager):
+     req = pickle.loads(data)
+     print(req)
+@@ -135,7 +136,7 @@
+                                           args=[addr, req.portForBundleReceiver, groupManager, group, bundle])
+         bundleReceiver.start()
+         # TODO refactor use it to determine if user ok to send bundle
+-        #TODO 9/4 ????
++        # TODO 9/4 ????
+         return pickle.dumps(GetBundleResponse(1))
+ 
+     elif req.type == 4:
+@@ -143,22 +144,23 @@
+         group = groupManager.getGroupWithId(req.groupId)
+         bundle = group.getBundleWithId(req.bundleId)
+         if bundle is False:
+-            #Not Found
++            # Not Found
+             return pickle.dumps(CheckBundleAvailabilityResponse(0))
+-        else :
+-            #Found
++        else:
++            # Found
+             return pickle.dumps(CheckBundleAvailabilityResponse(1))
+ 
+     elif req.type == 5:
+         print("Received Request To Send File")
+-        req = DownloadBundleRequest(req.bundleId, req.groupId, req.file,req.port)
++        req = DownloadBundleRequest(req.bundleId, req.groupId, req.file, req.port)
+         uploadThread = threading.Thread(target=uploadBundle,
+-                                          args=[addr, req.port,])
++                                        args=[addr, req.port, ])
+         uploadThread.start()
+         # TODO refactor use it to determine if user ok to send bundle
+-        #TODO 9/4 ????
++        # TODO 9/4 ????
+         return pickle.dumps(DownloadBundleResponse(1))
+ 
++
+ def responseHandler(data, groupManager):
+     res = pickle.loads(data)
+ 
+@@ -215,7 +217,7 @@
+         return False
+ 
+ 
+-def receiveBundle(port,client,groupManager,groupId,downloadManager):
++def receiveBundle(port, client, groupManager, groupId, downloadManager):
+     print("RECEIVING BUNDLE THREAD")
+     bundleBytes = b""
+     with socket(AF_INET, SOCK_STREAM) as s:
+@@ -229,20 +231,21 @@
+                 data = conn.recv(1024)
+                 # print(data)
+                 bundleBytes = bundleBytes + data
+-                #TODO save Bytes to group and downloads also start downloading.
++                # TODO save Bytes to group and downloads also start downloading.
+                 if not data:
+                     # print("Break")
+                     break
+             # print("Break3")
+     # print("Bundle Str",bundleBytes.decode())
+     bundleObj = json.loads(bundleBytes.decode())
+-    #Fix Bundle Root to be downloaded and location
+-    client : Client.Client
+-    bundleObj["root"] =client.DIR_PATH_DOWNLOADS
+-    bundle = Bundle(bundleObj["name"],bundleObj["description"],bundleObj["id"],bundleObj["timestamp"],bundleObj["root"],bundleObj["pieceSize"],bundleObj["files"])
++    # Fix Bundle Root to be downloaded and location
++    client: Client.Client
++    bundleObj["root"] = client.DIR_PATH_DOWNLOADS
++    bundle = Bundle(bundleObj["name"], bundleObj["description"], bundleObj["id"], bundleObj["timestamp"],
++                    bundleObj["root"], bundleObj["pieceSize"], bundleObj["files"])
+     group = groupManager.getGroupWithId(groupId)
+-    groupManager.addBundle(bundle,group.name)
+-    downloadManager.downloadBundle(bundle,group)
++    groupManager.addBundle(bundle, group.name)
++    downloadManager.downloadBundle(bundle, group)
+ 
+ 
+ def sendBundle(addr, port, groupManager, group, bundle):
+@@ -264,13 +267,14 @@
+ 
+         s.sendall(bundleStr.encode())
+ 
++
+ def is_port_in_use(port: int) -> bool:
+     import socket
+     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+         return s.connect_ex(('localhost', port)) == 0
+ 
+ 
+-def downloadBundle(port, peer,file,bundle,usedPeers,freeFiles):
++def downloadBundle(port, peer, file, bundle, usedPeers, freeFiles):
+     print("DOWNLOADING BUNDLE THREAD")
+     with socket(AF_INET, SOCK_STREAM) as s:
+         s.bind(("0.0.0.0", port))
+@@ -283,11 +287,10 @@
+                 data = conn.recv(1024)
+ 
+ 
+-
+ def uploadBundle(addr, port):
+     print("SENDING BUNDLE THREAD")
+     group: Group
+     with socket(AF_INET, SOCK_STREAM) as s:
+         s.connect((addr[0], port))
+         print("SENDING DATA")
+-        s.sendall("Test Sent".encode())
+\ No newline at end of file
++        s.sendall("Test Sent".encode())
