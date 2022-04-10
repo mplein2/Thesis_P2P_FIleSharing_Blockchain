@@ -5,7 +5,8 @@ import os
 import copy
 import json
 import threading
-from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use,downloadBundle
+from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use,downloadBundle,DownloadBundleRequest
+
 from pickle import dumps, loads
 from time import sleep
 
@@ -157,7 +158,9 @@ class DownloadManager:
                                 # Responded decide what to do
                                 pass
                             else:
-                                print("No Response from", userIp)
+                                usedPeers.remove(peer)
+                                print("No Response from", peer)
+
 
             # Time delay until next iteration .
             # If status changed it will be paused.
