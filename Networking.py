@@ -355,7 +355,7 @@ def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
                         pass
                     else:
                         piece = int(piece.decode())
-                        print(f"Trying to send {piece}")
+                        # print(f"Trying to send {piece}")
                         openfileobject.seek(piece * bundle.pieceSize)
                         readData = openfileobject.read(bundle.pieceSize)
                         s.sendall(readData)
