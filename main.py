@@ -29,7 +29,6 @@ def index():
 @app.route("/groups", methods=['GET'])
 def groups():
     group = request.args.get('group')
-    print("Group page request :", group)
     group = groupManager.getGroupWithName(group)
     return render_template("groups.html", groups=groupManager.groups, group=group)
 
