@@ -177,7 +177,7 @@ class DownloadManager:
 
 
     def downloadBundle(self, bundle: Bundle, group: Group):
-        print("Download Manager Creating Download Class for ", bundle.name)
+        # print("Download Manager Creating Download Class for ", bundle.name)
         bundleToDownload = BundleToDownload(bundle, group)
         self.saveBundle(bundleToDownload)
         self.bundlesDownloading.append(bundleToDownload)

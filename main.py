@@ -103,13 +103,13 @@ def selectDownloadLocation():
 
 @app.route('/searchBundles', methods=['POST'])
 def searchBundles():
-    print("Search Bundles Route")
+    # print("Search Bundles Route")
     if request.method == 'POST':
         data = request.form
 
         #Get Keywords from search
         keywords = data["searchKeyWords"].split()
-        print("Search for :",keywords)
+        # print("Search for :",keywords)
 
         #Get Group
         group = data["group"]
@@ -127,8 +127,8 @@ def searchBundles():
             else:
                 print("No Response from",peer[0])
         #Merge all responses to single list
-        for x in responses:
-            print("Response:",x[0],x[1],x[1].responseBundles)
+        # for x in responses:
+        #     print("Response:",x[0],x[1],x[1].responseBundles)
         #WITH RESPONSES DO STUFF.
         #Respond
         return render_template("search.html", groups=groupManager.groups, group=group , responses = responses)
@@ -167,7 +167,8 @@ def getBundle():
             #Responded decide what to do
             pass
         else:
-            print("No Response from", userIp)
+            # print("No Response from", userIp)
+            pass
     return "1"
 
 
