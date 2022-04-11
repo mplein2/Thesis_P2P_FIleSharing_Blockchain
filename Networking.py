@@ -91,7 +91,7 @@ class DownloadBundleResponse(Request):
 
 def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
-    print(req)
+    print(f"Received From {addr[0]}:{addr[1]} {req.__class__.__name__}")
 
     # Response to JoinRequest
     if req.type == 1:
@@ -113,7 +113,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
         bundlesOfGroup = groupManager.getGroupWithId(req.groupID).bundles
         # Bundles to reply
         responseBundles = []
-        print(responseBundles)
+        # print(responseBundles)
         for bundle in bundlesOfGroup:
             # For each bundle make a single list (bundleKeywords) and search if any of the keywords other user send are in there then send back
             name = bundle.name.split()
@@ -197,7 +197,7 @@ def receiver(groupManager):
         # RECEIVE AND RESPOND.
         data, addr = sock.recvfrom(65537)
         # data, addr = sock.recvfrom(65507)
-        print("Received from :", addr)
+        # print("Received from :", addr)
         response = requestHandler(data, addr, groupManager)
         sock.sendto(response, addr)
 
