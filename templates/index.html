@@ -129,7 +129,13 @@
                                                  aria-valuemax="100"></div>
                                         </div>
                                     </td>
-                                    <td>{{bundle['status']}}</td>
+                                    <td>
+                                        {% if bundle['status']==1 %}
+                                        <label class="badge badge-gradient-success">COMPLETED</label>
+                                        {% else %}
+                                        <label class="badge badge-gradient-warning">DOWNLOADING</label>
+                                        {% endif %}
+                                    </td>
                                     {%endfor%}
                                     </tbody>
                                 </table>

@@ -8,6 +8,7 @@ import threading
 from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use,downloadBundle,DownloadBundleRequest
 from pickle import dumps, loads
 from time import sleep
+from math import floor
 
 
 class DownloadManager:
@@ -129,6 +130,7 @@ class DownloadManager:
 
                             # Find free port.
                             freePort = False
+                            #TODO dynamic
                             port = 6702
                             while freePort is False:
                                 if is_port_in_use(port) is True:
@@ -146,28 +148,29 @@ class DownloadManager:
                                     break
                             # ADD PEER TO USED PEERS.
                             usedPeers.append(peer)
+                            #Download Bundle is a networking function not self.function .
                             downloadReceiver = threading.Thread(target=downloadBundle,
                                                                 args=[self,port, peer,file,bundle,usedPeers,freeFiles])
                             downloadReceiver.start()
 
                             downloadBundleReq = DownloadBundleRequest(bundle.bundleId, bundle.groupId,file[0], port)
                             res = sendRequest(peer[0], 6700, dumps(downloadBundleReq), self.groupManager)
-                            # if other peer is responded.
-                            if res is not False:
-                                # Responded decide what to do
-                                pass
-                            else:
+
+                            if res is False:
+                                #User didnt Respond Close Thream And Remove Him from usedPeers.
+                                downloadReceiver.terminate()
                                 usedPeers.remove(peer)
                                 print("No Response from", peer)
 
 
             # Time delay until next iteration .
-            # If status changed it will be paused.
-            # Sleep()
-            # print("CONTINUING TO DOWNLOAD")
+            if len(freeFiles)==0:
+                #No More Files To Be Downloaded
+                self.saveBundle(bundle)
+                print(f"All Files Completed for {bundle.name}")
+                break
             sleep(10)
-            # print("All Peers :",seeders)
-            # print("Active Peers :",activePeers)
+
 
     def downloadBundle(self, bundle: Bundle, group: Group):
         print("Download Manager Creating Download Class for ", bundle.name)
@@ -227,10 +230,14 @@ class DownloadManager:
                     if piece[2] == 1:
                         completedPieces = completedPieces + 1
             pieces = str(completedPieces) + "/" + str(totalPieces)
-            progress = completedPieces // totalPieces
-            # TODO Status
+            #Get progress as a % eg. 70%
+            progress = floor((completedPieces / totalPieces)*100)
+            if progress>99:
+                status= 1
+            else:
+                status= 0
             progressOfBundle = {"index": indexNum, "name": x.name, "pieces": pieces, "progress": progress,
-                                "status": "TODOTHIS"}
+                                "status": status}
             progressOfBundles.append(progressOfBundle)
         return progressOfBundles
 
