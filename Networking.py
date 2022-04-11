@@ -296,7 +296,7 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
         os.makedirs(dir)
 
     if os.path.exists(filePath) is False:
-        print("CreatingFIle")
+        print("Creating File")
         file = open(filePath, 'x')
         file.close()
 
@@ -314,13 +314,13 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
                     print("Received Ok")
                     for piece in pieceList:
                         if piece[2] == 0:
-                            print(f"Sending Piece num {piece[0]} ")
+                            # print(f"Sending Piece num {piece[0]} ")
                             conn.sendall(str(piece[0]).encode())
                             openfileobject.seek(piece[0]*bundle.pieceSize)
                             data = conn.recv(100000)
-                            print(f"Received {data}")
+                            # print(f"Received {data}")
                             if hashlib.sha1(data).hexdigest() == piece[1]:
-                                print("HASH OK")
+                                # print("HASH OK")
                                 openfileobject.write(data)
                                 piece[2]=1
                                 print(piece)
@@ -336,13 +336,13 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
 
 
 def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
-    print("SENDING BUNDLE THREAD")
+    # print("SENDING BUNDLE THREAD")
     group = groupManager.getGroupWithId(groupId)
     bundle = group.getBundleWithId(bundleId)
     with open(bundle.root + file, 'rb') as openfileobject:
         with socket(AF_INET, SOCK_STREAM) as s:
             s.connect((addr[0], port))
-            print("SENDING DATA")
+            # print("SENDING DATA")
             s.sendall("OK".encode())
             while True:
                 piece = s.recv(1024)

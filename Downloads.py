@@ -177,6 +177,8 @@ class DownloadManager:
         bundleToDownload = BundleToDownload(bundle, group)
         self.saveBundle(bundleToDownload)
         self.bundlesDownloading.append(bundleToDownload)
+        #Re Initialize Downloader
+        self.downloader()
 
     def findPeers(self):
         pass
