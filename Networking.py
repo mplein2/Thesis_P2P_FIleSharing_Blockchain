@@ -153,7 +153,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
             return pickle.dumps(CheckBundleAvailabilityResponse(1))
 
     elif req.type == 5:
-        print("Received Request To Send File")
+        # print("Received Request To Send File")
         req = DownloadBundleRequest(req.bundleId, req.groupId, req.file, req.port)
         uploadThread = threading.Thread(target=uploadBundle,
                                         args=[addr, req.port, req.bundleId, req.groupId, req.file, groupManager])
@@ -220,15 +220,15 @@ def sendRequest(address, port, request, groupManager):
 
 
 def receiveBundle(port, client, groupManager, groupId, downloadManager):
-    print("RECEIVING BUNDLE THREAD")
+    # print("RECEIVING BUNDLE THREAD")
     bundleBytes = b""
     with socket(AF_INET, SOCK_STREAM) as s:
         s.bind(("0.0.0.0", port))
-        print("Bundle Receiver Ready")
+        # print("Bundle Receiver Ready")
         s.listen()
         conn, addr = s.accept()
         with conn:
-            print(f"Connected by {addr}")
+            print(f"Connection From {addr[0]}:{addr[1]} Accepted.")
             while True:
                 data = conn.recv(1024)
                 # print(data)
@@ -251,11 +251,12 @@ def receiveBundle(port, client, groupManager, groupId, downloadManager):
 
 
 def sendBundle(addr, port, groupManager, group, bundle):
-    print("SENDING BUNDLE THREAD")
+    # print("SENDING BUNDLE THREAD")
     group: Group
     with socket(AF_INET, SOCK_STREAM) as s:
         s.connect((addr[0], port))
-        print("SENDING DATA")
+        print(f"Connected To {addr[0]}:{addr[1]}.")
+        # print("SENDING DATA")
         groupManager: GroupManager
         json_file_name = bundle.name + ".json"
         bundleDir = groupManager.DIR_PATH_GROUPS + group.name + "\\" + "Bundles" + "\\" + json_file_name
@@ -285,10 +286,10 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
             pieceList = x["pieces"]
             break
     # pieceList = [[0, '5920572cf97d3711a77a9b7a3469a5fd03bb2a8a', 0]]
-    print("DOWNLOADING BUNDLE THREAD")
+    # print("DOWNLOADING BUNDLE THREAD")
     filePath = bundle.root +f"\\{bundle.name}"+ file[0]
     dir = filePath.rsplit('\\', 1)[0]
-    print(dir)
+    # print(dir)
     #Create Directory's that don't exist.
     isExist = os.path.exists(dir)
     if not isExist:
@@ -304,14 +305,14 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
     with open(filePath, 'rb+') as openfileobject:
         with socket(AF_INET, SOCK_STREAM) as s:
             s.bind(("0.0.0.0", port))
-            print("Bundle Receiver Ready")
+            # print("Bundle Receiver Ready")
             s.listen()
             conn, addr = s.accept()
             with conn:
-                print(f"Connected by {addr} to download file.")
+                print(f"Connection From {addr[0]}:{addr[1]} Accepted.")
                 data = conn.recv(1024)
                 if data.decode() == "OK":
-                    print("Received Ok")
+                    # print("Received Ok")
                     for piece in pieceList:
                         if piece[2] == 0:
                             # print(f"Sending Piece num {piece[0]} ")
@@ -323,7 +324,7 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
                                 # print("HASH OK")
                                 openfileobject.write(data)
                                 piece[2]=1
-                                print(piece)
+                                # print(piece)
                             else:
                                 pass
                                 # print("hashes dont match")
@@ -331,7 +332,7 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
                     conn.sendall("🥭🍓🍇🍉🍐🥧🍊🍍🍏🥑🍑🍌🍎🍐🍉🍇🍓🥭🥝🍒🍅".encode())
                     usedPeers.remove(peer)
                     downloadManager.saveBundle(bundle)
-    print(f"Thread Exit {file}")
+    # print(f"Thread Exit {file}")
 
 
 

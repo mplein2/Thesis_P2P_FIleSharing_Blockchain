@@ -97,7 +97,7 @@ class DownloadManager:
                             # Check if he already is in
                             seeders.append(peer)
                             # new peer found update bundle download file.
-                            print("new peep found")
+                            # print("new peep found")
                             bundle.peers.append(peer)
                             self.saveBundle(bundle)
 
@@ -126,7 +126,7 @@ class DownloadManager:
                             # TODO PUT PEER IN IGNORE LIST don't send to him again.
                             pass
                         elif res.answer == 1:
-                            print("Have peer with bundle to use . ")
+                            # print("Have peer with bundle to use . ")
 
                             # Find free port.
                             freePort = False
@@ -146,21 +146,25 @@ class DownloadManager:
                                     # Block others use the same file
                                     fileToDownload[1] = 1
                                     break
+                            #if no file to download (all completed -> break)
+                            if len(file)==0:
+                                break
+
                             # ADD PEER TO USED PEERS.
                             usedPeers.append(peer)
                             #Download Bundle is a networking function not self.function .
                             downloadReceiver = threading.Thread(target=downloadBundle,
                                                                 args=[self,port, peer,file,bundle,usedPeers,freeFiles])
                             downloadReceiver.start()
-
+                            # print(f"File :{file}")
                             downloadBundleReq = DownloadBundleRequest(bundle.bundleId, bundle.groupId,file[0], port)
                             res = sendRequest(peer[0], 6700, dumps(downloadBundleReq), self.groupManager)
 
                             if res is False:
                                 #User didnt Respond Close Thream And Remove Him from usedPeers.
-                                downloadReceiver.terminate()
+                                #TODO KILL THREAD
                                 usedPeers.remove(peer)
-                                print("No Response from", peer)
+                                # print("No Response from", peer)
 
 
             # Time delay until next iteration .
@@ -169,7 +173,7 @@ class DownloadManager:
                 self.saveBundle(bundle)
                 print(f"All Files Completed for {bundle.name}")
                 break
-            sleep(10)
+            sleep(1)
 
 
     def downloadBundle(self, bundle: Bundle, group: Group):
@@ -263,7 +267,7 @@ class BundleToDownload:
             for file in bundleTemp.files:
                 for piece in file["pieces"]:
                     piece.append(0)
-            print(bundle.files)
+            # print(bundle.files)
 
             # Refactor Files to fit BundleToDownload Class
             self.files = bundleTemp.files

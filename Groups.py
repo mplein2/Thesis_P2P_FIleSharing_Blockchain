@@ -71,8 +71,8 @@ class GroupManager:
     def removeGroup(self, group):
         for x in self.groups:
             if x.name == group:
-                print(self.groups.remove(x))
-        print(self.groups)
+                self.groups.remove(x)
+        # print(self.groups)
 
     def getGroupWithName(self, name):
         group: Group
@@ -156,13 +156,13 @@ class GroupManager:
     def addBundle(self, bundle, group):
         if not os.path.exists(self.DIR_PATH_GROUPS + group + "\\" + "Bundles"):
             # Create a new directory because it does not exist
-            print("Gonna Create Group Folder")
+            print("Creating Group Folder")
             os.makedirs(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
         json_file_name = bundle.name + ".json"
         json_file = open(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name, "w")
         json_file.write(json.dumps(bundle.toJSON()))
         json_file.close()
         self.getGroupWithName(group).bundles.append(bundle)
-        print("Added Bundle")
-        print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
-        print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name)
+        # print("Added Bundle")
+        # print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
+        # print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name)
