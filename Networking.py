@@ -341,22 +341,25 @@ def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
     group = groupManager.getGroupWithId(groupId)
     bundle = group.getBundleWithId(bundleId)
     with open(bundle.root + file, 'rb') as openfileobject:
-        with socket(AF_INET, SOCK_STREAM) as s:
-            s.connect((addr[0], port))
-            # print("SENDING DATA")
-            s.sendall("OK".encode())
-            while True:
-                piece = s.recv(1024)
-                #delimmiter for data
-                if piece == "🥭🍓🍇🍉🍐🥧🍊🍍🍏🥑🍑🍌🍎🍐🍉🍇🍓🥭🥝🍒🍅".encode():
-                    break
-                else:
-                    if piece == b'':
-                        # print("Empty")
-                        pass
+        try:
+            with socket(AF_INET, SOCK_STREAM) as s:
+                s.connect((addr[0], port))
+                # print("SENDING DATA")
+                s.sendall("OK".encode())
+                while True:
+                    piece = s.recv(1024)
+                    #delimmiter for data
+                    if piece == "🥭🍓🍇🍉🍐🥧🍊🍍🍏🥑🍑🍌🍎🍐🍉🍇🍓🥭🥝🍒🍅".encode():
+                        break
                     else:
-                        piece = int(piece.decode())
-                        # print(f"Trying to send {piece}")
-                        openfileobject.seek(piece * bundle.pieceSize)
-                        readData = openfileobject.read(bundle.pieceSize)
-                        s.sendall(readData)
+                        if piece == b'':
+                            # print("Empty")
+                            pass
+                        else:
+                            piece = int(piece.decode())
+                            # print(f"Trying to send {piece}")
+                            openfileobject.seek(piece * bundle.pieceSize)
+                            readData = openfileobject.read(bundle.pieceSize)
+                            s.sendall(readData)
+        except ConnectionResetError as exception:
+            print("Downloader DC")
