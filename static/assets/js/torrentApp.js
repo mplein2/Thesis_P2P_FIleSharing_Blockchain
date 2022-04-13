@@ -134,7 +134,15 @@ function shareBundle(groupName) {
                 , url: '/shareBundle'
                 , success: function (response) {
                     if (response==0){
-                    alert("0");
+                    closeShareBundle();
+                        Swal.fire({
+                          title: "Bundle Shared!",
+                            icon: 'success'
+                        },
+                        function(){
+                          location.reload();
+                        });
+
                     }else{
                     //TODO FAILED ALERT
                     alert("Failed to Create Group");
