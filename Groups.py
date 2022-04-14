@@ -6,6 +6,8 @@ import json
 from typing import Type
 import shutil
 import hashlib
+from Blockchain import Blockchain
+import Blockchain
 from Bundles import Bundle
 import copy
 
@@ -22,7 +24,8 @@ class Invite:
 
 
 class Group:
-    def __init__(self, name, private, admin, peers, timestamp, id=None):
+    def __init__(self, name, private, admin, peers, timestamp, blockchainPath,id=None):
+        self.blockchain = Blockchain.Blockchain(blockchainPath)
         self.name = name
         self.timestamp = timestamp
         self.private = private
@@ -38,6 +41,11 @@ class Group:
         invite = Invite(self.id, self.name, self.timestamp, self.peers)
         return invite
 
+
+    def removeBundle(self,bundle):
+        self.bundles.remove(bundle)
+        return True
+
     def toJSON(self):
         return json.dumps(self.__dict__)
 
@@ -49,7 +57,6 @@ class Group:
                 return bundle
         # If Nothing Proked return in for loop return false for not having the bundle .
         return False
-
 
 class GroupManager:
 
@@ -64,15 +71,21 @@ class GroupManager:
         self.loadGroups()
         print("GroupManager Initialized")
 
+    def deleteBundle(self,group,bundle):
+        group = self.getGroupWithId(group)
+        bundle = group.getBundleWithId(bundle)
+        group.removeBundle(bundle)
+        os.remove(self.DIR_PATH_GROUPS + group.name+"\\Bundles\\"+bundle.name+".json")
+        return True
+
+
     def addGroup(self, group):
         self.saveGroup(group)
         self.groups.append(group)
 
     def removeGroup(self, group):
-        for x in self.groups:
-            if x.name == group:
-                self.groups.remove(x)
-        # print(self.groups)
+        self.groups.remove(group)
+        print(self.groups)
 
     def getGroupWithName(self, name):
         group: Group
@@ -97,14 +110,15 @@ class GroupManager:
 
     def createGroup(self, name, private, admin):
         timeNow = time()
-        newGroup = Group(name, private, [admin, ], [admin, ], timeNow)
+        newGroup = Group(name, private, [admin, ], [admin, ], timeNow,blockchainPath=self.DIR_PATH_GROUPS+name+"\\Blockchain")
         self.saveGroup(newGroup)
         self.groups.append(newGroup)
         return True
 
-    def quitGroup(self, name):
-        shutil.rmtree(self.DIR_PATH_GROUPS + name)
-        self.removeGroup(name)
+    def quitGroup(self, group):
+        group : Group
+        shutil.rmtree(self.DIR_PATH_GROUPS + group.name)
+        self.removeGroup(group)
         return True
 
     def saveGroup(self, group: Group):
@@ -117,6 +131,7 @@ class GroupManager:
         json_file = open(self.DIR_PATH_GROUPS + group.name + '\\' + json_file_name, "w")
         saveCopy = copy.copy(group)
         del saveCopy.bundles
+        del saveCopy.blockchain
         json_file.write(saveCopy.toJSON())
         json_file.close()
 
@@ -125,10 +140,11 @@ class GroupManager:
             file = open(self.DIR_PATH_GROUPS + groupName + "\\" + groupName + ".json")
             json_load_group = json.load(file)
             file.close()
-            group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
-                          json_load_group["peers"], json_load_group["timestamp"], json_load_group["id"], )
         except:
             print("Error Opening Group file :", groupName)
+
+        group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
+                      json_load_group["peers"], json_load_group["timestamp"],self.DIR_PATH_GROUPS + groupName + "\\" + "Blockchain\\", json_load_group["id"], )
 
         # Load Bundles of Each group.
         groupBundlePath = self.DIR_PATH_GROUPS + groupName + "\\" + "Bundles\\"
@@ -146,6 +162,9 @@ class GroupManager:
                     bundleObj = Bundle(data["name"], data["description"], data["id"], data["timestamp"], data["root"],
                                        data["pieceSize"], data["files"])
                     group.bundles.append(bundleObj)
+
+
+
         self.groups.append(group)
 
     def loadGroups(self):

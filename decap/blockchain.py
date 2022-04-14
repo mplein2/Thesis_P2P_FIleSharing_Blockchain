@@ -16,7 +16,7 @@ class Block:
         return sha256(block_string.encode()).hexdigest()
 
 class Blockchain:
-    difficulty = 6
+    difficulty = 5
 
     def __init__(self):
         self.unconfirmed_transactions = []
@@ -85,17 +85,6 @@ if __name__ == '__main__':
     print(blockchain.last_block.transactions)
     blockchain.add_new_transaction("8.8.8.8 Joined")
     blockchain.add_new_transaction("8.8.8.8 Shared File asdasdasdasd")
-    mine_response = blockchain.mine()
-    print(mine_response)
-    print(blockchain.last_block.transactions)
-    blockchain.add_new_transaction("B ivited 1.1.1.1")
-    blockchain.add_new_transaction("8.8.8.8 Joined")
-    blockchain.add_new_transaction("8.8.8.8 Joined")
-    mine_response = blockchain.mine()
-    print(mine_response)
-    print(blockchain.last_block.transactions)
-    blockchain.add_new_transaction("8.8.8.8 Joined")
-    blockchain.add_new_transaction("8.8.8.8 Joined")
     mine_response = blockchain.mine()
     print(mine_response)
     print(blockchain.last_block.transactions)

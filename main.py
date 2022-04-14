@@ -36,8 +36,16 @@ def groups():
 @app.route('/start', methods=['POST', 'GET'])
 def start():
     print("Start Worked")
-    # TODO Start downloading
-    return "alright"
+    if downloadManager.STATUS:
+        downloadManager.STATUS = False
+        #downloadManager Off
+        print("Download Manager Not Active")
+        return "0"
+    else:
+        downloadManager.STATUS = True
+        #downloadManager On
+        print("Download Manager Active")
+        return "1"
 
 
 @app.route('/generateInvite', methods=['POST'])
@@ -53,6 +61,17 @@ def generateInvite():
         print(group)
         invite = group.generateInvite()
         return Compress.compress(invite.toJSON())
+
+@app.route('/deleteBundle', methods=['POST'])
+def deleteBundle():
+    if request.method == 'POST':
+        data = request.form
+        groupId = data["groupId"]
+        bundleId = data["bundleId"]
+        if groupManager.deleteBundle(groupId,bundleId):
+            return "1"
+        else:
+            return "0"
 
 
 @app.route('/joinGroup', methods=['POST'])
@@ -177,7 +196,8 @@ def quitGroup():
     print('QUIT GROUP REQ')
     if request.method == 'POST':
         data = request.form
-        group = data["group"]
+        groupid = data["group"]
+        group = groupManager.getGroupWithId(groupid)
         if groupManager.quitGroup(group):
             # True
             return "0"

@@ -1,8 +1,12 @@
 function start() {
-    alert("JS RECEIVED START");
     const xhttp = new XMLHttpRequest();
     xhttp.onload = function() {
-        alert("AJAX COMPLETED, RESPONSE:"+this.responseText);
+        if (this.responseText == "1"){
+        alert("Download Manager Active");
+        }
+        else{
+        alert("Download Manager Not Active");
+        }
 
         }
     xhttp.open("POST", "/start", true);
@@ -39,6 +43,22 @@ function generateInvite(groupName) {
                 , url: '/generateInvite'
                 , success: function (response) {
                     inviteTextArea.value=response;
+                }
+            });
+
+}
+
+function deleteBundle(bundleId,groupId) {
+    $.ajax({
+                data: {bundleId:bundleId, groupId:groupId}
+                , type: 'post'
+                , url: '/deleteBundle'
+                , success: function (response) {
+                        Swal.fire({
+                          title: "Bundle Deleted!",
+                            icon: 'success'
+                        });
+                        location.reload();
                 }
             });
 
