@@ -3,6 +3,8 @@ import logging
 import threading
 from pickle import dumps, loads
 from flask import Flask, render_template, request, redirect
+
+import Blockchain
 import Compress
 from Networking import receiver, sendRequest, JoinRequest,SearchBundleRequest,receiveBundle,GetBundleRequest
 from Groups import GroupManager, Invite,Group
@@ -54,7 +56,7 @@ def generateInvite():
         data = request.form
         group = data["group"]
         print(str(group))
-        # TODO IP SPECIFIC BLOCKCHAIN
+        # TODO KEY SPECIFIC BLOCKCHAIN
         ip = data["ip"]
         print("Generate Invite for :", group)
         group = groupManager.getGroupWithName(group)
@@ -162,6 +164,10 @@ def createGroup():
         else:
             private = 0
     if groupManager.createGroup(name, private, [client.publicIP]):
+        #Make First Block In Blockchain Append Admin
+        #Type 0 First Created
+        group = groupManager.getGroupWithName(name)
+        group.blockchain.create_genesis_block(client)
         # True
         return "0"
     else:

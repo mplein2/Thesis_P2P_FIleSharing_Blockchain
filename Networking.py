@@ -213,7 +213,6 @@ def sendRequest(address, port, request, groupManager):
         res = responseHandler(data, groupManager)
         return res
     # TODO except socket.timeout
-    # TODO for better exception handling fix later.
     except Exception as exception:
         # print("Exception on SendRequest:", exception)
         return False

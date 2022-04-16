@@ -173,7 +173,7 @@ class DownloadManager:
                 self.saveBundle(bundle)
                 print(f"All Files Completed for {bundle.name}")
                 break
-            sleep(1)
+            sleep(5)
 
 
     def downloadBundle(self, bundle: Bundle, group: Group):

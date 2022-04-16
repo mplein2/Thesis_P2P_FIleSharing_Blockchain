@@ -25,12 +25,12 @@ class Invite:
 
 class Group:
     def __init__(self, name, private, admin, peers, timestamp, blockchainPath,id=None):
-        self.blockchain = Blockchain.Blockchain(blockchainPath)
         self.name = name
         self.timestamp = timestamp
         self.private = private
         self.admins = admin
         self.peers = peers
+        self.blockchain = Blockchain.Blockchain(blockchainPath,self.peers)
         self.bundles = []
         if id is None:
             self.id = hashlib.sha256((name + str(timestamp)).encode('utf-8')).hexdigest()
@@ -144,7 +144,7 @@ class GroupManager:
             print("Error Opening Group file :", groupName)
 
         group = Group(json_load_group["name"], json_load_group["private"], json_load_group["admins"],
-                      json_load_group["peers"], json_load_group["timestamp"],self.DIR_PATH_GROUPS + groupName + "\\" + "Blockchain\\", json_load_group["id"], )
+                      json_load_group["peers"], json_load_group["timestamp"],self.DIR_PATH_GROUPS + groupName + "\\" + "Blockchain\\", json_load_group["id"])
 
         # Load Bundles of Each group.
         groupBundlePath = self.DIR_PATH_GROUPS + groupName + "\\" + "Bundles\\"

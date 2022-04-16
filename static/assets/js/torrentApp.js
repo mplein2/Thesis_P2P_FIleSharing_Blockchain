@@ -54,11 +54,12 @@ function deleteBundle(bundleId,groupId) {
                 , type: 'post'
                 , url: '/deleteBundle'
                 , success: function (response) {
-                        Swal.fire({
+ Swal.fire({
                           title: "Bundle Deleted!",
                             icon: 'success'
-                        });
-                        location.reload();
+                        }).then(function() {
+                        window.location.reload();
+                    });
                 }
             });
 
@@ -158,10 +159,9 @@ function shareBundle(groupName) {
                         Swal.fire({
                           title: "Bundle Shared!",
                             icon: 'success'
-                        },
-                        function(){
-                          location.reload();
-                        });
+                        }).then(function() {
+                        window.location.reload();
+                    });
 
                     }else{
                     //TODO FAILED ALERT
