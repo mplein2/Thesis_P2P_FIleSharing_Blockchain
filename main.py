@@ -91,7 +91,7 @@ def joinGroup():
             print(peer[0])
             res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
             group = res.group
-            group = Group(group.name,group.private,group.admins,group.peers,group.timestamp)
+            group = Group(group.name,group.admins,group.peers,group.timestamp,blockchainPath=groupManager.DIR_PATH_GROUPS+group.name+"\\Blockchain")
             groupManager.addGroup(group)
         return "1"
 
