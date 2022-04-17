@@ -123,10 +123,9 @@ function joinGroup() {
 }
 
 function createGroup() {
-    var private = document.getElementById("private").value;
     var name = document.getElementById("name").value;
     $.ajax({
-                data: {private: private,name:name}
+                data: {name:name}
                 , type: 'post'
                 , url: '/createGroup'
                 , success: function (response) {

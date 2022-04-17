@@ -21,15 +21,14 @@ class GroupManager:
                 # Append them on Groups List
                 try:
                     loaded_group = Group(json_load_group["group_name"], json_load_group["group_desc"],
-                                         json_load_group["group_priv"],
                                          json_load_group["peer_list"])
                     self.Groups.append(loaded_group)
                 except:
                     pass
 
-    def CreateGroup(self, group_name, group_desc, group_priv, peer_list):
+    def CreateGroup(self, group_name, group_desc, peer_list):
         group_name = "@" + group_name.replace(" ", "_").lower()
-        new_group = Group(group_name, group_desc, group_priv, peer_list)
+        new_group = Group(group_name, group_desc, peer_list)
         new_group.GroupSave(self.DIR_PATH_GROUPS)
 
     def JoinGroup(self):
@@ -60,7 +59,6 @@ class GroupManager:
             # Append them on Groups List
             try:
                 loaded_group = Group(json_load_group["group_name"], json_load_group["group_desc"],
-                                     json_load_group["group_priv"],
                                      json_load_group["peer_list"])
                 self.Groups.append(loaded_group)
             except:
@@ -69,10 +67,9 @@ class GroupManager:
 
 # This will be a class representing a group that the user is part of .
 class Group:
-    def __init__(self, group_name, group_desc, group_priv, peer_list):
+    def __init__(self, group_name, group_desc, peer_list):
         self.group_name = group_name
         self.group_desc = group_desc
-        self.group_priv = group_priv
         self.peer_list = peer_list
 
     def AddPeer(self, ip, port):

@@ -159,11 +159,7 @@ def createGroup():
     if request.method == 'POST':
         data = request.form
         name = data["name"]
-        if data["private"]:
-            private = 1
-        else:
-            private = 0
-    if groupManager.createGroup(name, private, [client.publicIP]):
+    if groupManager.createGroup(name, [client.publicIP]):
         #Make First Block In Blockchain Append Admin
         #Type 0 First Created
         group = groupManager.getGroupWithName(name)
