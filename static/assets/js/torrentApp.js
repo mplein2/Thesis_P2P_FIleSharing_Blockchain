@@ -112,11 +112,10 @@ function joinGroup() {
                 , type: 'post'
                 , url: '/joinGroup'
                 , success: function (response) {
-                    if (response==0){
+                    if (response=="1"){
                     window.location.replace("/groups?group="+name);
                     }else{
-                    //TODO FAILED ALERT
-                    alert("Failed to Join Group")
+                    alert("Failed to join , try again.")
                     }
                 }
             });
