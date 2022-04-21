@@ -89,6 +89,7 @@ class DownloadBundleResponse(Request):
         super().__init__(5)
         self.answer = answer
 
+
 class UpdateBlockchainRequest(Request):
     def __init__(self, groupId):
         super().__init__(6)
@@ -99,6 +100,7 @@ class UpdateBlockchainResponse(Request):
     def __init__(self, answer):
         super().__init__(6)
         self.answer = answer
+
 
 def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
@@ -178,40 +180,47 @@ def requestHandler(data, addr, groupManager: GroupManager):
         req = UpdateBlockchainRequest(req.groupId)
         group = groupManager.getGroupWithId(req.groupId)
         if group.blockchain.isUserAllowed(addr[0]):
-            #User is ok
+            # User is ok
             lastBlock = group.blockchain.getLastBlock()
-            lastBlock : Blockchain.Block
+            lastBlock: Blockchain.Block
             lastBlockIndex = lastBlock.index
             return pickle.dumps(UpdateBlockchainResponse(lastBlockIndex))
         else:
-            #User not invited not joined, therefore don't answer.
+            # User not invited not joined, therefore don't answer.
             return False
 
-def responseHandler(data):
+
+def responseHandler(data,addr):
     res = pickle.loads(data)
 
     if res.type == 1:
         res = JoinResponse(res.group)
+        print(f"Received Response{res.__class__} from {addr[0]}")
         return res
 
     elif res.type == 2:
         res = SearchBundleResponse(res.responseBundles)
+        print(f"Received Response{res.__class__} from {addr[0]}")
         return res
 
     elif res.type == 3:
         res = SearchBundleResponse(res.answer)
+        print(f"Received Response{res.__class__} from {addr[0]}")
         return res
 
     elif res.type == 4:
         res = CheckBundleAvailabilityResponse(res.answer)
+        print(f"Received Response{res.__class__} from {addr[0]}")
         return res
 
     elif res.type == 5:
         res = DownloadBundleResponse(res.answer)
+        print(f"Received Response{res.__class__} from {addr[0]}")
         return res
 
     elif res.type == 6:
         res = UpdateBlockchainResponse(res.answer)
+        print(f"Received Response{res.__class__} from {addr[0]}")
         return res
 
 
@@ -227,7 +236,7 @@ def receiver(groupManager):
         # data, addr = sock.recvfrom(65507)
         # print("Received from :", addr)
         response = requestHandler(data, addr, groupManager)
-        #Request Handler if not want to answer returns False.
+        # Request Handler if not want to answer returns False.
         if response is not False:
             sock.sendto(response, addr)
 
@@ -239,8 +248,7 @@ def sendRequest(address, port, request):
     try:
         clientSocket.sendto(request, (address, port))
         data, addr = clientSocket.recvfrom(65537)
-        # data, addr = clientSocket.recvfrom(65507)
-        res = responseHandler(data)
+        res = responseHandler(data, addr)
         return res
     # TODO except socket.timeout
     except Exception as exception:
@@ -306,8 +314,7 @@ def is_port_in_use(port: int) -> bool:
         return s.connect_ex(('localhost', port)) == 0
 
 
-def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFiles):
-    bundle: BundleToDownload
+def downloadBundle(downloadManager, port, peer, file, bundle, usedPeers, freeFiles):
     pieceList = []
     # Find pieces missing
     for x in bundle.files:
@@ -316,10 +323,10 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
             break
     # pieceList = [[0, '5920572cf97d3711a77a9b7a3469a5fd03bb2a8a', 0]]
     # print("DOWNLOADING BUNDLE THREAD")
-    filePath = bundle.root +f"\\{bundle.name}"+ file[0]
+    filePath = bundle.root + f"\\{bundle.name}" + file[0]
     dir = filePath.rsplit('\\', 1)[0]
     # print(dir)
-    #Create Directory's that don't exist.
+    # Create Directory's that don't exist.
     isExist = os.path.exists(dir)
     if not isExist:
         # Create a new directory because it does not exist
@@ -329,7 +336,6 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
         print("Creating File")
         file = open(filePath, 'x')
         file.close()
-
 
     with open(filePath, 'rb+') as openfileobject:
         with socket(AF_INET, SOCK_STREAM) as s:
@@ -346,13 +352,13 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
                         if piece[2] == 0:
                             # print(f"Sending Piece num {piece[0]} ")
                             conn.sendall(str(piece[0]).encode())
-                            openfileobject.seek(piece[0]*bundle.pieceSize)
+                            openfileobject.seek(piece[0] * bundle.pieceSize)
                             data = conn.recv(100000)
                             # print(f"Received {data}")
                             if hashlib.sha1(data).hexdigest() == piece[1]:
                                 # print("HASH OK")
                                 openfileobject.write(data)
-                                piece[2]=1
+                                piece[2] = 1
                                 # print(piece)
                             else:
                                 pass
@@ -362,7 +368,6 @@ def downloadBundle(downloadManager , port, peer, file, bundle, usedPeers, freeFi
                     usedPeers.remove(peer)
                     downloadManager.saveBundle(bundle)
     # print(f"Thread Exit {file}")
-
 
 
 def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
@@ -377,7 +382,7 @@ def uploadBundle(addr, port, bundleId, groupId, file, groupManager):
                 s.sendall("OK".encode())
                 while True:
                     piece = s.recv(1024)
-                    #delimmiter for data
+                    # delimmiter for data
                     if piece == "🥭🍓🍇🍉🍐🥧🍊🍍🍏🥑🍑🍌🍎🍐🍉🍇🍓🥭🥝🍒🍅".encode():
                         break
                     else:
