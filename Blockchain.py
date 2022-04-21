@@ -182,12 +182,12 @@ class Blockchain:
             # print("Peer to ask for update:",peer)
             updateBlockchainReq = Networking.UpdateBlockchainRequest(self.groupId)
             res = Networking.sendRequest(peer[0], 6700, dumps(updateBlockchainReq))
-            print(res)
+            # print(res)
             if res is not False:
                  responses.append(res)
         if len(responses):
-            for x in res:
-                print(x.answer)
+            for x in responses:
+                print(f"Answer for last index is:",x.answer)
             #Someone answered.
             # update from responded peers until you have max blockchain thing .
 
@@ -265,9 +265,15 @@ class Blockchain:
         for block in self.chain:
             block : Block
             transaction = json.loads(block.transaction)
+            #From Create Genesis Block
+            if transaction["type"]==0:
+                if transaction["ip"]==ip:
+                    return True
+            #From Invite
             if transaction["type"]==1:
                 if transaction["ip"]==ip:
                     return True
+        #Didndt find user
         return False
 
 
