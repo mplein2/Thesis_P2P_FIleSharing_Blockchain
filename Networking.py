@@ -260,14 +260,17 @@ def receiver(groupManager):
     sock.bind((UDP_IP, UDP_PORT))
     print("Listening on ", UDP_IP, ":", UDP_PORT)
     while True:
-        # RECEIVE AND RESPOND.
-        data, addr = sock.recvfrom(65537)
-        # data, addr = sock.recvfrom(65507)
-        # print("Received from :", addr)
-        response = requestHandler(data, addr, groupManager)
-        # Request Handler if not want to answer returns False.
-        if response is not False:
-            sock.sendto(response, addr)
+        try:
+            # RECEIVE AND RESPOND.
+            data, addr = sock.recvfrom(65537)
+            # data, addr = sock.recvfrom(65507)
+            # print("Received from :", addr)
+            response = requestHandler(data, addr, groupManager)
+            # Request Handler if not want to answer returns False.
+            if response is not False:
+                sock.sendto(response, addr)
+        except Exception as e:
+            pass
 
 
 def sendRequest(address, port, request):
