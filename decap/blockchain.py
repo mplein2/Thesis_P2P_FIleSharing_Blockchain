@@ -34,11 +34,11 @@ class Blockchain:
 
     def proof_of_work(self, block):
         block.nonce = 0
-        computed_hash = block.compute_hash()
+        computed_hash = block.computeHash()
         print("Starting Mining")
         while not computed_hash.startswith('0' * Blockchain.difficulty):
             block.nonce += 1
-            computed_hash = block.compute_hash()
+            computed_hash = block.computeHash()
         print("Mining Ended Nonce :", block.nonce)
         return computed_hash
 
@@ -54,7 +54,7 @@ class Blockchain:
 
     def is_valid_proof(self, block, block_hash):
         return (block_hash.startswith('0' * Blockchain.difficulty) and
-                block_hash == block.compute_hash())
+                block_hash == block.computeHash())
 
     def add_new_transaction(self, transaction):
         self.unconfirmed_transactions.append(transaction)

@@ -60,7 +60,7 @@ def generateInvite():
         ip = data["ip"] #This is string
         transaction = Blockchain.InviteTransaction(ip)
         transactionStr = json.dumps(transaction.__dict__)
-        group.blockchain.add_new_transaction(transactionStr)
+        group.blockchain.addNewTransaction(transactionStr)
         # print("Generate Invite for :", group)
         # print(group)
         invite = group.generateInvite()
@@ -167,7 +167,7 @@ def createGroup():
         #Make First Block In Blockchain Append Admin
         #Type 0 First Created
         group = groupManager.getGroupWithName(name)
-        group.blockchain.create_genesis_block(client)
+        group.blockchain.createGenesisBlock(client)
         # True
         return "0"
     else:
@@ -214,7 +214,7 @@ def quitGroup():
 
 if __name__ == "__main__":
     client = Client()
-    groupManager = GroupManager()
+    groupManager = GroupManager(client)
     bundleManager = BundleManager()
     downloadManager = DownloadManager(groupManager,client)
     #TODO Networking Thread To Receive From Internet

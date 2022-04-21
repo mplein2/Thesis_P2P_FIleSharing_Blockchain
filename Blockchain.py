@@ -22,7 +22,7 @@ class Block:
 
         self.signatures = signatures
 
-    def compute_hash(self):
+    def computeHash(self):
         mycopy = copy.copy(self)
         del mycopy.signatures
         # print(mycopy.__dict__)
@@ -92,7 +92,7 @@ class Blockchain:
         else:
             return len(self.peers)
 
-    def create_genesis_block(self, client):
+    def createGenesisBlock(self, client):
         transaction = GenesisTransaction(client.publicIP, client.publicKey.save_pkcs1(format='PEM').decode("utf-8"))
         transactionStr = json.dumps(transaction.__dict__)
         # this is string json format
@@ -102,12 +102,8 @@ class Blockchain:
 
         signature = rsa.sign(transactionStr.encode(), client.privateKey, 'SHA-1')
 
-        # Bytes
-        # print(signature)
-        # print(signature.__class__)
-
         genesis_block = Block(0, transactionStr, str(time.time()), "0", [str(signature)])
-        genesis_block.hash = genesis_block.compute_hash()
+        genesis_block.hash = genesis_block.computeHash()
         self.saveBlock(genesis_block)
         self.chain.append(genesis_block)
 
@@ -170,10 +166,10 @@ class Blockchain:
         self.chain.append(blockObj)
         # print(blockObj.__dict__)
 
-    def add_new_transaction(self, transaction: str):
+    def addNewTransaction(self, transaction: str):
         newUnconfirmedTransaction = UnconfirmedTransaction(transaction)
         self.unconfirmed_transactions.append(newUnconfirmedTransaction)
-        self.save_unconfirmed_transactions()
+        self.saveUnconfirmedTransactions()
 
     def updateBlockchain(self):
         for peer in self.peers:
@@ -185,13 +181,12 @@ class Blockchain:
                 if res.answer > self.getLastBlockIndex():
                     print(self.getLastBlockIndex().__class__, res.answer.__class__)
                     while self.getLastBlockIndex() < res.answer:
-
                         # Get block
                         getBlockReq = Networking.GetBlockRequest(self.groupId, self.getLastBlockIndex() + 1)
                         blockRes = Networking.sendRequest(peer[0], 6700, dumps(getBlockReq))
                         if blockRes is not False:
                             print(f"Update BC Response:{blockRes}")
-                            print(blockRes.answer)
+                            # print(blockRes.answer)
                             block = blockRes.answer
                             block: Block
                             print(block.index, block.transaction, block.signatures, block.timestamp,
@@ -199,9 +194,9 @@ class Blockchain:
                             newBlock = Block(block.index, block.transaction, block.timestamp, block.previous_hash,
                                   block.signatures)
                             newBlock.hash = block.hash
-                            print(newBlock)
-                            # Save Block
-                            # Append to blockchain
+                            if self.validateNewBlock(newBlock):
+                                self.saveBlock(newBlock)
+                                self.chain.append(newBlock)
                         else:
                             break
 
@@ -211,6 +206,31 @@ class Blockchain:
             if block.index == index:
                 return block
         return False
+
+    def validateNewBlock(self,newBlock):
+        """This function is for new blocks that come from peers returns true if blocks checks out."""
+        newBlock : Block
+
+        #If hash ok.
+        if newBlock.computeHash() == newBlock.hash:
+            # Validation for genesis block
+            if newBlock.index ==0:
+                if self.getLastBlockIndex()==-1:
+                    #No other blocks accept it.
+                    return True
+                else:
+                    return False
+            else:
+                #Check if new block is made with the same previous block.
+                #TODO if not resolve ?
+                if newBlock.previous_hash == self.getLastBlock().computeHash():
+                    #TODO check if signatures okay.
+                    #TODO check timestamp.
+                    #TODO check difficulty based on blockchain etc.
+                    return True
+
+
+
 
     def mine(self):
         # Load my public key.
@@ -224,7 +244,6 @@ class Blockchain:
         while True:
             # Update Blockchain.
             self.updateBlockchain()
-
             if not self.unconfirmed_transactions:
                 # If No Transaction sleep and check again soon.
                 sleep(30)
@@ -240,7 +259,7 @@ class Blockchain:
                             # No Signatures add my signature
                             signature = rsa.sign(transaction.transaction.encode(), privateKey, 'SHA-1')
                             transaction.signatures.append(str(signature))
-                            self.save_unconfirmed_transactions()
+                            self.saveUnconfirmedTransactions()
                         else:
                             # Get Signatures from other persons.
                             pass
@@ -253,15 +272,15 @@ class Blockchain:
                         lastBlock: Block
                         print(f"Last Block Index :{lastBlock.index}")
                         newBlock = Block(lastBlock.index + 1, transaction.transaction, str(time.time()),
-                                         lastBlock.compute_hash(), transaction.signatures)
-                        newBlock.hash = newBlock.compute_hash()
+                                         lastBlock.computeHash(), transaction.signatures)
+                        newBlock.hash = newBlock.computeHash()
                         self.unconfirmed_transactions.remove(transaction)
-                        self.save_unconfirmed_transactions()
+                        self.saveUnconfirmedTransactions()
                         self.saveBlock(newBlock)
                         self.chain.append(newBlock)
                 sleep(30)
 
-    def getLastBlock(self):
+    def getLastBlock(self) -> Block:
         lastBlockIndex = self.chain[0].index
         # Find last Block and return it
         lastBlock = self.chain[0]
@@ -286,7 +305,7 @@ class Blockchain:
                     lastBlockIndex = block.index
             return lastBlock.index
 
-    def save_unconfirmed_transactions(self):
+    def saveUnconfirmedTransactions(self):
         # print(self.TRANSACTION_PATH)
         if not os.path.exists(self.TRANSACTION_PATH):
             # Create a new directory because it does not exist

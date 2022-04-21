@@ -13,7 +13,7 @@ message = rsa.decrypt(crypto, peer1prv)
 print(message.decode('utf8'))
 
 
-hash = rsa.compute_hash(message, 'SHA-1')
+hash = rsa.computeHash(message, 'SHA-1')
 
 peer1signature = rsa.sign_hash(hash, peer1prv, 'SHA-1')
 peer2signature = rsa.sign_hash(hash, peer2prv, 'SHA-1')
