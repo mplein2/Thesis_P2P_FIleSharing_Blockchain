@@ -96,7 +96,7 @@ def joinGroup():
                 group = Group(group.name,group.admins,group.peers,group.timestamp,blockchainPath=groupManager.DIR_PATH_GROUPS+group.name+"\\Blockchain")
                 groupManager.addGroup(group)
         #Make thread to update blockhain and get up to date.
-        #TODO
+        #TODO if fail do something.
         return "1"
 
 

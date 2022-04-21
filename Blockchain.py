@@ -177,19 +177,31 @@ class Blockchain:
         self.save_unconfirmed_transactions()
 
     def updateBlockchain(self):
-        responses = []
         for peer in self.peers:
-            # print("Peer to ask for update:",peer)
+            #For each peer ask their max index of blockchain
             updateBlockchainReq = Networking.UpdateBlockchainRequest(self.groupId)
             res = Networking.sendRequest(peer[0], 6700, dumps(updateBlockchainReq))
-            # print(res)
             if res is not False:
-                 responses.append(res)
-        if len(responses):
-            for x in responses:
-                print(f"Answer for last index is:",x.answer)
-            #Someone answered.
-            # update from responded peers until you have max blockchain thing .
+                #if the response is bigger than me ask him for his block until we are at the same.
+                if res.answer>self.getLastBlock().index:
+                    while self.getLastBlock().index<res.answer:
+                        #Get block
+                        getBlockReq = Networking.GetBlockRequest(self.groupId,self.getLastBlock().index+1)
+                        res = Networking.sendRequest(peer[0], 6700, dumps(getBlockReq))
+                        if res is not False:
+                            print(f"Update BC Response:{res}")
+                            # Save Block
+                            # Append to blockchain
+                        else:
+                            break
+
+    def getBlockWithIndex(self,index):
+        for block in self.chain:
+            block : Block
+            if block.index == index:
+                return block
+        return False
+
 
     def mine(self):
         #Load my public key.
@@ -244,7 +256,7 @@ class Blockchain:
         #Find last Block and return it
         lastBlock = self.chain[0]
         for block in self.chain:
-            print(block.index)
+            # print(block.index)
             if block.index > lastBlockIndex:
                 lastBlock = block
                 lastBlockIndex = block.index

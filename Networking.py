@@ -101,6 +101,21 @@ class UpdateBlockchainResponse(Request):
         super().__init__(6)
         self.answer = answer
 
+class GetBlockRequest(Request):
+    def __init__(self, groupId):
+        super().__init__(7)
+        self.groupId = groupId
+        self.blockIndex = blockIndex
+
+
+class GetBlockResponse(Request):
+    def __init__(self, answer):
+        super().__init__(7)
+        self.answer = answer
+
+
+
+
 
 def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
@@ -189,6 +204,15 @@ def requestHandler(data, addr, groupManager: GroupManager):
             # User not invited not joined, therefore don't answer.
             return False
 
+    elif req.type ==7:
+        req = GetBlockRequest(req.groupId,req.blockIndex)
+        group = groupManager.getGroupWithId(req.groupId)
+        block = group.blockchain.getBlockWithIndex(req.blockIndex)
+        if block is not False:
+            return pickle.dumps(GetBlockResponse(block))
+        else:
+            return False
+
 
 def responseHandler(data,addr):
     res = pickle.loads(data)
@@ -220,6 +244,11 @@ def responseHandler(data,addr):
 
     elif res.type == 6:
         res = UpdateBlockchainResponse(res.answer)
+        print(f"Received from {addr[0]} {res.__class__.__name__}")
+        return res
+
+    elif res.type == 7:
+        res = GetBlockResponse(res.answer)
         print(f"Received from {addr[0]} {res.__class__.__name__}")
         return res
 
