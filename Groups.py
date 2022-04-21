@@ -24,18 +24,19 @@ class Invite:
 
 
 class Group:
-    def __init__(self, name, admin, peers, timestamp, blockchainPath,id=None):
+    def __init__(self, name, admin, peers, timestamp, blockchainPath,client,id=None):
         self.name = name
         self.timestamp = timestamp
         self.admins = admin
         self.peers = peers
         self.bundles = []
+        self.client = client
         if id is None:
             self.id = hashlib.sha256((name + str(timestamp)).encode('utf-8')).hexdigest()
         else:
             self.id = id
 
-        self.blockchain = Blockchain.Blockchain(blockchainPath,self.peers,self.id)
+        self.blockchain = Blockchain.Blockchain(blockchainPath,self.peers,self.id,self.client)
 
     def generateInvite(self):
         invite = Invite(self.id, self.name, self.timestamp, self.peers)
@@ -60,7 +61,8 @@ class Group:
 
 class GroupManager:
 
-    def __init__(self):
+    def __init__(self,client):
+        self.client = client
         self.groups = []
         self.DIR_PATH_GROUPS = '%s\\TorrentApp\\Groups\\' % os.environ['APPDATA']
         if not os.path.exists(self.DIR_PATH_GROUPS):
@@ -114,7 +116,7 @@ class GroupManager:
 
     def createGroup(self, name, admin):
         timeNow = time()
-        newGroup = Group(name, [admin, ], [admin, ], timeNow,blockchainPath=self.DIR_PATH_GROUPS+name+"\\Blockchain")
+        newGroup = Group(name, [admin, ], [admin, ], timeNow,blockchainPath=self.DIR_PATH_GROUPS+name+"\\Blockchain",client=self.client)
         self.saveGroup(newGroup)
         self.groups.append(newGroup)
         return True
@@ -136,6 +138,7 @@ class GroupManager:
         saveCopy = copy.copy(group)
         del saveCopy.bundles
         del saveCopy.blockchain
+        del saveCopy.client
         json_file.write(saveCopy.toJSON())
         json_file.close()
 
@@ -148,7 +151,7 @@ class GroupManager:
             print("Error Opening Group file :", groupName)
 
         group = Group(json_load_group["name"], json_load_group["admins"],
-                      json_load_group["peers"], json_load_group["timestamp"],self.DIR_PATH_GROUPS + groupName + "\\" + "Blockchain\\", json_load_group["id"])
+                      json_load_group["peers"], json_load_group["timestamp"],self.DIR_PATH_GROUPS + groupName + "\\" + "Blockchain\\",self.client,json_load_group["id"])
 
         # Load Bundles of Each group.
         groupBundlePath = self.DIR_PATH_GROUPS + groupName + "\\" + "Bundles\\"

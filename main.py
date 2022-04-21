@@ -93,7 +93,7 @@ def joinGroup():
             res = sendRequest(peer[0], 6700, dumps(joinReq))
             if res is not False:
                 group = res.group
-                group = Group(group.name,group.admins,group.peers,group.timestamp,blockchainPath=groupManager.DIR_PATH_GROUPS+group.name+"\\Blockchain")
+                group = Group(group.name,group.admins,group.peers,group.timestamp,blockchainPath=groupManager.DIR_PATH_GROUPS+group.name+"\\Blockchain",client=client)
                 groupManager.addGroup(group)
         #Make thread to update blockhain and get up to date.
         #TODO if fail do something.

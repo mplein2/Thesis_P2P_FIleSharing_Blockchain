@@ -53,13 +53,14 @@ class InviteTransaction:
 
 
 class Blockchain:
-    def __init__(self, path, groupPeers, groupId):
+    def __init__(self, path, groupPeers, groupId,client):
         self.BLOCKCHAIN_PATH = path
         self.TRANSACTION_PATH = self.BLOCKCHAIN_PATH + "\\Transactions\\"
         self.unconfirmed_transactions = []
         self.chain = []
         self.peers = groupPeers
         self.groupId = groupId
+        self.client = client
         if not os.path.exists(self.BLOCKCHAIN_PATH):
             # If Path dosent Exist Create it
             os.makedirs(self.BLOCKCHAIN_PATH)
@@ -78,7 +79,7 @@ class Blockchain:
 
         # Start Casual Operations.
         # Thread This.
-        miner = threading.Thread(target=self.mine, args=[])
+        miner = threading.Thread(target=self.mine, args=[client])
         miner.start()
         # print(self.unconfirmed_transactions)
         # for block in self.chain:
@@ -171,34 +172,39 @@ class Blockchain:
         self.unconfirmed_transactions.append(newUnconfirmedTransaction)
         self.saveUnconfirmedTransactions()
 
-    def updateBlockchain(self):
+    def updateBlockchain(self,client):
         for peer in self.peers:
-            # For each peer ask their max index of blockchain
-            updateBlockchainReq = Networking.UpdateBlockchainRequest(self.groupId)
-            res = Networking.sendRequest(peer[0], 6700, dumps(updateBlockchainReq))
-            if res is not False:
-                # if the response is bigger than me ask him for his block until we are at the same.
-                if res.answer > self.getLastBlockIndex():
-                    print(self.getLastBlockIndex().__class__, res.answer.__class__)
-                    while self.getLastBlockIndex() < res.answer:
-                        # Get block
-                        getBlockReq = Networking.GetBlockRequest(self.groupId, self.getLastBlockIndex() + 1)
-                        blockRes = Networking.sendRequest(peer[0], 6700, dumps(getBlockReq))
-                        if blockRes is not False:
-                            print(f"Update BC Response:{blockRes}")
-                            # print(blockRes.answer)
-                            block = blockRes.answer
-                            block: Block
-                            print(block.index, block.transaction, block.signatures, block.timestamp,
-                                  block.previous_hash, block.hash)
-                            newBlock = Block(block.index, block.transaction, block.timestamp, block.previous_hash,
-                                  block.signatures)
-                            newBlock.hash = block.hash
-                            if self.validateNewBlock(newBlock):
-                                self.saveBlock(newBlock)
-                                self.chain.append(newBlock)
-                        else:
-                            break
+            #Dont send to self
+            if peer[0] != client.publicIP:
+                # For each peer ask their max index of blockchain
+                updateBlockchainReq = Networking.UpdateBlockchainRequest(self.groupId)
+                res = Networking.sendRequest(peer[0], 6700, dumps(updateBlockchainReq))
+                if res is not False:
+                    # if the response is bigger than me ask him for his block until we are at the same.
+                    if res.answer > self.getLastBlockIndex():
+                        print(self.getLastBlockIndex().__class__, res.answer.__class__)
+                        while self.getLastBlockIndex() < res.answer:
+                            # Get block
+                            getBlockReq = Networking.GetBlockRequest(self.groupId, self.getLastBlockIndex() + 1)
+                            blockRes = Networking.sendRequest(peer[0], 6700, dumps(getBlockReq))
+                            if blockRes is not False:
+                                print(f"Update BC Response:{blockRes}")
+                                # print(blockRes.answer)
+                                block = blockRes.answer
+                                block: Block
+                                print(block.index, block.transaction, block.signatures, block.timestamp,
+                                      block.previous_hash, block.hash)
+                                newBlock = Block(block.index, block.transaction, block.timestamp, block.previous_hash,
+                                      block.signatures)
+                                newBlock.hash = block.hash
+                                if self.validateNewBlock(newBlock):
+                                    self.saveBlock(newBlock)
+                                    self.chain.append(newBlock)
+                            else:
+                                break
+                    else:
+                        # print("Up-to-date.")
+                        pass
 
     def getBlockWithIndex(self, index):
         for block in self.chain:
@@ -232,18 +238,18 @@ class Blockchain:
 
 
 
-    def mine(self):
+    def mine(self,client):
         # Load my public key.
-        keyLoc = self.BLOCKCHAIN_PATH + "\\..\\..\\..\\PRIVATEKEY.json"
-        # print(f"key location = {keyLoc}")
-        f = open(keyLoc, "rb")
-        data = f.read()
-        privateKey = rsa.PrivateKey.load_pkcs1(data)
-        # print(publicKey)
-        f.close()
+        # keyLoc = self.BLOCKCHAIN_PATH + "\\..\\..\\..\\PRIVATEKEY.json"
+        # # print(f"key location = {keyLoc}")
+        # f = open(keyLoc, "rb")
+        # data = f.read()
+        # privateKey = rsa.PrivateKey.load_pkcs1(data)
+        # # print(publicKey)
+        # f.close()
         while True:
             # Update Blockchain.
-            self.updateBlockchain()
+            self.updateBlockchain(client)
             if not self.unconfirmed_transactions:
                 # If No Transaction sleep and check again soon.
                 sleep(30)
@@ -257,7 +263,7 @@ class Blockchain:
                     if diff > len(transaction.signatures):
                         if not len(transaction.signatures):
                             # No Signatures add my signature
-                            signature = rsa.sign(transaction.transaction.encode(), privateKey, 'SHA-1')
+                            signature = rsa.sign(transaction.transaction.encode(), client.privateKey, 'SHA-1')
                             transaction.signatures.append(str(signature))
                             self.saveUnconfirmedTransactions()
                         else:
