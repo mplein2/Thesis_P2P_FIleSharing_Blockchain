@@ -195,32 +195,32 @@ def responseHandler(data,addr):
 
     if res.type == 1:
         res = JoinResponse(res.group)
-        print(f"Received Response{res.__class__} from {addr[0]}")
+        print(f"Received from {addr[0]} {res.__class__.__name__}")
         return res
 
     elif res.type == 2:
         res = SearchBundleResponse(res.responseBundles)
-        print(f"Received Response{res.__class__} from {addr[0]}")
+        print(f"Received from {addr[0]} {res.__class__.__name__}")
         return res
 
     elif res.type == 3:
         res = SearchBundleResponse(res.answer)
-        print(f"Received Response{res.__class__} from {addr[0]}")
+        print(f"Received from {addr[0]} {res.__class__.__name__}")
         return res
 
     elif res.type == 4:
         res = CheckBundleAvailabilityResponse(res.answer)
-        print(f"Received Response{res.__class__} from {addr[0]}")
+        print(f"Received from {addr[0]} {res.__class__.__name__}")
         return res
 
     elif res.type == 5:
         res = DownloadBundleResponse(res.answer)
-        print(f"Received Response{res.__class__} from {addr[0]}")
+        print(f"Received from {addr[0]} {res.__class__.__name__}")
         return res
 
     elif res.type == 6:
         res = UpdateBlockchainResponse(res.answer)
-        print(f"Received Response{res.__class__} from {addr[0]}")
+        print(f"Received from {addr[0]} {res.__class__.__name__}")
         return res
 
 
