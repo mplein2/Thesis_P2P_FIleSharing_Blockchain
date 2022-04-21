@@ -18,7 +18,7 @@ app = Flask(__name__)
 # This Disables Logging
 app.logger.disabled = False
 log = logging.getLogger('werkzeug')
-log.disabled = True
+log.disabled = False
 
 
 # Routes

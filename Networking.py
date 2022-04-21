@@ -101,8 +101,9 @@ class UpdateBlockchainResponse(Request):
         super().__init__(6)
         self.answer = answer
 
+
 class GetBlockRequest(Request):
-    def __init__(self, groupId,blockIndex):
+    def __init__(self, groupId, blockIndex):
         super().__init__(7)
         self.groupId = groupId
         self.blockIndex = blockIndex
@@ -112,9 +113,6 @@ class GetBlockResponse(Request):
     def __init__(self, answer):
         super().__init__(7)
         self.answer = answer
-
-
-
 
 
 def requestHandler(data, addr, groupManager: GroupManager):
@@ -194,18 +192,20 @@ def requestHandler(data, addr, groupManager: GroupManager):
     elif req.type == 6:
         req = UpdateBlockchainRequest(req.groupId)
         group = groupManager.getGroupWithId(req.groupId)
-        if group.blockchain.isUserAllowed(addr[0]):
-            # User is ok
-            lastBlock = group.blockchain.getLastBlock()
-            lastBlock: Blockchain.Block
-            lastBlockIndex = lastBlock.index
-            return pickle.dumps(UpdateBlockchainResponse(lastBlockIndex))
-        else:
-            # User not invited not joined, therefore don't answer.
-            return False
+        # If i am in group for group that im not in.
+        if group is not False:
+            if group.blockchain.isUserAllowed(addr[0]):
+                # User is ok
+                lastBlock = group.blockchain.getLastBlock()
+                lastBlock: Blockchain.Block
+                lastBlockIndex = lastBlock.index
+                return pickle.dumps(UpdateBlockchainResponse(lastBlockIndex))
+            else:
+                # User not invited not joined, therefore don't answer.
+                return False
 
-    elif req.type ==7:
-        req = GetBlockRequest(req.groupId,req.blockIndex)
+    elif req.type == 7:
+        req = GetBlockRequest(req.groupId, req.blockIndex)
         group = groupManager.getGroupWithId(req.groupId)
         block = group.blockchain.getBlockWithIndex(req.blockIndex)
         if block is not False:
@@ -214,7 +214,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
             return False
 
 
-def responseHandler(data,addr):
+def responseHandler(data, addr):
     res = pickle.loads(data)
 
     if res.type == 1:
