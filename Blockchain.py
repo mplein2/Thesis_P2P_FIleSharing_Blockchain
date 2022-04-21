@@ -183,10 +183,10 @@ class Blockchain:
             res = Networking.sendRequest(peer[0], 6700, dumps(updateBlockchainReq))
             if res is not False:
                 #if the response is bigger than me ask him for his block until we are at the same.
-                if res.answer>self.getLastBlock().index:
-                    while self.getLastBlock().index<res.answer:
+                if res.answer>self.getLastBlockIndex():
+                    while self.getLastBlockIndex()<res.answer:
                         #Get block
-                        getBlockReq = Networking.GetBlockRequest(self.groupId,self.getLastBlock().index+1)
+                        getBlockReq = Networking.GetBlockRequest(self.groupId,self.getLastBlockIndex()+1)
                         res = Networking.sendRequest(peer[0], 6700, dumps(getBlockReq))
                         if res is not False:
                             print(f"Update BC Response:{res}")
@@ -262,6 +262,16 @@ class Blockchain:
                 lastBlockIndex = block.index
         return lastBlock
 
+    def getLastBlockIndex(self):
+        lastBlockIndex = self.chain[0].index
+        #Find last Block and return it
+        lastBlock = self.chain[0]
+        for block in self.chain:
+            # print(block.index)
+            if block.index > lastBlockIndex:
+                lastBlock = block
+                lastBlockIndex = block.index
+        return lastBlock.index
 
     def save_unconfirmed_transactions(self):
         # print(self.TRANSACTION_PATH)
