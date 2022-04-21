@@ -9,6 +9,7 @@ import Client
 from Groups import GroupManager, Group
 import os
 import hashlib
+import Blockchain
 
 
 class Request:
@@ -88,6 +89,16 @@ class DownloadBundleResponse(Request):
         super().__init__(5)
         self.answer = answer
 
+class UpdateBlockchainRequest(Request):
+    def __init__(self, groupId):
+        super().__init__(6)
+        self.groupId = groupId
+
+
+class UpdateBlockchainResponse(Request):
+    def __init__(self, answer):
+        super().__init__(6)
+        self.answer = answer
 
 def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
@@ -96,14 +107,15 @@ def requestHandler(data, addr, groupManager: GroupManager):
     # Response to JoinRequest
     if req.type == 1:
         req = JoinRequest(req.name, req.timestamp)
-        # TODO If this is allowed add peer and respond
-        # TODO Peer Port
-        groupManager.addPeerGroup(req.name, [addr[0]])
         group = groupManager.getGroupWithName(req.name)
-        groupCpy = copy.copy(group)
-        del groupCpy.bundles
-        joinResponse = JoinResponse(groupCpy)
-        return pickle.dumps(joinResponse)
+        if group.blockchain.isUserAllowed(addr[0]):
+            groupManager.addPeerGroup(req.name, [addr[0]])
+            groupCpy = copy.copy(group)
+            del groupCpy.bundles
+            joinResponse = JoinResponse(groupCpy)
+            return pickle.dumps(joinResponse)
+        else:
+            return False
 
     # Response to search req
     elif req.type == 2:
@@ -162,8 +174,20 @@ def requestHandler(data, addr, groupManager: GroupManager):
         # TODO 9/4 ????
         return pickle.dumps(DownloadBundleResponse(1))
 
+    elif req.type == 6:
+        req = UpdateBlockchainRequest(req.groupId)
+        group = groupManager.getGroupWithId(req.groupId)
+        if group.blockchain.isUserAllowed(addr[0]):
+            #User is ok
+            lastBlock = group.blockchain.getLastBlock()
+            lastBlock : Blockchain.Block
+            lastBlockIndex = lastBlock.index
+            return pickle.dumps(UpdateBlockchainResponse(lastBlockIndex))
+        else:
+            #User not invited not joined, therefore don't answer.
+            return False
 
-def responseHandler(data, groupManager):
+def responseHandler(data):
     res = pickle.loads(data)
 
     if res.type == 1:
@@ -186,6 +210,10 @@ def responseHandler(data, groupManager):
         res = DownloadBundleResponse(res.answer)
         return res
 
+    elif res.type == 6:
+        res = UpdateBlockchainResponse(res.answer)
+        return res
+
 
 def receiver(groupManager):
     UDP_IP = '0.0.0.0'
@@ -199,10 +227,12 @@ def receiver(groupManager):
         # data, addr = sock.recvfrom(65507)
         # print("Received from :", addr)
         response = requestHandler(data, addr, groupManager)
-        sock.sendto(response, addr)
+        #Request Handler if not want to answer returns False.
+        if response is not False:
+            sock.sendto(response, addr)
 
 
-def sendRequest(address, port, request, groupManager):
+def sendRequest(address, port, request):
     # Create a socket for sending files
     clientSocket = socket(AF_INET, SOCK_DGRAM)
     clientSocket.settimeout(1)
@@ -210,7 +240,7 @@ def sendRequest(address, port, request, groupManager):
         clientSocket.sendto(request, (address, port))
         data, addr = clientSocket.recvfrom(65537)
         # data, addr = clientSocket.recvfrom(65507)
-        res = responseHandler(data, groupManager)
+        res = responseHandler(data)
         return res
     # TODO except socket.timeout
     except Exception as exception:

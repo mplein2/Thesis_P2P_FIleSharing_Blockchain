@@ -33,11 +33,20 @@ function closeInvite() {
     var modal = document.getElementById("createInviteModal");
     modal.style.display = "none";
 }
+function ValidateIp(ipaddress)
+{
+ if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress))
+  {
+    return (true)
+  }
+return (false)
+}
 
 function generateInvite(groupName) {
     var ip = document.getElementById("ip").value;
     var inviteTextArea = document.getElementById("invite");
-    $.ajax({
+    if (ValidateIp(ip)==true){
+     $.ajax({
                 data: {group:groupName,ip:ip}
                 , type: 'post'
                 , url: '/generateInvite'
@@ -45,7 +54,10 @@ function generateInvite(groupName) {
                     inviteTextArea.value=response;
                 }
             });
-
+    }
+    else{
+alert("You have entered an invalid IP address!")
+    }
 }
 
 function deleteBundle(bundleId,groupId) {

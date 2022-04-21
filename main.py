@@ -55,12 +55,14 @@ def generateInvite():
     if request.method == 'POST':
         data = request.form
         group = data["group"]
-        print(str(group))
-        # TODO KEY SPECIFIC BLOCKCHAIN
-        ip = data["ip"]
-        print("Generate Invite for :", group)
         group = groupManager.getGroupWithName(group)
-        print(group)
+        # TODO KEY SPECIFIC BLOCKCHAIN
+        ip = data["ip"] #This is string
+        transaction = Blockchain.InviteTransaction(ip)
+        transactionStr = json.dumps(transaction.__dict__)
+        group.blockchain.add_new_transaction(transactionStr)
+        # print("Generate Invite for :", group)
+        # print(group)
         invite = group.generateInvite()
         return Compress.compress(invite.toJSON())
 
@@ -85,14 +87,16 @@ def joinGroup():
         inviteLoad = json.loads(inviteDecomp)
         invite = Invite(inviteLoad["id"],inviteLoad["name"], inviteLoad["timestamp"], inviteLoad["peers"])
         joinReq = JoinRequest(invite.name, invite.timestamp)
-        # TODO PORTS
         print(invite.peers)
         for peer in invite.peers:
             print(peer[0])
-            res = sendRequest(peer[0], 6700, dumps(joinReq), groupManager)
-            group = res.group
-            group = Group(group.name,group.admins,group.peers,group.timestamp,blockchainPath=groupManager.DIR_PATH_GROUPS+group.name+"\\Blockchain")
-            groupManager.addGroup(group)
+            res = sendRequest(peer[0], 6700, dumps(joinReq))
+            if res is not False:
+                group = res.group
+                group = Group(group.name,group.admins,group.peers,group.timestamp,blockchainPath=groupManager.DIR_PATH_GROUPS+group.name+"\\Blockchain")
+                groupManager.addGroup(group)
+        #Make thread to update blockhain and get up to date.
+        #TODO
         return "1"
 
 
@@ -140,7 +144,7 @@ def searchBundles():
         responses = []
         # SEND TO ALL PEERS COLLECT RESPONSES AND PRESENT
         for peer in group.peers:
-            res = sendRequest(peer[0], 6700, dumps(searchReq), groupManager)
+            res = sendRequest(peer[0], 6700, dumps(searchReq))
             #if other peer is responded.
             if res is not False:
                 # print(res)
@@ -182,7 +186,7 @@ def getBundle():
         bundleReceiver = threading.Thread(target=receiveBundle, args=[portForBundleReceiver,client,groupManager,groupId,downloadManager])
         bundleReceiver.start()
         getBundleReq = GetBundleRequest(bundleId,groupId,portForBundleReceiver)
-        res = sendRequest(userIp, 6700, dumps(getBundleReq), groupManager)
+        res = sendRequest(userIp, 6700, dumps(getBundleReq))
         # if other peer is responded.
         if res is not False:
             #Responded decide what to do
@@ -213,6 +217,7 @@ if __name__ == "__main__":
     groupManager = GroupManager()
     bundleManager = BundleManager()
     downloadManager = DownloadManager(groupManager,client)
+    #TODO Networking Thread To Receive From Internet
     receiver = threading.Thread(target=receiver, args=[groupManager])
     receiver.start()
     app.run(host='', port=6969)

@@ -29,12 +29,14 @@ class Group:
         self.timestamp = timestamp
         self.admins = admin
         self.peers = peers
-        self.blockchain = Blockchain.Blockchain(blockchainPath,self.peers)
+
         self.bundles = []
         if id is None:
             self.id = hashlib.sha256((name + str(timestamp)).encode('utf-8')).hexdigest()
         else:
             self.id = id
+
+        self.blockchain = Blockchain.Blockchain(blockchainPath,self.peers,self.id)
 
     def generateInvite(self):
         invite = Invite(self.id, self.name, self.timestamp, self.peers)
