@@ -263,15 +263,18 @@ class Blockchain:
         return lastBlock
 
     def getLastBlockIndex(self):
-        lastBlockIndex = self.chain[0].index
-        #Find last Block and return it
-        lastBlock = self.chain[0]
-        for block in self.chain:
-            # print(block.index)
-            if block.index > lastBlockIndex:
-                lastBlock = block
-                lastBlockIndex = block.index
-        return lastBlock.index
+        if len(self.chain)==0:
+            return -1
+        else:
+            lastBlockIndex = self.chain[0].index
+            #Find last Block and return it
+            lastBlock = self.chain[0]
+            for block in self.chain:
+                # print(block.index)
+                if block.index > lastBlockIndex:
+                    lastBlock = block
+                    lastBlockIndex = block.index
+            return lastBlock.index
 
     def save_unconfirmed_transactions(self):
         # print(self.TRANSACTION_PATH)

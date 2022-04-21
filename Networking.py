@@ -102,7 +102,7 @@ class UpdateBlockchainResponse(Request):
         self.answer = answer
 
 class GetBlockRequest(Request):
-    def __init__(self, groupId):
+    def __init__(self, groupId,blockIndex):
         super().__init__(7)
         self.groupId = groupId
         self.blockIndex = blockIndex
@@ -219,37 +219,37 @@ def responseHandler(data,addr):
 
     if res.type == 1:
         res = JoinResponse(res.group)
-        print(f"Received from {addr[0]} {res.__class__.__name__}")
+        print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
         return res
 
     elif res.type == 2:
         res = SearchBundleResponse(res.responseBundles)
-        print(f"Received from {addr[0]} {res.__class__.__name__}")
+        print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
         return res
 
     elif res.type == 3:
         res = SearchBundleResponse(res.answer)
-        print(f"Received from {addr[0]} {res.__class__.__name__}")
+        print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
         return res
 
     elif res.type == 4:
         res = CheckBundleAvailabilityResponse(res.answer)
-        print(f"Received from {addr[0]} {res.__class__.__name__}")
+        print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
         return res
 
     elif res.type == 5:
         res = DownloadBundleResponse(res.answer)
-        print(f"Received from {addr[0]} {res.__class__.__name__}")
+        print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
         return res
 
     elif res.type == 6:
         res = UpdateBlockchainResponse(res.answer)
-        print(f"Received from {addr[0]} {res.__class__.__name__}")
+        print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
         return res
 
     elif res.type == 7:
         res = GetBlockResponse(res.answer)
-        print(f"Received from {addr[0]} {res.__class__.__name__}")
+        print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
         return res
 
 
