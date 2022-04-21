@@ -199,7 +199,7 @@ def getBundle():
 
 @app.route('/quitGroup', methods=['POST'])
 def quitGroup():
-    print('QUIT GROUP REQ')
+    # print('QUIT GROUP REQ')
     if request.method == 'POST':
         data = request.form
         groupid = data["group"]

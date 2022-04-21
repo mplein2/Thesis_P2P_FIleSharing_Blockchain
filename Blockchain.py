@@ -193,7 +193,7 @@ class Blockchain:
 
     def mine(self):
         #Load my public key.
-        keyLoc = self.BLOCKCHAIN_PATH+"..\\..\\..\\PRIVATEKEY.json"
+        keyLoc = self.BLOCKCHAIN_PATH+"\\..\\..\\..\\PRIVATEKEY.json"
         # print(f"key location = {keyLoc}")
         f = open(keyLoc, "rb")
         data = f.read()

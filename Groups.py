@@ -93,12 +93,16 @@ class GroupManager:
         for group in self.groups:
             if group.name == name:
                 return group
+        #Group not found
+        return False
 
     def getGroupWithId(self, id):
         group: Group
         for group in self.groups:
             if group.id == id:
                 return group
+        #Group not found
+        return False
 
     def addPeerGroup(self, name, peer):
         group: Group
