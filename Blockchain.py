@@ -52,8 +52,40 @@ class InviteTransaction:
         self.ip = ip
 
 
+class JoinTransaction:
+    def __init__(self, ip, publicKey):
+        # Type of Transaction
+        self.type = 2
+        self.ip = ip
+        self.publicKey = publicKey
+
+
+class BanTransaction:
+    def __init__(self, ip):
+        self.type = 3
+        self.ip = ip
+
+
+class UnbanTransaction:
+    def __init__(self, ip):
+        self.type = 4
+        self.ip = ip
+
+
+class AddAdminTransaction:
+    def __init__(self, ip):
+        self.type = 5
+        self.ip = ip
+
+
+class RemoveAdminTransaction:
+    def __init__(self, ip):
+        self.type = 6
+        self.ip = ip
+
+
 class Blockchain:
-    def __init__(self, path, groupPeers, groupId,client):
+    def __init__(self, path, groupPeers, groupId, client):
         self.BLOCKCHAIN_PATH = path
         self.TRANSACTION_PATH = self.BLOCKCHAIN_PATH + "\\Transactions\\"
         self.unconfirmed_transactions = []
@@ -100,9 +132,7 @@ class Blockchain:
         # print(transactionStr)
         # print(transactionStr.__class__)
         # Genereate signature for Transaction
-
         signature = rsa.sign(transactionStr.encode(), client.privateKey, 'SHA-1')
-
         genesis_block = Block(0, transactionStr, str(time.time()), "0", [str(signature)])
         genesis_block.hash = genesis_block.computeHash()
         self.saveBlock(genesis_block)
@@ -172,9 +202,9 @@ class Blockchain:
         self.unconfirmed_transactions.append(newUnconfirmedTransaction)
         self.saveUnconfirmedTransactions()
 
-    def updateBlockchain(self,client):
+    def updateBlockchain(self, client):
         for peer in self.peers:
-            #Dont send to self
+            # Dont send to self
             if peer[0] != client.publicIP:
                 # For each peer ask their max index of blockchain
                 updateBlockchainReq = Networking.UpdateBlockchainRequest(self.groupId)
@@ -195,7 +225,7 @@ class Blockchain:
                                 print(block.index, block.transaction, block.signatures, block.timestamp,
                                       block.previous_hash, block.hash)
                                 newBlock = Block(block.index, block.transaction, block.timestamp, block.previous_hash,
-                                      block.signatures)
+                                                 block.signatures)
                                 newBlock.hash = block.hash
                                 if self.validateNewBlock(newBlock):
                                     self.saveBlock(newBlock)
@@ -213,32 +243,29 @@ class Blockchain:
                 return block
         return False
 
-    def validateNewBlock(self,newBlock):
+    def validateNewBlock(self, newBlock):
         """This function is for new blocks that come from peers returns true if blocks checks out."""
-        newBlock : Block
+        newBlock: Block
 
-        #If hash ok.
+        # If hash ok.
         if newBlock.computeHash() == newBlock.hash:
             # Validation for genesis block
-            if newBlock.index ==0:
-                if self.getLastBlockIndex()==-1:
-                    #No other blocks accept it.
+            if newBlock.index == 0:
+                if self.getLastBlockIndex() == -1:
+                    # No other blocks accept it.
                     return True
                 else:
                     return False
             else:
-                #Check if new block is made with the same previous block.
-                #TODO if not resolve ?
+                # Check if new block is made with the same previous block.
+                # TODO if not resolve ?
                 if newBlock.previous_hash == self.getLastBlock().computeHash():
-                    #TODO check if signatures okay.
-                    #TODO check timestamp.
-                    #TODO check difficulty based on blockchain etc.
+                    # TODO check if signatures okay.
+                    # TODO check timestamp.
+                    # TODO check difficulty based on blockchain etc.
                     return True
 
-
-
-
-    def mine(self,client):
+    def mine(self, client):
         # Load my public key.
         # keyLoc = self.BLOCKCHAIN_PATH + "\\..\\..\\..\\PRIVATEKEY.json"
         # # print(f"key location = {keyLoc}")
@@ -336,5 +363,60 @@ class Blockchain:
         # Didndt find user
         return False
 
+    def getOwner(self):
+        for block in self.chain:
+            transaction = json.loads(block.transaction)
+            if transaction["type"]==0:
+                return transaction["ip"]
+
+    def parseBlockchain(self):
+        """
+        Parses Blockchain and returns 5 list of user types.
+        Peers that are in the blockchain and allowed.
+        Banned peers, Invites ,Admins and, Owner . All are lists.
+        """
+        peers = []
+        bans = []
+        admins = []
+        invites = []
+        owner = []
+
+        # class GenesisTransaction:
+        #         self.type = 0
+        # class InviteTransaction:
+        #         self.type = 1
+        # class JoinTransaction:
+        #         self.type = 2
+        # class BanTransaction:
+        #         self.type = 3
+        # class UnbanTransaction:
+        #         self.type = 4
+        # class AddAdminTransaction:
+        #         self.type = 5
+        # class RemoveAdminTransaction:
+        #         self.type = 6
+
+        for block in self.chain:
+            transaction = json.loads(block.transaction)
+            if transaction["type"]==0:
+                owner.append(transaction["ip"])
+                admins.append(transaction["ip"])
+                peers.append(transaction["ip"])
+            elif transaction["type"]==1:
+                invites.append(transaction["ip"])
+            elif transaction["type"]==2:
+                peers.append(transaction["ip"])
+                invites.remove(transaction["ip"])
+            elif transaction["type"]==3:
+                peers.remove(transaction["ip"])
+                bans.append(transaction["ip"])
+            elif transaction["type"]==4:
+                bans.remove(transaction["ip"])
+            elif transaction["type"]==5:
+                admins.append(transaction["ip"])
+            elif transaction["type"]==6:
+                admins.remove(transaction["ip"])
+        # print(f"Peers:{peers},Bans:{bans},Admins:{admins},Owners:{owner}")
+        return peers,bans,admins,owner
 
 import Networking

@@ -33,8 +33,8 @@ function closeInvite() {
     var modal = document.getElementById("createInviteModal");
     modal.style.display = "none";
 }
-function ValidateIp(ipaddress)
-{
+
+function ValidateIp(ipaddress){
  if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress))
   {
     return (true)
@@ -76,6 +76,7 @@ function deleteBundle(bundleId,groupId) {
             });
 
 }
+
 function quitGroup(groupName) {
     $.ajax({
                 data: {group:groupName}
@@ -90,6 +91,7 @@ function quitGroup(groupName) {
             });
 
 }
+
 function joinGroupModal() {
     var modal = document.getElementById("joinGroupModal");
     modal.style.display = "block";
@@ -99,10 +101,12 @@ function openShareModal() {
     var modal = document.getElementById("shareModal");
     modal.style.display = "block";
 }
+
 function openSettingsModal() {
     var modal = document.getElementById("settingsModal");
     modal.style.display = "block";
 }
+
 function closeSettingsModal() {
     var modal = document.getElementById("settingsModal");
     modal.style.display = "none";
@@ -112,6 +116,7 @@ function closeGroupModal() {
     var modal = document.getElementById("joinGroupModal");
     modal.style.display = "none";
 }
+
 function closeShareBundle() {
     var modal = document.getElementById("shareModal");
     modal.style.display = "none";
@@ -127,7 +132,7 @@ function joinGroup() {
                     if (response=="1"){
                     window.location.replace("/groups?group="+name);
                     }else{
-                    alert("Failed to join , try again.")
+                    alert("No responses , try again later.")
                     }
                 }
             });
@@ -203,6 +208,7 @@ alert("JS OK");
             });
 
 }
+
 function selectDownloadLocation() {
     var downloadLocationElement = document.getElementById("downloadLocation");
     alert("Select Folder Window is opened.");
@@ -220,4 +226,121 @@ function selectDownloadLocation() {
                 }
             });
 
+}
+
+function banUser(groupId,userIp){
+//alert("ban from group"+groupId+" ,user :"+userIp);
+Swal.fire({
+  title: 'Are you sure you want to ban '+userIp+' ?',
+  showCancelButton: true,
+  confirmButtonText: 'Confirm',
+}).then((result) => {
+  /* Read more about isConfirmed, isDenied below */
+  if (result.isConfirmed) {
+      $.ajax({
+                data: {
+                        group:groupId,
+                        userip:userIp
+                      }
+                , type: 'post'
+                , url: '/banUser'
+                , success: function (response) {
+                    if (response==0){
+                        Swal.fire('Success!', 'Change will appear shortly.', 'success');
+                    }else{
+                    //TODO FAILED ALERT
+                    alert("Failed");
+                    }
+                }
+            });
+
+  }
+});
+}
+
+function unbanUser(groupId,userIp){
+//alert("unban from group"+groupId+" ,user :"+userIp);
+Swal.fire({
+  title: 'Are you sure you want to unban '+userIp+' ?',
+  showCancelButton: true,
+  confirmButtonText: 'Confirm',
+}).then((result) => {
+  /* Read more about isConfirmed, isDenied below */
+  if (result.isConfirmed) {
+      $.ajax({
+                data: {
+                        group:groupId,
+                        userip:userIp
+                      }
+                , type: 'post'
+                , url: '/unbanUser'
+                , success: function (response) {
+                    if (response==0){
+                        Swal.fire('Success!', 'Change will appear shortly.', 'success');
+                    }else{
+                    //TODO FAILED ALERT
+                    alert("Failed");
+                    }
+                }
+            });
+  }
+});
+}
+
+function addAdmin(groupId,userIp){
+//alert("addAdmin from group"+groupId+" ,user :"+userIp);
+Swal.fire({
+  title: 'Are you sure you want to add  '+userIp+' as admin ?',
+  showCancelButton: true,
+  confirmButtonText: 'Confirm',
+}).then((result) => {
+  /* Read more about isConfirmed, isDenied below */
+  if (result.isConfirmed) {
+      $.ajax({
+                data: {
+                        group:groupId,
+                        userip:userIp
+                      }
+                , type: 'post'
+                , url: '/addAdmin'
+                , success: function (response) {
+                    if (response==0){
+                        Swal.fire('Success!', 'Change will appear shortly.', 'success');
+                    }else{
+                    //TODO FAILED ALERT
+                    alert("Failed");
+                    }
+                }
+            });
+  }
+});
+}
+
+function removeAdmin(groupId,userIp){
+//alert("removeAdmin from group"+groupId+" ,user :"+userIp);
+Swal.fire({
+  title: 'Are you sure you want to remove '+userIp+' from admins ?',
+  showCancelButton: true,
+  confirmButtonText: 'Confirm',
+}).then((result) => {
+  /* Read more about isConfirmed, isDenied below */
+  if (result.isConfirmed) {
+      $.ajax({
+                data: {
+                        group:groupId,
+                        userip:userIp
+                      }
+                , type: 'post'
+                , url: '/removeAdmin'
+                , success: function (response) {
+                    if (response==0){
+                        Swal.fire('Success!', 'Change will appear shortly.', 'success');
+                    }else{
+                    //TODO FAILED ALERT
+                    alert("Failed");
+                    }
+                }
+            });
+  }
+});
 }
