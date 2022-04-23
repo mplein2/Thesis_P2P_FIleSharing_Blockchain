@@ -51,6 +51,12 @@ class InviteTransaction:
         self.type = 1
         self.ip = ip
 
+class JoinTransaction:
+    def __init__(self,ip,publicKey):
+        # Type of Transaction
+        self.type = 2
+        self.ip = ip
+        self.publicKey = publicKey
 
 class Blockchain:
     def __init__(self, path, groupPeers, groupId,client):

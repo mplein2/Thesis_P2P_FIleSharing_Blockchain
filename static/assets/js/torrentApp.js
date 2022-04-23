@@ -127,7 +127,7 @@ function joinGroup() {
                     if (response=="1"){
                     window.location.replace("/groups?group="+name);
                     }else{
-                    alert("Failed to join , try again.")
+                    alert("No responses , try again later.")
                     }
                 }
             });

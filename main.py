@@ -32,7 +32,12 @@ def index():
 def groups():
     group = request.args.get('group')
     group = groupManager.getGroupWithName(group)
-    return render_template("groups.html", groups=groupManager.groups, group=group)
+    #Check if user should see admin panels.
+    adminPriv = False
+    for admin in group.admins:
+        if admin[0]==client.publicIP:
+            adminPriv = True
+    return render_template("groups.html", groups=groupManager.groups, group=group,client=client,adminPriv=adminPriv)
 
 
 @app.route('/start', methods=['POST', 'GET'])
@@ -92,12 +97,30 @@ def joinGroup():
             print(peer[0])
             res = sendRequest(peer[0], 6700, dumps(joinReq))
             if res is not False:
+                #Response from user with group data.
                 group = res.group
                 group = Group(group.name,group.admins,group.peers,group.timestamp,blockchainPath=groupManager.DIR_PATH_GROUPS+group.name+"\\Blockchain",client=client)
                 groupManager.addGroup(group)
-        #Make thread to update blockhain and get up to date.
-        #TODO if fail do something.
-        return "1"
+                #Make Join Transaction.
+                transaction = Blockchain.JoinTransaction(client.publicIP,
+                                                 client.publicKey.save_pkcs1(format='PEM').decode("utf-8"))
+                transactionStr = json.dumps(transaction.__dict__)
+                group.blockchain.addNewTransaction(transactionStr)
+                # transactionStr = json.dumps(transaction.__dict__)
+                # this is string json format
+                # print(transactionStr)
+                # print(transactionStr.__class__)
+                # Genereate signature for Transaction
+                # signature = rsa.sign(transactionStr.encode(), client.privateKey, 'SHA-1')
+                # genesis_block = Block(0, transactionStr, str(time.time()), "0", [str(signature)])
+                # genesis_block.hash = genesis_block.computeHash()
+                # self.saveBlock(genesis_block)
+                # self.chain.append(genesis_block)
+                return "1"
+        #No responses.
+        return "0"
+
+
 
 
 @app.route('/shareBundle', methods=['POST'])
