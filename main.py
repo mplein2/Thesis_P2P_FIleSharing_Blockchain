@@ -121,16 +121,6 @@ def joinGroup():
                                                          client.publicKey.save_pkcs1(format='PEM').decode("utf-8"))
                 transactionStr = json.dumps(transaction.__dict__)
                 group.blockchain.addNewTransaction(transactionStr)
-                # transactionStr = json.dumps(transaction.__dict__)
-                # this is string json format
-                # print(transactionStr)
-                # print(transactionStr.__class__)
-                # Genereate signature for Transaction
-                # signature = rsa.sign(transactionStr.encode(), client.privateKey, 'SHA-1')
-                # genesis_block = Block(0, transactionStr, str(time.time()), "0", [str(signature)])
-                # genesis_block.hash = genesis_block.computeHash()
-                # self.saveBlock(genesis_block)
-                # self.chain.append(genesis_block)
                 return "1"
         # No responses.
         return "0"

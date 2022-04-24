@@ -130,7 +130,7 @@ function joinGroup() {
                 , url: '/joinGroup'
                 , success: function (response) {
                     if (response=="1"){
-                    window.location.replace("/groups?group="+name);
+                    window.location.reload()
                     }else{
                     alert("No responses , try again later.")
                     }
