@@ -114,7 +114,6 @@
                 </nav>
             </div>
             <div class="row">
-                <!--Bundles Shared-->
                 <div class="col-lg-6 grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
@@ -133,8 +132,7 @@
                                 <tr>
                                     <td>{{bundle.name}}</td>
                                     <td>{{bundle.description}}</td>
-                                    <td><a class="nav-link" href="#"
-                                           onclick='deleteBundle("{{bundle.id}}","{{group.id}}")'>
+                                    <td><a class="nav-link" href="#" onclick='deleteBundle("{{bundle.id}}","{{group.id}}")'>
                                         <i class="mdi mdi-delete"></i>
                                     </a></td>
                                 </tr>
@@ -144,115 +142,6 @@
                         </div>
                     </div>
                 </div>
-                <!--Table For Admin to manage users.-->
-
-                <!--Users-->
-                {% if adminPriv %}
-                <div class="col-lg-6 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Users</h4>
-                            </p>
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>Address</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for peer in peers %}
-                                <tr>
-                                    <td>{{peer}}</td>
-                                    <td><a class="nav-link" href="#"
-                                           onclick='banUser("{{group.id}}","{{peer}}")'
-                                           style="display:inline-block;">
-                                        <i class="mdi mdi-lock"></i>
-                                    </a>
-                                        <a class="nav-link" href="#"
-                                           onclick='addAdmin("{{group.id}}","{{peer}}")'
-                                           style="display:inline-block;">
-                                            <i class="mdi mdi-arrow-up-bold-hexagon-outline"></i>
-                                        </a></td>
-                                </tr>
-
-
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                <!--Bans-->
-                {% if adminPriv %}
-                <div class="col-lg-6 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Bans</h4>
-                            </p>
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>Address</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for ban in bans %}
-                                <tr>
-
-                                    <td>{{ban}}</td>
-                                    <td>
-                                        <a class="nav-link" href="#"
-                                           onclick='unbanUser("{{group.id}}","{{ban}}")'
-                                           style="display:inline-block;">
-                                            <i class="mdi mdi-lock-open"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-
-
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
-                <!--Admins-->
-                {% if ownerPriv %}
-                <div class="col-lg-6 grid-margin stretch-card">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Admins</h4>
-                            </p>
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>Address</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for admin in admins %}
-                                <tr>
-                                    <td>{{admin}}</td>
-                                    <td><a class="nav-link" href="#"
-                                           onclick='removeAdmin("{{group.id}}","{{admin}}")'>
-                                        <i class="mdi mdi-arrow-down-bold-hexagon-outline"></i>
-                                    </a></td>
-                                </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-
             </div>
         </div>
         <!-- content-wrapper ends -->
@@ -381,49 +270,5 @@
         </div>
     </div>
 </div>
-<div id="manageUserModal" class="modal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Manage User</h5>
-            </div>
-            <div class="modal-body">
-                <div class="forms-sample">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">IP</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Username" aria-label="Username"
-                                   aria-describedby="basic-addon1">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-sm-3 col-form-label">Permissions</label>
-                        <div class="col-sm-4">
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input type="radio" class="form-check-input" name="membershipRadios"
-                                           id="membershipRadios1" value="" checked=""> Member <i
-                                        class="input-helper"></i></label>
-                            </div>
-                        </div>
-                        <div class="col-sm-5">
-                            <div class="form-check">
-                                <label class="form-check-label">
-                                    <input type="radio" class="form-check-input" name="membershipRadios"
-                                           id="membershipRadios2" value="option2"> Admin <i
-                                        class="input-helper"></i></label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="btn btn-gradient-primary me-2" onclick='#'>Apply</div>
-                    <div class="btn btn-light" onclick="closeManagerUserModal()">Cancel</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 </body>
 </html>
