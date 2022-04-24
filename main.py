@@ -34,17 +34,19 @@ def groups():
     group = groupManager.getGroupWithName(group)
     # Check if user should see admin panels.
     peers, bans, admins, owner = group.blockchain.parseBlockchain()
+    print(peers,admins,bans)
     # Check privs what to show on group page.
     adminPriv = False
     for admin in group.admins:
         if admin[0] == client.publicIP:
             adminPriv = True
-            admins.remove([client.publicIP])
-            peers.remove([client.publicIP])
 
     ownerPriv = False
     if group.blockchain.getOwner() == client.publicIP:
         ownerPriv = True
+
+
+
 
     return render_template("groups.html", groups=groupManager.groups, group=group, client=client, adminPriv=adminPriv,
                            ownerPriv=ownerPriv, peers=peers, bans=bans, admins=admins)
@@ -80,6 +82,7 @@ def generateInvite():
         # print(group)
         invite = group.generateInvite()
         return Compress.compress(invite.toJSON())
+
 
 
 @app.route('/deleteBundle', methods=['POST'])
