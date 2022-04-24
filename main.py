@@ -34,7 +34,7 @@ def groups():
     group = groupManager.getGroupWithName(group)
     # Check if user should see admin panels.
     peers, bans, admins, owner = group.blockchain.parseBlockchain()
-    #Check privs what to show on group page.
+    # Check privs what to show on group page.
     adminPriv = False
     for admin in group.admins:
         if admin[0] == client.publicIP:
@@ -43,12 +43,11 @@ def groups():
             peers.remove(client.publicIP)
 
     ownerPriv = False
-    if group.blockchain.getOwner()==client.publicIP:
-            ownerPriv = True
+    if group.blockchain.getOwner() == client.publicIP:
+        ownerPriv = True
 
-
-
-    return render_template("groups.html", groups=groupManager.groups, group=group, client=client, adminPriv=adminPriv , ownerPriv = ownerPriv,peers=peers,bans=bans,admins=admins)
+    return render_template("groups.html", groups=groupManager.groups, group=group, client=client, adminPriv=adminPriv,
+                           ownerPriv=ownerPriv, peers=peers, bans=bans, admins=admins)
 
 
 @app.route('/start', methods=['POST', 'GET'])
