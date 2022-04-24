@@ -384,41 +384,40 @@ class Blockchain:
         invites = []
         owner = []
 
-        # class GenesisTransaction:
-        #         self.type = 0
-        # class InviteTransaction:
-        #         self.type = 1
-        # class JoinTransaction:
-        #         self.type = 2
-        # class BanTransaction:
-        #         self.type = 3
-        # class UnbanTransaction:
-        #         self.type = 4
-        # class AddAdminTransaction:
-        #         self.type = 5
-        # class RemoveAdminTransaction:
-        #         self.type = 6
-
         for block in self.chain:
             transaction = json.loads(block.transaction)
+            #GenesisTransactio
             if transaction["type"] == 0:
                 owner.append(transaction["ip"])
                 admins.append(transaction["ip"])
                 peers.append(transaction["ip"])
+
+            #InviteTransaction
             elif transaction["type"] == 1:
-                invites.append([transaction["ip"]])
+                invites.append(transaction["ip"])
+
+            #JoinTransaction
             elif transaction["type"] == 2:
-                peers.append([transaction["ip"]])
-                invites.remove([transaction["ip"]])
+                peers.append(transaction["ip"])
+                invites.remove(transaction["ip"])
+
+            #BanTransaction
             elif transaction["type"] == 3:
-                peers.remove([transaction["ip"]])
-                bans.append([transaction["ip"]])
+                peers.remove(transaction["ip"])
+                bans.append(transaction["ip"])
+
+            # UnbanTransaction
             elif transaction["type"] == 4:
-                bans.remove([transaction["ip"]])
+                bans.remove(transaction["ip"])
+
+                # AddAdminTransaction
             elif transaction["type"] == 5:
-                admins.append([transaction["ip"]])
+                admins.append(transaction["ip"])
+
+            # RemoveAdminTransaction
             elif transaction["type"] == 6:
-                admins.remove([transaction["ip"]])
+                admins.remove(transaction["ip"])
+
         # print(f"Peers:{peers},Bans:{bans},Admins:{admins},Owners:{owner}")
         return peers, bans, admins, owner
 

@@ -45,6 +45,12 @@ def groups():
     if group.blockchain.getOwner() == client.publicIP:
         ownerPriv = True
 
+    if client.publicIP in admins:
+        admins.remove(client.publicIP)
+    if client.publicIP in peers:
+        peers.remove(client.publicIP)
+
+
 
 
 
