@@ -58,13 +58,6 @@ class JoinTransaction:
         self.ip = ip
         self.publicKey = publicKey
 
-class JoinTransaction:
-    def __init__(self, ip, publicKey):
-        # Type of Transaction
-        self.type = 2
-        self.ip = ip
-        self.publicKey = publicKey
-
 
 class BanTransaction:
     def __init__(self, ip):
