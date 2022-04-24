@@ -36,8 +36,7 @@ class Group:
         else:
             self.id = id
 
-        self.blockchain = Blockchain.Blockchain(blockchainPath,self.peers,self.id,self.client)
-        self.blockchain.parseBlockchain()
+        self.blockchain = Blockchain.Blockchain(blockchainPath,self.peers,self.admins,self.id,self.client)
     def generateInvite(self):
         invite = Invite(self.id, self.name, self.timestamp, self.peers)
         return invite

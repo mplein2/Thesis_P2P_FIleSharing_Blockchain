@@ -84,12 +84,13 @@ class RemoveAdminTransaction:
 
 
 class Blockchain:
-    def __init__(self, path, groupPeers, groupId, client):
+    def __init__(self, path, groupPeers,groupAdmins, groupId, client):
         self.BLOCKCHAIN_PATH = path
         self.TRANSACTION_PATH = self.BLOCKCHAIN_PATH + "\\Transactions\\"
         self.unconfirmed_transactions = []
         self.chain = []
         self.peers = groupPeers
+        self.admins = groupAdmins
         self.groupId = groupId
         self.client = client
         if not os.path.exists(self.BLOCKCHAIN_PATH):
@@ -231,9 +232,15 @@ class Blockchain:
                                     self.chain.append(newBlock)
                             else:
                                 break
+                        #After While get blocks update the group peers , admins
+                        peersP,bansP,adminsP,ownerP=self.parseBlockchain()
+                        self.peers = peersP
+                        self.admins = adminsP
                     else:
                         # print("Up-to-date.")
+
                         pass
+
 
     def getBlockWithIndex(self, index):
         for block in self.chain:
@@ -398,23 +405,23 @@ class Blockchain:
         for block in self.chain:
             transaction = json.loads(block.transaction)
             if transaction["type"]==0:
-                owner.append(transaction["ip"])
-                admins.append(transaction["ip"])
-                peers.append(transaction["ip"])
+                owner.append([transaction["ip"]])
+                admins.append([transaction["ip"]])
+                peers.append([transaction["ip"]])
             elif transaction["type"]==1:
-                invites.append(transaction["ip"])
+                invites.append([transaction["ip"]])
             elif transaction["type"]==2:
-                peers.append(transaction["ip"])
-                invites.remove(transaction["ip"])
+                peers.append([transaction["ip"]])
+                invites.remove([transaction["ip"]])
             elif transaction["type"]==3:
-                peers.remove(transaction["ip"])
-                bans.append(transaction["ip"])
+                peers.remove([transaction["ip"]])
+                bans.append([transaction["ip"]])
             elif transaction["type"]==4:
-                bans.remove(transaction["ip"])
+                bans.remove([transaction["ip"]])
             elif transaction["type"]==5:
-                admins.append(transaction["ip"])
+                admins.append([transaction["ip"]])
             elif transaction["type"]==6:
-                admins.remove(transaction["ip"])
+                admins.remove([transaction["ip"]])
         # print(f"Peers:{peers},Bans:{bans},Admins:{admins},Owners:{owner}")
         return peers,bans,admins,owner
 

@@ -39,8 +39,8 @@ def groups():
     for admin in group.admins:
         if admin[0] == client.publicIP:
             adminPriv = True
-            admins.remove(client.publicIP)
-            peers.remove(client.publicIP)
+            admins.remove([client.publicIP])
+            peers.remove([client.publicIP])
 
     ownerPriv = False
     if group.blockchain.getOwner() == client.publicIP:
