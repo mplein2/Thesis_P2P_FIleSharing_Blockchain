@@ -328,7 +328,10 @@ class Blockchain:
                                     if res is not False:
                                         if res.answer!=0 and res.answer!=1:
                                             #Verified.
-                                            print(res.answer)
+                                            print(f"Signature:{res.answer},SignBytes:{bytes(res.answer,'utf-8')}")
+                                            # key = rsa.PublicKey.load_pkcs1(self.getRSAKey(peer[0]))
+                                            # print(rsa.verify(transaction.transaction, signature, key))
+
                                     else:
                                         #Peer Dead Try From Others.
                                         print("No Response from", peer[0])
@@ -369,6 +372,21 @@ class Blockchain:
                 lastBlock = block
                 lastBlockIndex = block.index
         return lastBlock
+
+    def getRSAKey(self,ip):
+        """Use only with peers in group so key always exists one way or another."""
+        for block in self.chain:
+            block:Block
+            transaction = json.loads(block.transaction)
+            if transaction["type"] == 0:
+                if transaction["ip"]==ip:
+                    return transaction["publicKey"]
+
+            # From Invite
+            elif transaction["type"] == 2:
+                if transaction["ip"]==ip:
+                    return transaction["publicKey"]
+
 
     def getLastBlockIndex(self):
         if len(self.chain) == 0:
