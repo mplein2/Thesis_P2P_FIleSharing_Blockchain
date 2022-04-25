@@ -130,7 +130,7 @@ function joinGroup() {
                 , url: '/joinGroup'
                 , success: function (response) {
                     if (response=="1"){
-                    window.location.reload()
+                    window.location.reload();
                     }else{
                     alert("No responses , try again later.")
                     }

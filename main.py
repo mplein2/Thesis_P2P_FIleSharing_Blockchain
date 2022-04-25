@@ -32,9 +32,15 @@ def index():
 def groups():
     group = request.args.get('group')
     group = groupManager.getGroupWithName(group)
+    groupManager.saveGroup(group)
     # Check if user should see admin panels.
     peers, bans, admins, owner = group.blockchain.parseBlockchain()
-    print(peers,admins,bans)
+    if owner[0] in peers:
+        peers.remove(owner[0])
+
+    if owner[0] in admins:
+        admins.remove(owner[0])
+
     # Check privs what to show on group page.
     adminPriv = False
     for admin in group.admins:
@@ -50,10 +56,8 @@ def groups():
     if client.publicIP in peers:
         peers.remove(client.publicIP)
 
-
-
-
-
+    dif = group.blockchain.getDifficulty()
+    print(dif)
     return render_template("groups.html", groups=groupManager.groups, group=group, client=client, adminPriv=adminPriv,
                            ownerPriv=ownerPriv, peers=peers, bans=bans, admins=admins)
 
@@ -112,9 +116,9 @@ def joinGroup():
         inviteLoad = json.loads(inviteDecomp)
         invite = Invite(inviteLoad["id"], inviteLoad["name"], inviteLoad["timestamp"], inviteLoad["peers"])
         joinReq = JoinRequest(invite.name, invite.timestamp)
-        print(invite.peers)
+        # print(invite.peers)
         for peer in invite.peers:
-            print(peer[0])
+            # print(peer[0])
             res = sendRequest(peer[0], 6700, dumps(joinReq))
             if res is not False:
                 # Response from user with group data.
@@ -139,9 +143,9 @@ def shareBundle():
         name = data["bundleName"]
         desc = data["bundleDescription"]
         groupName = data["groupName"]
-        print(name)
-        print(desc)
-        print(groupName)
+        # print(name)
+        # print(desc)
+        # print(groupName)
         path = easygui.diropenbox(msg="Select folder to share as bundle", title="Share Bundle")
         bundle = bundleManager.createBundle(name, desc, path=path)
         groupManager.addBundle(bundle, groupName)
@@ -152,7 +156,7 @@ def shareBundle():
 def selectDownloadLocation():
     if request.method == 'POST':
         path = easygui.diropenbox(msg="Select folder to download bundles", title="Select Bundle Download Location")
-        print(path)
+        # print(path)
         # Update Download Path in Config
         client.DIR_PATH_DOWNLOADS = path
         client.saveConfig()

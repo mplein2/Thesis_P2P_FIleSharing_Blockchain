@@ -236,8 +236,34 @@ class Blockchain:
                             else:
                                 break
                     else:
+                        # print(id(self.peers))
+                        peers, bans, admins, owner = self.parseBlockchain()
+                        # self.peers = peers
+                        # self.groupAdmins = admins
+                        # print(id(self.peers))
+                        # print("Blockchain Updated And Parsed")
                         # print("Up-to-date.")
                         pass
+
+        #Update Group Peers And Admins
+        peers, bans, admins, owner = self.parseBlockchain()
+        for ip in admins:
+            inside = False
+            for admin in self.groupAdmins:
+                if admin[0]==ip:
+                    inside = True
+            if not inside:
+                self.groupAdmins.append([ip])
+
+
+        for ip in peers:
+            inside = False
+            for peer in self.peers:
+                if peer[0]==ip:
+                    inside = True
+            if not inside:
+                self.peers.append([ip])
+
 
     def getBlockWithIndex(self, index):
         for block in self.chain:
@@ -269,14 +295,6 @@ class Blockchain:
                     return True
 
     def mine(self, client):
-        # Load my public key.
-        # keyLoc = self.BLOCKCHAIN_PATH + "\\..\\..\\..\\PRIVATEKEY.json"
-        # # print(f"key location = {keyLoc}")
-        # f = open(keyLoc, "rb")
-        # data = f.read()
-        # privateKey = rsa.PrivateKey.load_pkcs1(data)
-        # # print(publicKey)
-        # f.close()
         while True:
             # Update Blockchain.
             self.updateBlockchain(client)
@@ -298,6 +316,7 @@ class Blockchain:
                             self.saveUnconfirmedTransactions()
                         else:
                             # Get Signatures from other persons.
+                            #TODO IMPORTANT.
                             pass
                     else:
                         # We have the signatures number procede to make block and share.

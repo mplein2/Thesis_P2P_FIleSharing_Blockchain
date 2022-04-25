@@ -120,6 +120,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
     print(f"Received From {addr[0]}:{addr[1]} {req.__class__.__name__}")
 
     # Response to JoinRequest
+    #TODO refactor this.
     if req.type == 1:
         req = JoinRequest(req.name, req.timestamp)
         group = groupManager.getGroupWithName(req.name)
