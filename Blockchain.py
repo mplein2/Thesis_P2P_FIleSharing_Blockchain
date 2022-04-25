@@ -136,7 +136,7 @@ class Blockchain:
         # print(transactionStr.__class__)
         # Genereate signature for Transaction
         signature = rsa.sign(transactionStr.encode(), client.privateKey, 'SHA-1')
-        genesis_block = Block(0, transactionStr, str(time.time()), "0", [client.publicIP,str(signature)])
+        genesis_block = Block(0, transactionStr, str(time.time()), "0", [client.publicIP,signature.hex()])
         genesis_block.hash = genesis_block.computeHash()
         self.saveBlock(genesis_block)
         self.chain.append(genesis_block)
@@ -314,7 +314,7 @@ class Blockchain:
                         if not len(transaction.signatures):
                             # No Signatures add my signature
                             signature = rsa.sign(transaction.transaction.encode(), client.privateKey, 'SHA-1')
-                            transaction.signatures.append([str(client.publicIP),str(signature)])
+                            transaction.signatures.append([str(client.publicIP),signature.hex()])
                             self.saveUnconfirmedTransactions()
                         else:
                             print("TRYING TO MINE FROM PEERS")
@@ -328,10 +328,18 @@ class Blockchain:
                                     if res is not False:
                                         if res.answer!=0 and res.answer!=1:
                                             #Verified.
-                                            print(f"Signature:{res.answer},SignBytes:{bytes(res.answer,'utf-8')}")
-                                            # key = rsa.PublicKey.load_pkcs1(self.getRSAKey(peer[0]))
-                                            # print(rsa.verify(transaction.transaction, signature, key))
-
+                                            signature = bytes.fromhex(res.answer)
+                                            key = rsa.PublicKey.load_pkcs1(self.getRSAKey(peer[0]))
+                                            if rsa.verify(transaction.transaction.encode(), signature, key)=='SHA-1':
+                                                #Append the signature.
+                                                # print(signature.hex().__class__)
+                                                transaction.signatures.append([peer[0],signature.hex()])
+                                                if diff > len(transaction.signatures):
+                                                    #max signatures not reached
+                                                    pass
+                                                else:
+                                                    #max signatures reached
+                                                    break
                                     else:
                                         #Peer Dead Try From Others.
                                         print("No Response from", peer[0])
