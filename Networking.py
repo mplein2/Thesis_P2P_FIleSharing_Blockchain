@@ -114,6 +114,19 @@ class GetBlockResponse(Request):
         super().__init__(7)
         self.answer = answer
 
+class GetSignatureRequest(Request):
+    def __init__(self, groupId, lastIndex,transaction):
+        super().__init__(8)
+        self.groupId = groupId
+        self.lastIndex = lastIndex
+        self.transaction = transaction
+
+class GetSignatureResponse(Request):
+    def __init__(self, answer):
+        super().__init__(8)
+        self.answer = answer
+
+
 
 def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
@@ -214,6 +227,25 @@ def requestHandler(data, addr, groupManager: GroupManager):
         else:
             return False
 
+    elif req.type == 8:
+        req = GetSignatureRequest(req.groupId, req.lastIndex, req.transaction)
+        group = groupManager.getGroupWithId(req.groupId)
+        lastIndex = group.blockchain.getLastBlockIndex()
+        #If up to date or more
+        if lastIndex==req.lastIndex:
+            #Up To date
+            if group.blockchain.verifyTransaction(req.transaction):
+                #Transaction Ok
+                signature = rsa.sign(transactionStr.encode(), group.client.privateKey, 'SHA-1')
+                return pickle.dumps(GetSignatureResponse(str(signature)))
+            else:
+                #Transaction not ok.
+                return pickle.dumps(GetSignatureResponse(1))
+
+        else:
+            #Not up to date.
+            return pickle.dumps(GetSignatureResponse(0))
+
 
 def responseHandler(data, addr):
     res = pickle.loads(data)
@@ -250,6 +282,11 @@ def responseHandler(data, addr):
 
     elif res.type == 7:
         res = GetBlockResponse(res.answer)
+        print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
+        return res
+
+    elif res.type == 8:
+        res = GetSignatureResponse(res.answer)
         print(f"Received from {addr[0]}:{addr[1]} {res.__class__.__name__}")
         return res
 

@@ -58,6 +58,7 @@ def groups():
 
     dif = group.blockchain.getDifficulty()
     print(dif)
+    groupManager.saveGroup(group)
     return render_template("groups.html", groups=groupManager.groups, group=group, client=client, adminPriv=adminPriv,
                            ownerPriv=ownerPriv, peers=peers, bans=bans, admins=admins)
 

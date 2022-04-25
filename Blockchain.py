@@ -120,8 +120,8 @@ class Blockchain:
         #     print(block)
 
     def getDifficulty(self):
-        # Diffuculty of blockchain will be dependent on the users participating
-        # TODO refactor this for join ban unban
+        # Diffuculty of blockchain will be dependent on the users participating in  --->log2(peers)
+        return 2
         if len(self.peers) == 0:
             return 1
         else:
@@ -136,10 +136,14 @@ class Blockchain:
         # print(transactionStr.__class__)
         # Genereate signature for Transaction
         signature = rsa.sign(transactionStr.encode(), client.privateKey, 'SHA-1')
-        genesis_block = Block(0, transactionStr, str(time.time()), "0", [str(signature)])
+        genesis_block = Block(0, transactionStr, str(time.time()), "0", [client.publicIP,str(signature)])
         genesis_block.hash = genesis_block.computeHash()
         self.saveBlock(genesis_block)
         self.chain.append(genesis_block)
+
+    def verifyTransaction(self,transaction):
+        #TODO verify transactions.
+        return True
 
     def saveBlock(self, block):
         if not os.path.exists(self.BLOCKCHAIN_PATH):
@@ -186,8 +190,6 @@ class Blockchain:
         blockObj = Block(block["index"], block["transaction"], block["timestamp"], block["previous_hash"],
                          block["signatures"])
         blockObj.hash = block["hash"]
-        # TODO Add all transactions here
-
         # elif transaction["type"] == 1:
         #     # print("Genesis block")
         #     # print(transaction)
@@ -312,18 +314,40 @@ class Blockchain:
                         if not len(transaction.signatures):
                             # No Signatures add my signature
                             signature = rsa.sign(transaction.transaction.encode(), client.privateKey, 'SHA-1')
-                            transaction.signatures.append(str(signature))
+                            transaction.signatures.append([str(client.publicIP),str(signature)])
                             self.saveUnconfirmedTransactions()
                         else:
-                            # Get Signatures from other persons.
-                            #TODO IMPORTANT.
+                            print("TRYING TO MINE FROM PEERS")
+                            for peer in self.peers:
+                                if peer[0]!=client.publicIP:
+                                    print(f"Trying to get signatures from :{peer[0]}")
+                                    print(transaction.transaction)
+                                    #Send Transaction get signature.
+                                    signReq = Networking.GetSignatureRequest(self.groupId,self.getLastBlockIndex(),transaction.transaction)
+                                    res = Networking.sendRequest(peer[0], 6700, dumps(signReq))
+                                    if res is not False:
+                                        if res.answer!=0 and res.answer!=1:
+                                            #Verified.
+                                            print(res.answer)
+                                    else:
+                                        #Peer Dead Try From Others.
+                                        print("No Response from", peer[0])
+                                        pass
+
+
+
+
+
+
+
+
                             pass
                     else:
                         # We have the signatures number procede to make block and share.
                         print(f"Signature {transaction} ready to be made block.")
                         # Bytes
                         lastBlock = self.getLastBlock()
-                        print(lastBlock)
+                        # print(lastBlock)
                         lastBlock: Block
                         print(f"Last Block Index :{lastBlock.index}")
                         newBlock = Block(lastBlock.index + 1, transaction.transaction, str(time.time()),
