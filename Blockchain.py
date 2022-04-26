@@ -457,8 +457,10 @@ class Blockchain:
 
         for block in self.chain:
             transaction = json.loads(block.transaction)
+
             #GenesisTransactio
             if transaction["type"] == 0:
+
                 owner.append(transaction["ip"])
                 admins.append(transaction["ip"])
                 peers.append(transaction["ip"])
