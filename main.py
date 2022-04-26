@@ -19,7 +19,7 @@ app = Flask(__name__)
 # This Disables Logging
 app.logger.disabled = False
 log = logging.getLogger('werkzeug')
-log.disabled = False
+log.disabled = True
 
 
 # Routes
@@ -95,7 +95,6 @@ def generateInvite():
         # print(group)
         invite = group.generateInvite()
         return Compress.compress(invite.toJSON())
-
 
 
 @app.route('/deleteBundle', methods=['POST'])
@@ -185,13 +184,15 @@ def searchBundles():
         responses = []
         # SEND TO ALL PEERS COLLECT RESPONSES AND PRESENT
         for peer in group.peers:
-            res = sendRequest(peer[0], 6700, dumps(searchReq))
-            # if other peer is responded.
-            if res is not False:
-                # print(res)
-                responses.append([peer[0], res])
-            else:
-                print("No Response from", peer[0])
+            # Dont Search Self.
+            if peer[0] != client.publicIP:
+                res = sendRequest(peer[0], 6700, dumps(searchReq))
+                # if other peer is responded.
+                if res is not False:
+                    # print(res)
+                    responses.append([peer[0], res])
+                else:
+                    print("No Response from", peer[0])
         # Merge all responses to single list
         # for x in responses:
         #     print("Response:",x[0],x[1],x[1].responseBundles)
@@ -233,12 +234,11 @@ def getBundle():
         res = sendRequest(userIp, 6700, dumps(getBundleReq))
         # if other peer is responded.
         if res is not False:
-            # Responded decide what to do
+            return "0"
             pass
         else:
-            # print("No Response from", userIp)
+            return "1"
             pass
-    return "1"
 
 
 @app.route('/quitGroup', methods=['POST'])
@@ -318,4 +318,3 @@ if __name__ == "__main__":
     receiver.start()
     print(' * Running on http://127.0.0.1:6969/ (Press CTRL+C to quit)')
     app.run(host='', port=6969)
-

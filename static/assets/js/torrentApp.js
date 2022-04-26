@@ -188,7 +188,7 @@ function shareBundle(groupName) {
 }
 
 function getBundle(bundleId,groupId,userIp) {
-alert("JS OK");
+//alert("JS OK");
     $.ajax({
                 data: {
                         bundleId:bundleId,
@@ -199,10 +199,10 @@ alert("JS OK");
                 , url: '/getBundle'
                 , success: function (response) {
                     if (response==0){
-                    alert("0");
+                    Swal.fire('Success!', 'Bundle will start downloading shortly.', 'success');
                     }else{
                     //TODO FAILED ALERT
-                  alert("not 0");
+                  alert("Peer Didn't Respond.");
                     }
                 }
             });
