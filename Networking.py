@@ -1,15 +1,16 @@
 import copy
+import hashlib
 import json
+import os
 import pickle
 import socket
 import threading
 from socket import *
-from Bundles import Bundle
-import Client
-from Groups import GroupManager, Group
-import os
-import hashlib
+
 import Blockchain
+import Client
+from Bundles import Bundle
+from Groups import GroupManager, Group
 
 
 class Request:
@@ -367,8 +368,8 @@ def sendBundle(addr, port, groupManager, group, bundle):
         groupManager: GroupManager
         json_file_name = bundle.name + ".json"
         bundleDir = groupManager.DIR_PATH_GROUPS + group.name + "\\" + "Bundles" + "\\" + json_file_name
-        print(bundleDir)
-        print(json_file_name)
+        # print(bundleDir)
+        # print(json_file_name)
         with open(bundleDir) as f:
             bundleContent = f.read()
             bundleObj = json.loads(bundleContent)
@@ -403,7 +404,7 @@ def downloadBundle(downloadManager, port, peer, file, bundle, usedPeers, freeFil
         os.makedirs(dir)
 
     if os.path.exists(filePath) is False:
-        print("Creating File")
+        # print("Creating File")
         file = open(filePath, 'x')
         file.close()
 

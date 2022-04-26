@@ -1,14 +1,15 @@
+import copy
+import json
 import math
 import os
-import json
-from os import listdir
-import rsa
-import time
-from time import sleep
 import threading
+import time
 from hashlib import sha256
-import copy
-from pickle import dumps, loads
+from os import listdir
+from pickle import dumps
+from time import sleep
+
+import rsa
 
 
 class Block:
@@ -121,7 +122,6 @@ class Blockchain:
 
     def getDifficulty(self):
         # Diffuculty of blockchain will be dependent on the users participating in  --->log2(peers)
-        return 2
         if len(self.peers) == 0:
             return 1
         else:
@@ -223,12 +223,12 @@ class Blockchain:
                             getBlockReq = Networking.GetBlockRequest(self.groupId, self.getLastBlockIndex() + 1)
                             blockRes = Networking.sendRequest(peer[0], 6700, dumps(getBlockReq))
                             if blockRes is not False:
-                                print(f"Update BC Response:{blockRes}")
+                                # print(f"Update BC Response:{blockRes}")
                                 # print(blockRes.answer)
                                 block = blockRes.answer
                                 block: Block
-                                print(block.index, block.transaction, block.signatures, block.timestamp,
-                                      block.previous_hash, block.hash)
+                                # print(block.index, block.transaction, block.signatures, block.timestamp,
+                                #       block.previous_hash, block.hash)
                                 newBlock = Block(block.index, block.transaction, block.timestamp, block.previous_hash,
                                                  block.signatures)
                                 newBlock.hash = block.hash
@@ -305,8 +305,8 @@ class Blockchain:
                 sleep(30)
             else:
                 diff = self.getDifficulty()
-                print(f"Blockchain Difficulty :{diff}")
-                print(f"Unconfirmed Transactions:{len(self.unconfirmed_transactions)}")
+                # print(f"Blockchain Difficulty :{diff}")
+                # print(f"Unconfirmed Transactions:{len(self.unconfirmed_transactions)}")
                 for transaction in self.unconfirmed_transactions:
                     transaction: UnconfirmedTransaction
                     # For Each Transaction if signatures < difficulty collect transactions
@@ -317,11 +317,11 @@ class Blockchain:
                             transaction.signatures.append([str(client.publicIP),signature.hex()])
                             self.saveUnconfirmedTransactions()
                         else:
-                            print("TRYING TO MINE FROM PEERS")
+                            # print("TRYING TO MINE FROM PEERS")
                             for peer in self.peers:
                                 if peer[0]!=client.publicIP:
-                                    print(f"Trying to get signatures from :{peer[0]}")
-                                    print(transaction.transaction)
+                                    # print(f"Trying to get signatures from :{peer[0]}")
+                                    # print(transaction.transaction)
                                     #Send Transaction get signature.
                                     signReq = Networking.GetSignatureRequest(self.groupId,self.getLastBlockIndex(),transaction.transaction)
                                     res = Networking.sendRequest(peer[0], 6700, dumps(signReq))
@@ -355,12 +355,13 @@ class Blockchain:
                             pass
                     else:
                         # We have the signatures number procede to make block and share.
-                        print(f"Signature {transaction} ready to be made block.")
+                        # print(f"Signature {transaction} ready to be made block.")
                         # Bytes
+
                         lastBlock = self.getLastBlock()
                         # print(lastBlock)
                         lastBlock: Block
-                        print(f"Last Block Index :{lastBlock.index}")
+                        # print(f"Last Block Index :{lastBlock.index}")
                         newBlock = Block(lastBlock.index + 1, transaction.transaction, str(time.time()),
                                          lastBlock.computeHash(), transaction.signatures)
                         newBlock.hash = newBlock.computeHash()
@@ -368,6 +369,7 @@ class Blockchain:
                         self.saveUnconfirmedTransactions()
                         self.saveBlock(newBlock)
                         self.chain.append(newBlock)
+                        print(f"Block_{newBlock.index} mined.")
                 sleep(30)
 
     def getLastBlock(self) -> Block:

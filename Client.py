@@ -1,8 +1,8 @@
-from requests import get
-import os
-from socket import *
 import copy
 import json
+import os
+from socket import *
+
 import rsa
 
 

@@ -1,14 +1,15 @@
-from Bundles import Bundle
-import Groups
-from Groups import GroupManager, Group
-import os
 import copy
 import json
+import os
 import threading
-from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use,downloadBundle,DownloadBundleRequest
-from pickle import dumps, loads
-from time import sleep
 from math import floor
+from pickle import dumps
+from time import sleep
+
+from Bundles import Bundle
+from Groups import Group
+from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use, \
+    downloadBundle, DownloadBundleRequest
 
 
 class DownloadManager:
@@ -84,7 +85,7 @@ class DownloadManager:
                     # print(peer[0])
                     # print(self.client.publicIP)
                     checkAvailabilityReq = CheckBundleAvailabilityRequest(bundle.bundleId, bundle.groupId)
-                    res = sendRequest(peer[0], 6700, dumps(checkAvailabilityReq), self.groupManager)
+                    res = sendRequest(peer[0], 6700, dumps(checkAvailabilityReq))
                     # if other peer is responded.
                     if res is not False:
                         res: CheckBundleAvailabilityResponse
@@ -116,7 +117,7 @@ class DownloadManager:
                 if peer not in usedPeers:
 
                     checkAvailabilityReq = CheckBundleAvailabilityRequest(bundle.bundleId, bundle.groupId)
-                    res = sendRequest(peer[0], 6700, dumps(checkAvailabilityReq), self.groupManager)
+                    res = sendRequest(peer[0], 6700, dumps(checkAvailabilityReq))
                     # if other peer is responded.
                     if res is not False:
                         res: CheckBundleAvailabilityResponse
@@ -130,7 +131,7 @@ class DownloadManager:
 
                             # Find free port.
                             freePort = False
-                            #TODO dynamic
+                            # TODO dynamic
                             port = 6702
                             while freePort is False:
                                 if is_port_in_use(port) is True:
@@ -146,42 +147,41 @@ class DownloadManager:
                                     # Block others use the same file
                                     fileToDownload[1] = 1
                                     break
-                            #if no file to download (all completed -> break)
-                            if len(file)==0:
+                            # if no file to download (all completed -> break)
+                            if len(file) == 0:
                                 break
 
                             # ADD PEER TO USED PEERS.
                             usedPeers.append(peer)
-                            #Download Bundle is a networking function not self.function .
+                            # Download Bundle is a networking function not self.function .
                             downloadReceiver = threading.Thread(target=downloadBundle,
-                                                                args=[self,port, peer,file,bundle,usedPeers,freeFiles])
+                                                                args=[self, port, peer, file, bundle, usedPeers,
+                                                                      freeFiles])
                             downloadReceiver.start()
                             # print(f"File :{file}")
-                            downloadBundleReq = DownloadBundleRequest(bundle.bundleId, bundle.groupId,file[0], port)
-                            res = sendRequest(peer[0], 6700, dumps(downloadBundleReq), self.groupManager)
+                            downloadBundleReq = DownloadBundleRequest(bundle.bundleId, bundle.groupId, file[0], port)
+                            res = sendRequest(peer[0], 6700, dumps(downloadBundleReq))
 
                             if res is False:
-                                #User didnt Respond Close Thream And Remove Him from usedPeers.
-                                #TODO KILL THREAD
+                                # User didnt Respond Close Thream And Remove Him from usedPeers.
+                                # TODO KILL THREAD
                                 usedPeers.remove(peer)
                                 # print("No Response from", peer)
 
-
             # Time delay until next iteration .
-            if len(freeFiles)==0:
-                #No More Files To Be Downloaded
+            if len(freeFiles) == 0:
+                # No More Files To Be Downloaded
                 self.saveBundle(bundle)
                 print(f"All Files Completed for {bundle.name}")
                 break
             sleep(5)
-
 
     def downloadBundle(self, bundle: Bundle, group: Group):
         # print("Download Manager Creating Download Class for ", bundle.name)
         bundleToDownload = BundleToDownload(bundle, group)
         self.saveBundle(bundleToDownload)
         self.bundlesDownloading.append(bundleToDownload)
-        #Re Initialize Downloader
+        # Re Initialize Downloader
         self.downloader()
 
     def findPeers(self):
@@ -201,7 +201,8 @@ class DownloadManager:
         file.close()
         bundle = BundleToDownload(name=json_load_bundle["name"], bundleId=json_load_bundle["bundleId"],
                                   groupId=json_load_bundle["groupId"],
-                                  root=json_load_bundle["root"],pieceSize=json_load_bundle["pieceSize"], peers=json_load_bundle["peers"],
+                                  root=json_load_bundle["root"], pieceSize=json_load_bundle["pieceSize"],
+                                  peers=json_load_bundle["peers"],
                                   files=json_load_bundle["files"])
 
         self.bundlesDownloading.append(bundle)
@@ -236,12 +237,12 @@ class DownloadManager:
                     if piece[2] == 1:
                         completedPieces = completedPieces + 1
             pieces = str(completedPieces) + "/" + str(totalPieces)
-            #Get progress as a % eg. 70%
-            progress = floor((completedPieces / totalPieces)*100)
-            if progress>99:
-                status= 1
+            # Get progress as a % eg. 70%
+            progress = floor((completedPieces / totalPieces) * 100)
+            if progress > 99:
+                status = 1
             else:
-                status= 0
+                status = 0
             progressOfBundle = {"index": indexNum, "name": x.name, "pieces": pieces, "progress": progress,
                                 "status": status}
             progressOfBundles.append(progressOfBundle)
@@ -249,14 +250,15 @@ class DownloadManager:
 
 
 class BundleToDownload:
-    def __init__(self, bundle=None, group=None, name=None, bundleId=None, groupId=None, root=None, pieceSize=None,peers=None,
+    def __init__(self, bundle=None, group=None, name=None, bundleId=None, groupId=None, root=None, pieceSize=None,
+                 peers=None,
                  files=None):
         if bundleId is None:
             # If Creating From bundle and group.
             self.name = bundle.name
             self.bundleId = bundle.id
             self.groupId = group.id
-            self.pieceSize= bundle.pieceSize
+            self.pieceSize = bundle.pieceSize
             self.root = bundle.root
             self.peers = []
             # Get a copy i can manipulate to create BundleToDownload File List.

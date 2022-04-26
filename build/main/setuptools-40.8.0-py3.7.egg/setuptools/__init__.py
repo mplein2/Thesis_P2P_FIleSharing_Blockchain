@@ -11,7 +11,7 @@ from fnmatch import fnmatchcase
 
 import setuptools.version
 from setuptools.depends import Require
-from setuptools.dist import Distribution, Feature
+from setuptools.dist import Distribution
 from setuptools.extension import Extension
 from setuptools.extern.six import PY3, string_types
 from setuptools.extern.six.moves import filter, map
