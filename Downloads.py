@@ -1,14 +1,15 @@
-from Bundles import Bundle
-import Groups
-from Groups import GroupManager, Group
-import os
 import copy
 import json
+import os
 import threading
-from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use,downloadBundle,DownloadBundleRequest
-from pickle import dumps, loads
-from time import sleep
 from math import floor
+from pickle import dumps
+from time import sleep
+
+from Bundles import Bundle
+from Groups import Group
+from Networking import CheckBundleAvailabilityRequest, CheckBundleAvailabilityResponse, sendRequest, is_port_in_use, \
+    downloadBundle, DownloadBundleRequest
 
 
 class DownloadManager:

@@ -1,15 +1,15 @@
-from time import time
+import copy
+import hashlib
+import json
 import os
+import shutil
 from os import listdir
 from os.path import isfile, join
-import json
-from typing import Type
-import shutil
-import hashlib
-from Blockchain import Blockchain
+from time import time
+
 import Blockchain
+from Blockchain import Blockchain
 from Bundles import Bundle
-import copy
 
 
 class Invite:
@@ -35,8 +35,7 @@ class Group:
             self.id = hashlib.sha256((name + str(timestamp)).encode('utf-8')).hexdigest()
         else:
             self.id = id
-
-        self.blockchain = Blockchain.Blockchain(blockchainPath,self.peers,self.admins,self.id,self.client)
+        self.blockchain = Blockchain(blockchainPath,self.peers,self.admins,self.id,self.client)
     def generateInvite(self):
         invite = Invite(self.id, self.name, self.timestamp, self.peers)
         return invite
@@ -86,7 +85,7 @@ class GroupManager:
 
     def removeGroup(self, group):
         self.groups.remove(group)
-        print(self.groups)
+        # print(self.groups)
 
     def getGroupWithName(self, name):
         group: Group
@@ -131,7 +130,7 @@ class GroupManager:
         json_file_name = group.name + ".json"
         if not os.path.exists(self.DIR_PATH_GROUPS + group.name):
             # Create a new directory because it does not exist
-            print("Gonna Create Group Folder")
+            print("Creating Group Folder")
             os.makedirs(self.DIR_PATH_GROUPS + group.name)
         json_file = open(self.DIR_PATH_GROUPS + group.name + '\\' + json_file_name, "w")
         saveCopy = copy.copy(group)

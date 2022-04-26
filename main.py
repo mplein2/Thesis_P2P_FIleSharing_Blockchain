@@ -1,17 +1,18 @@
 import json
 import logging
 import threading
-from pickle import dumps, loads
-from flask import Flask, render_template, request, redirect
+from pickle import dumps
+
+import easygui
+from flask import Flask, render_template, request
 
 import Blockchain
 import Compress
-from Networking import receiver, sendRequest, JoinRequest, SearchBundleRequest, receiveBundle, GetBundleRequest
-from Groups import GroupManager, Invite, Group
-from Client import Client
-import easygui
 from Bundles import BundleManager
+from Client import Client
 from Downloads import DownloadManager
+from Groups import GroupManager, Invite, Group
+from Networking import receiver, sendRequest, JoinRequest, SearchBundleRequest, receiveBundle, GetBundleRequest
 
 app = Flask(__name__)
 
@@ -30,6 +31,7 @@ def index():
 
 @app.route("/groups", methods=['GET'])
 def groups():
+    # print(request.args.__class__)
     group = request.args.get('group')
     group = groupManager.getGroupWithName(group)
     groupManager.saveGroup(group)
@@ -57,7 +59,7 @@ def groups():
         peers.remove(client.publicIP)
 
     dif = group.blockchain.getDifficulty()
-    print(dif)
+    # print(dif)
     groupManager.saveGroup(group)
     return render_template("groups.html", groups=groupManager.groups, group=group, client=client, adminPriv=adminPriv,
                            ownerPriv=ownerPriv, peers=peers, bans=bans, admins=admins)
@@ -65,16 +67,16 @@ def groups():
 
 @app.route('/start', methods=['POST', 'GET'])
 def start():
-    print("Start Worked")
+    # print("Start Worked")
     if downloadManager.STATUS:
         downloadManager.STATUS = False
         # downloadManager Off
-        print("Download Manager Not Active")
+        print("Download Manager Disabled")
         return "0"
     else:
         downloadManager.STATUS = True
         # downloadManager On
-        print("Download Manager Active")
+        print("Download Manager Enabled")
         return "1"
 
 
@@ -314,4 +316,6 @@ if __name__ == "__main__":
     # TODO Networking Thread To Receive From Internet
     receiver = threading.Thread(target=receiver, args=[groupManager])
     receiver.start()
+    print(' * Running on http://127.0.0.1:6969/ (Press CTRL+C to quit)')
     app.run(host='', port=6969)
+
