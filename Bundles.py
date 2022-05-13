@@ -6,7 +6,6 @@ from functools import partial
 import hashlib
 
 
-# This Useless .
 class BundleManager:
     def __init__(self):
         self.bundles = []

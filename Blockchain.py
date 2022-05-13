@@ -136,13 +136,13 @@ class Blockchain:
         # print(transactionStr.__class__)
         # Genereate signature for Transaction
         signature = rsa.sign(transactionStr.encode(), client.privateKey, 'SHA-1')
-        genesis_block = Block(0, transactionStr, str(time.time()), "0", [client.publicIP,signature.hex()])
+        genesis_block = Block(0, transactionStr, str(time.time()), "0", [client.publicIP, signature.hex()])
         genesis_block.hash = genesis_block.computeHash()
         self.saveBlock(genesis_block)
         self.chain.append(genesis_block)
 
-    def verifyTransaction(self,transaction):
-        #TODO verify transactions.
+    def verifyTransaction(self, transaction):
+        # TODO verify transactions.
         return True
 
     def saveBlock(self, block):
@@ -247,25 +247,23 @@ class Blockchain:
                         # print("Up-to-date.")
                         pass
 
-        #Update Group Peers And Admins
+        # Update Group Peers And Admins
         peers, bans, admins, owner = self.parseBlockchain()
         for ip in admins:
             inside = False
             for admin in self.groupAdmins:
-                if admin[0]==ip:
+                if admin[0] == ip:
                     inside = True
             if not inside:
                 self.groupAdmins.append([ip])
 
-
         for ip in peers:
             inside = False
             for peer in self.peers:
-                if peer[0]==ip:
+                if peer[0] == ip:
                     inside = True
             if not inside:
                 self.peers.append([ip])
-
 
     def getBlockWithIndex(self, index):
         for block in self.chain:
@@ -289,12 +287,19 @@ class Blockchain:
                     return False
             else:
                 # Check if new block is made with the same previous block.
-                # TODO if not resolve ?
                 if newBlock.previous_hash == self.getLastBlock().computeHash():
+                    # check difficulty based on blockchain etc.
+                    if len(newBlock.signatures) >= self.getDifficulty():
                     # TODO check if signatures okay.
-                    # TODO check timestamp.
-                    # TODO check difficulty based on blockchain etc.
-                    return True
+                        signok = True
+                        for sign in newBlock.signatures:
+                            print(f"Signature: {sign}")
+                        if signok:
+                            return True
+                        else:
+                            return False
+                    else:
+                        return False
 
     def mine(self, client):
         while True:
@@ -314,43 +319,37 @@ class Blockchain:
                         if not len(transaction.signatures):
                             # No Signatures add my signature
                             signature = rsa.sign(transaction.transaction.encode(), client.privateKey, 'SHA-1')
-                            transaction.signatures.append([str(client.publicIP),signature.hex()])
+                            transaction.signatures.append([str(client.publicIP), signature.hex()])
                             self.saveUnconfirmedTransactions()
                         else:
                             # print("TRYING TO MINE FROM PEERS")
                             for peer in self.peers:
-                                if peer[0]!=client.publicIP:
+                                if peer[0] != client.publicIP:
                                     # print(f"Trying to get signatures from :{peer[0]}")
                                     # print(transaction.transaction)
-                                    #Send Transaction get signature.
-                                    signReq = Networking.GetSignatureRequest(self.groupId,self.getLastBlockIndex(),transaction.transaction)
+                                    # Send Transaction get signature.
+                                    signReq = Networking.GetSignatureRequest(self.groupId, self.getLastBlockIndex(),
+                                                                             transaction.transaction)
                                     res = Networking.sendRequest(peer[0], 6700, dumps(signReq))
                                     if res is not False:
-                                        if res.answer!=0 and res.answer!=1:
-                                            #Verified.
+                                        if res.answer != 0 and res.answer != 1:
+                                            # Verified.
                                             signature = bytes.fromhex(res.answer)
                                             key = rsa.PublicKey.load_pkcs1(self.getRSAKey(peer[0]))
-                                            if rsa.verify(transaction.transaction.encode(), signature, key)=='SHA-1':
-                                                #Append the signature.
+                                            if rsa.verify(transaction.transaction.encode(), signature, key) == 'SHA-1':
+                                                # Append the signature.
                                                 # print(signature.hex().__class__)
-                                                transaction.signatures.append([peer[0],signature.hex()])
+                                                transaction.signatures.append([peer[0], signature.hex()])
                                                 if diff > len(transaction.signatures):
-                                                    #max signatures not reached
+                                                    # max signatures not reached
                                                     pass
                                                 else:
-                                                    #max signatures reached
+                                                    # max signatures reached
                                                     break
                                     else:
-                                        #Peer Dead Try From Others.
+                                        # Peer Dead Try From Others.
                                         print("No Response from", peer[0])
                                         pass
-
-
-
-
-
-
-
 
                             pass
                     else:
@@ -383,20 +382,19 @@ class Blockchain:
                 lastBlockIndex = block.index
         return lastBlock
 
-    def getRSAKey(self,ip):
+    def getRSAKey(self, ip):
         """Use only with peers in group so key always exists one way or another."""
         for block in self.chain:
-            block:Block
+            block: Block
             transaction = json.loads(block.transaction)
             if transaction["type"] == 0:
-                if transaction["ip"]==ip:
+                if transaction["ip"] == ip:
                     return transaction["publicKey"]
 
             # From Invite
             elif transaction["type"] == 2:
-                if transaction["ip"]==ip:
+                if transaction["ip"] == ip:
                     return transaction["publicKey"]
-
 
     def getLastBlockIndex(self):
         if len(self.chain) == 0:
@@ -458,23 +456,23 @@ class Blockchain:
         for block in self.chain:
             transaction = json.loads(block.transaction)
 
-            #GenesisTransactio
+            # GenesisTransactio
             if transaction["type"] == 0:
 
                 owner.append(transaction["ip"])
                 admins.append(transaction["ip"])
                 peers.append(transaction["ip"])
 
-            #InviteTransaction
+            # InviteTransaction
             elif transaction["type"] == 1:
                 invites.append(transaction["ip"])
 
-            #JoinTransaction
+            # JoinTransaction
             elif transaction["type"] == 2:
                 peers.append(transaction["ip"])
                 invites.remove(transaction["ip"])
 
-            #BanTransaction
+            # BanTransaction
             elif transaction["type"] == 3:
                 peers.remove(transaction["ip"])
                 bans.append(transaction["ip"])

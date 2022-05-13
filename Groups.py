@@ -24,10 +24,10 @@ class Invite:
 
 
 class Group:
-    def __init__(self, name, admin, peers, timestamp, blockchainPath,client,id=None):
+    def __init__(self, name, admins, peers, timestamp, blockchainPath, client, id=None):
         self.name = name
         self.timestamp = timestamp
-        self.admins = admin
+        self.admins = admins
         self.peers = peers
         self.bundles = []
         self.client = client
@@ -35,14 +35,18 @@ class Group:
             self.id = hashlib.sha256((name + str(timestamp)).encode('utf-8')).hexdigest()
         else:
             self.id = id
-        self.blockchain = Blockchain(blockchainPath,self.peers,self.admins,self.id,self.client)
+        self.blockchain = Blockchain(blockchainPath, self.peers, self.admins, self.id, self.client)
+
     def generateInvite(self):
         invite = Invite(self.id, self.name, self.timestamp, self.peers)
         return invite
 
-
-    def removeBundle(self,bundle):
+    def removeBundle(self, bundle):
         self.bundles.remove(bundle)
+        return True
+
+    def addBundle(self, bundle):
+        self.bundles.append(bundle)
         return True
 
     def toJSON(self):
@@ -57,9 +61,10 @@ class Group:
         # If Nothing Proked return in for loop return false for not having the bundle .
         return False
 
+
 class GroupManager:
 
-    def __init__(self,client):
+    def __init__(self, client):
         self.client = client
         self.groups = []
         self.DIR_PATH_GROUPS = '%s\\TorrentApp\\Groups\\' % os.environ['APPDATA']
@@ -71,13 +76,26 @@ class GroupManager:
         self.loadGroups()
         print("GroupManager Initialized")
 
-    def deleteBundle(self,group,bundle):
+    def addBundle(self, bundle, group):
+        if not os.path.exists(self.DIR_PATH_GROUPS + group + "\\" + "Bundles"):
+            # Create a new directory because it does not exist
+            print("Creating Group Folder")
+            os.makedirs(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
+        json_file_name = bundle.name + ".json"
+        json_file = open(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name, "w")
+        json_file.write(json.dumps(bundle.toJSON()))
+        json_file.close()
+        self.getGroupWithName(group).bundles.append(bundle)
+        # print("Added Bundle")
+        # print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
+        # print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name)
+
+    def deleteBundle(self, group, bundle):
         group = self.getGroupWithId(group)
         bundle = group.getBundleWithId(bundle)
         group.removeBundle(bundle)
-        os.remove(self.DIR_PATH_GROUPS + group.name+"\\Bundles\\"+bundle.name+".json")
+        os.remove(self.DIR_PATH_GROUPS + group.name + "\\Bundles\\" + bundle.name + ".json")
         return True
-
 
     def addGroup(self, group):
         self.saveGroup(group)
@@ -92,7 +110,7 @@ class GroupManager:
         for group in self.groups:
             if group.name == name:
                 return group
-        #Group not found
+        # Group not found
         return False
 
     def getGroupWithId(self, id):
@@ -100,7 +118,7 @@ class GroupManager:
         for group in self.groups:
             if group.id == id:
                 return group
-        #Group not found
+        # Group not found
         return False
 
     def addPeerGroup(self, name, peer):
@@ -114,13 +132,14 @@ class GroupManager:
 
     def createGroup(self, name, admin):
         timeNow = time()
-        newGroup = Group(name, [admin, ], [admin, ], timeNow,blockchainPath=self.DIR_PATH_GROUPS+name+"\\Blockchain",client=self.client)
+        newGroup = Group(name, [admin, ], [admin, ], timeNow,
+                         blockchainPath=self.DIR_PATH_GROUPS + name + "\\Blockchain", client=self.client)
         self.saveGroup(newGroup)
         self.groups.append(newGroup)
         return True
 
     def quitGroup(self, group):
-        group : Group
+        group: Group
         shutil.rmtree(self.DIR_PATH_GROUPS + group.name)
         self.removeGroup(group)
         return True
@@ -149,7 +168,8 @@ class GroupManager:
             print("Error Opening Group file :", groupName)
 
         group = Group(json_load_group["name"], json_load_group["admins"],
-                      json_load_group["peers"], json_load_group["timestamp"],self.DIR_PATH_GROUPS + groupName + "\\" + "Blockchain\\",self.client,json_load_group["id"])
+                      json_load_group["peers"], json_load_group["timestamp"],
+                      self.DIR_PATH_GROUPS + groupName + "\\" + "Blockchain\\", self.client, json_load_group["id"])
 
         # Load Bundles of Each group.
         groupBundlePath = self.DIR_PATH_GROUPS + groupName + "\\" + "Bundles\\"
@@ -168,25 +188,9 @@ class GroupManager:
                                        data["pieceSize"], data["files"])
                     group.bundles.append(bundleObj)
 
-
-
         self.groups.append(group)
 
     def loadGroups(self):
         groups = [group for group in listdir(self.DIR_PATH_GROUPS)]
         for group in groups:
             self.loadGroup(group)
-
-    def addBundle(self, bundle, group):
-        if not os.path.exists(self.DIR_PATH_GROUPS + group + "\\" + "Bundles"):
-            # Create a new directory because it does not exist
-            print("Creating Group Folder")
-            os.makedirs(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
-        json_file_name = bundle.name + ".json"
-        json_file = open(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name, "w")
-        json_file.write(json.dumps(bundle.toJSON()))
-        json_file.close()
-        self.getGroupWithName(group).bundles.append(bundle)
-        # print("Added Bundle")
-        # print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles")
-        # print(self.DIR_PATH_GROUPS + group + "\\" + "Bundles" + "\\" + json_file_name)

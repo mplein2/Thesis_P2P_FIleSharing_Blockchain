@@ -22,6 +22,9 @@ class Client:
         sock.close()
 
         self.DIR_PATH_CLIENT = '%s\\TorrentApp\\' % os.environ['APPDATA']
+        if not os.path.exists(self.DIR_PATH_CLIENT):
+            # Create a new directory because it does not exist
+            os.makedirs(self.DIR_PATH_CLIENT)
         self.DIR_PATH_CONFIG = self.DIR_PATH_CLIENT + "config.json"
         self.DIR_PATH_PRIVATE_KEY = self.DIR_PATH_CLIENT + "PRIVATEKEY.json"
         self.DIR_PATH_PUBLIC_KEY = self.DIR_PATH_CLIENT + "PUBLICKEY.json"
@@ -42,9 +45,9 @@ class Client:
         # RSA Keys
         if not os.path.exists(self.DIR_PATH_PUBLIC_KEY):
             if not os.path.exists(self.DIR_PATH_PRIVATE_KEY):
-                #Create new Keys
+                # Create new Keys
                 self.publicKey, self.privateKey = rsa.newkeys(512)
-                #Create Key Files
+                # Create Key Files
                 f = open(self.DIR_PATH_PRIVATE_KEY, "wb+")
                 f.write(self.privateKey.save_pkcs1(format='PEM'))
                 f.close()

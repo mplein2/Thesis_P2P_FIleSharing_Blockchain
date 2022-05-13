@@ -23,7 +23,7 @@ log.disabled = True
 
 
 # Routes
-@app.route("/")
+@app.route("/", methods=['GET'])
 def index():
     progress = downloadManager.getDownloadProgress()
     return render_template("index.html", groups=groupManager.groups, client=client, progress=progress)
@@ -65,7 +65,7 @@ def groups():
                            ownerPriv=ownerPriv, peers=peers, bans=bans, admins=admins)
 
 
-@app.route('/start', methods=['POST', 'GET'])
+@app.route('/start', methods=['POST'])
 def start():
     # print("Start Worked")
     if downloadManager.STATUS:

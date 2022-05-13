@@ -115,12 +115,14 @@ class GetBlockResponse(Request):
         super().__init__(7)
         self.answer = answer
 
+
 class GetSignatureRequest(Request):
-    def __init__(self, groupId, lastIndex,transaction):
+    def __init__(self, groupId, lastIndex, transaction):
         super().__init__(8)
         self.groupId = groupId
         self.lastIndex = lastIndex
         self.transaction = transaction
+
 
 class GetSignatureResponse(Request):
     def __init__(self, answer):
@@ -128,13 +130,12 @@ class GetSignatureResponse(Request):
         self.answer = answer
 
 
-
 def requestHandler(data, addr, groupManager: GroupManager):
     req = pickle.loads(data)
     print(f"Received From {addr[0]}:{addr[1]} {req.__class__.__name__}")
 
     # Response to JoinRequest
-    #TODO refactor this.
+    # TODO refactor this.
     if req.type == 1:
         req = JoinRequest(req.name, req.timestamp)
         group = groupManager.getGroupWithName(req.name)
@@ -179,8 +180,6 @@ def requestHandler(data, addr, groupManager: GroupManager):
         bundleReceiver = threading.Thread(target=sendBundle,
                                           args=[addr, req.portForBundleReceiver, groupManager, group, bundle])
         bundleReceiver.start()
-        # TODO refactor use it to determine if user ok to send bundle
-        # TODO 9/4 ????
         return pickle.dumps(GetBundleResponse(1))
 
     elif req.type == 4:
@@ -200,8 +199,6 @@ def requestHandler(data, addr, groupManager: GroupManager):
         uploadThread = threading.Thread(target=uploadBundle,
                                         args=[addr, req.port, req.bundleId, req.groupId, req.file, groupManager])
         uploadThread.start()
-        # TODO refactor use it to determine if user ok to send bundle
-        # TODO 9/4 ????
         return pickle.dumps(DownloadBundleResponse(1))
 
     elif req.type == 6:
@@ -232,19 +229,19 @@ def requestHandler(data, addr, groupManager: GroupManager):
         req = GetSignatureRequest(req.groupId, req.lastIndex, req.transaction)
         group = groupManager.getGroupWithId(req.groupId)
         lastIndex = group.blockchain.getLastBlockIndex()
-        #If up to date or more
-        if lastIndex==req.lastIndex:
-            #Up To date
+        # If up to date or more
+        if lastIndex == req.lastIndex:
+            # Up To date
             if group.blockchain.verifyTransaction(req.transaction):
-                #Transaction Ok
+                # Transaction Ok
                 signature = rsa.sign(transactionStr.encode(), group.client.privateKey, 'SHA-1')
                 return pickle.dumps(GetSignatureResponse(str(signature.hex())))
             else:
-                #Transaction not ok.
+                # Transaction not ok.
                 return pickle.dumps(GetSignatureResponse(1))
 
         else:
-            #Not up to date.
+            # Not up to date.
             return pickle.dumps(GetSignatureResponse(0))
 
 
@@ -341,7 +338,6 @@ def receiveBundle(port, client, groupManager, groupId, downloadManager):
                 data = conn.recv(1024)
                 # print(data)
                 bundleBytes = bundleBytes + data
-                # TODO save Bytes to group and downloads also start downloading.
                 if not data:
                     # print("Break")
                     break

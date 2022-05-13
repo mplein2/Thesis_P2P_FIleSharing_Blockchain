@@ -2,10 +2,10 @@ function start() {
     const xhttp = new XMLHttpRequest();
     xhttp.onload = function() {
         if (this.responseText == "1"){
-        alert("Download Manager Active");
+        alert("Download Manager Enabled");
         }
         else{
-        alert("Download Manager Not Active");
+        alert("Download Manager Disabled");
         }
 
         }
