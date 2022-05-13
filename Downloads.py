@@ -91,7 +91,6 @@ class DownloadManager:
                         res: CheckBundleAvailabilityResponse
                         if res.answer == 0:
                             # Peer Dosent Have it
-                            # fuck this below
                             # TODO PUT PEER IN IGNORE LIST don't send to him again.
                             pass
                         elif res.answer == 1:
@@ -113,9 +112,7 @@ class DownloadManager:
             # From peers that i found and are not already used
             # Downlaod From the Also .
             for peer in bundle.peers:
-                # TODO AD IF IF USER IS NOT ALREADY BEING USED.
                 if peer not in usedPeers:
-
                     checkAvailabilityReq = CheckBundleAvailabilityRequest(bundle.bundleId, bundle.groupId)
                     res = sendRequest(peer[0], 6700, dumps(checkAvailabilityReq))
                     # if other peer is responded.
@@ -164,7 +161,6 @@ class DownloadManager:
 
                             if res is False:
                                 # User didnt Respond Close Thream And Remove Him from usedPeers.
-                                # TODO KILL THREAD
                                 usedPeers.remove(peer)
                                 # print("No Response from", peer)
 
@@ -183,9 +179,6 @@ class DownloadManager:
         self.bundlesDownloading.append(bundleToDownload)
         # Re Initialize Downloader
         self.downloader()
-
-    def findPeers(self):
-        pass
 
     def loadBundles(self):
         bundles = [bundle for bundle in os.listdir(self.DIR_PATH_DOWNLOADS)]
@@ -217,12 +210,6 @@ class DownloadManager:
         json_file.write(json.dumps(bundle.toJSON()))
         json_file.close()
 
-    def findPeers(self, bundleId, groupId):
-        pass
-
-    def getBundleWithId(self, bundleId):
-        pass
-
     def getDownloadProgress(self):
         progressOfBundles = []
         indexNum = 0
@@ -250,6 +237,7 @@ class DownloadManager:
 
 
 class BundleToDownload:
+
     def __init__(self, bundle=None, group=None, name=None, bundleId=None, groupId=None, root=None, pieceSize=None,
                  peers=None,
                  files=None):
