@@ -234,6 +234,7 @@ def requestHandler(data, addr, groupManager: GroupManager):
             # Up To date
             if group.blockchain.verifyTransaction(req.transaction):
                 # Transaction Ok
+                # print(transactionStr.encode())
                 signature = rsa.sign(transactionStr.encode(), group.client.privateKey, 'SHA-1')
                 return pickle.dumps(GetSignatureResponse(str(signature.hex())))
             else:
