@@ -147,7 +147,6 @@ def requestHandler(data, addr, groupManager: GroupManager):
             return pickle.dumps(joinResponse)
         else:
             return False
-
     # Response to search req
     elif req.type == 2:
         # Create The Request again for local use
@@ -245,6 +244,9 @@ def requestHandler(data, addr, groupManager: GroupManager):
             # Not up to date.
             return pickle.dumps(GetSignatureResponse(0))
 
+    else:
+        return False
+
 
 def responseHandler(data, addr):
     res = pickle.loads(data)
@@ -311,16 +313,16 @@ def receiver(groupManager):
 
 
 def sendRequest(address, port, request):
-    # Create a socket for sending files
+    # Create a socket for sending data
     clientSocket = socket(AF_INET, SOCK_DGRAM)
-    clientSocket.settimeout(1)
+    clientSocket.settimeout(0.5)
     try:
         clientSocket.sendto(request, (address, port))
         data, addr = clientSocket.recvfrom(65537)
         res = responseHandler(data, addr)
         return res
-    # TODO except socket.timeout
     except Exception as exception:
+        # No Response From User
         # print("Exception on SendRequest:", exception)
         return False
 
@@ -372,7 +374,6 @@ def sendBundle(addr, port, groupManager, group, bundle):
             bundleObj = json.loads(bundleContent)
             bundleObj["root"] = ""
             bundleStr = json.dumps(bundleObj)
-
         s.sendall(bundleStr.encode())
 
 

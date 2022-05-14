@@ -36,7 +36,7 @@ class Bundle:
             self.root = path
             self.timestamp = str(time.time())
             self.id = hashlib.sha256((name + desc + str(self.timestamp)).encode('utf-8')).hexdigest()
-            self.pieceSize = 49152
+            self.pieceSize = pieceSize
             self.files = []
             for root, dirs, files in os.walk(path, topdown=False):
                 for name in files:

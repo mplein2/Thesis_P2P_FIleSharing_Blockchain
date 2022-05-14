@@ -63,7 +63,6 @@ class Group:
 
 
 class GroupManager:
-
     def __init__(self, client):
         self.client = client
         self.groups = []
@@ -171,7 +170,7 @@ class GroupManager:
                       json_load_group["peers"], json_load_group["timestamp"],
                       self.DIR_PATH_GROUPS + groupName + "\\" + "Blockchain\\", self.client, json_load_group["id"])
 
-        # Load Bundles of Each group.
+        # Load Bundles of group.
         groupBundlePath = self.DIR_PATH_GROUPS + groupName + "\\" + "Bundles\\"
         # Make the folder if it dosent exist .
         if not os.path.exists(groupBundlePath):

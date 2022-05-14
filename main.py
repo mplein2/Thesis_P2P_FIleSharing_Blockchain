@@ -2,10 +2,8 @@ import json
 import logging
 import threading
 from pickle import dumps
-
 import easygui
 from flask import Flask, render_template, request
-
 import Blockchain
 import Compress
 from Bundles import BundleManager
@@ -23,6 +21,8 @@ log.disabled = True
 
 
 # Routes
+
+# Index/Dashboard
 @app.route("/", methods=['GET'])
 def index():
     progress = downloadManager.getDownloadProgress()
@@ -65,6 +65,7 @@ def groups():
                            ownerPriv=ownerPriv, peers=peers, bans=bans, admins=admins)
 
 
+# Swap Downloader Status
 @app.route('/start', methods=['POST'])
 def start():
     # print("Start Worked")
@@ -149,9 +150,13 @@ def shareBundle():
         # print(desc)
         # print(groupName)
         path = easygui.diropenbox(msg="Select folder to share as bundle", title="Share Bundle")
-        bundle = bundleManager.createBundle(name, desc, path=path)
-        groupManager.addBundle(bundle, groupName)
-        return "0"
+        if path is not None:
+            bundle = bundleManager.createBundle(name, desc, path=path)
+            groupManager.addBundle(bundle, groupName)
+            return "0"
+        else:
+            # Fail no path
+            return "1"
 
 
 @app.route('/selectDownloadLocation', methods=['POST'])
@@ -187,12 +192,13 @@ def searchBundles():
             # Dont Search Self.
             if peer[0] != client.publicIP:
                 res = sendRequest(peer[0], 6700, dumps(searchReq))
-                # if other peer is responded.
+                # if other peer  responded.
                 if res is not False:
                     # print(res)
                     responses.append([peer[0], res])
                 else:
-                    print("No Response from", peer[0])
+                    # print("No Response from", peer[0])
+                    pass
         # Merge all responses to single list
         # for x in responses:
         #     print("Response:",x[0],x[1],x[1].responseBundles)
@@ -208,7 +214,6 @@ def createGroup():
         name = data["name"]
     if groupManager.createGroup(name, [client.publicIP]):
         # Make First Block In Blockchain Append Admin
-        # Type 0 First Created
         group = groupManager.getGroupWithName(name)
         group.blockchain.createGenesisBlock(client)
         # True
@@ -225,8 +230,13 @@ def getBundle():
         bundleId = data["bundleId"]
         groupId = data["groupId"]
         userIp = data["userIp"]
-        # TODO dynamic port on receiver for bundle
         portForBundleReceiver = 6701
+        freePort = False
+        while freePort is False:
+            if is_port_in_use(portForBundleReceiver) is True:
+                port = port + 1
+            else:
+                freePort = True
         bundleReceiver = threading.Thread(target=receiveBundle,
                                           args=[portForBundleReceiver, client, groupManager, groupId, downloadManager])
         bundleReceiver.start()
@@ -313,8 +323,7 @@ if __name__ == "__main__":
     groupManager = GroupManager(client)
     bundleManager = BundleManager()
     downloadManager = DownloadManager(groupManager, client)
-    # TODO Networking Thread To Receive From Internet
     receiver = threading.Thread(target=receiver, args=[groupManager])
     receiver.start()
-    print(' * Running on http://127.0.0.1:6969/ (Press CTRL+C to quit)')
-    app.run(host='', port=6969)
+    print(' * Running on http://127.0.0.1:6699/ (Press CTRL+C to quit)')
+    app.run(host='', port=6699)

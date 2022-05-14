@@ -11,7 +11,6 @@ function start() {
         }
     xhttp.open("POST", "/start", true);
     xhttp.send();
-
 }
 
 function addGroup() {
