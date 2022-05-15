@@ -296,7 +296,7 @@ class Blockchain:
                             # print(signature)
                             # print(key)
                             signok = True
-                            try:
+                            try :
                                 if rsa.verify(newBlock.transaction.encode(), signature, key) != 'SHA-1':
                                     signok = False
                             except Exception as e:
