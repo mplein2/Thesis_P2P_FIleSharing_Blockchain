@@ -285,18 +285,22 @@ class Blockchain:
                 if newBlock.previous_hash == self.getLastBlock().computeHash():
                     # check difficulty based on blockchain etc.
                     if len(newBlock.signatures) >= self.getDifficulty():
-                        # TODO check if signatures okay.
                         signok = True
                         for sign in newBlock.signatures:
                             # print(f"Signature: {sign}")
                             signature = bytes.fromhex(sign[1])
+                            print(sign[1])
                             key = rsa.PublicKey.load_pkcs1(self.getRSAKey(sign[0]))
                             # print(f"VERYFING BLOCK")
                             # print(newBlock.transaction)
                             # print(signature)
                             # print(key)
-                            if rsa.verify(newBlock.transaction.encode(), signature, key) != 'SHA-1':
-                                signok = False
+                            signok = True
+                            try:
+                                if rsa.verify(newBlock.transaction.encode(), signature, key) != 'SHA-1':
+                                    signok = False
+                            except Exception as e:
+                                pass
                         if signok:
                             return True
                         else:
