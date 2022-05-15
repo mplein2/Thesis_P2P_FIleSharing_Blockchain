@@ -171,7 +171,7 @@ class DownloadManager:
                 self.saveBundle(bundle)
                 print(f"All Files Completed for {bundle.name}")
                 break
-            sleep(5)
+            sleep(1)
 
     def downloadBundle(self, bundle: Bundle, group: Group):
         # print("Download Manager Creating Download Class for ", bundle.name)
