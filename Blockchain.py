@@ -212,7 +212,7 @@ class Blockchain:
                 if res is not False:
                     # if the response is bigger than me ask him for his block until we are at the same.
                     if res.answer > self.getLastBlockIndex():
-                        print(self.getLastBlockIndex().__class__, res.answer.__class__)
+                        # print(self.getLastBlockIndex().__class__, res.answer.__class__)
                         while self.getLastBlockIndex() < res.answer:
                             # Get block
                             getBlockReq = Networking.GetBlockRequest(self.groupId, self.getLastBlockIndex() + 1)
