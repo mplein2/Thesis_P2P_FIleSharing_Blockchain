@@ -49,6 +49,7 @@ class Bundle:
                     with open(os.path.join(root, name), 'rb') as openfileobject:
                         for chunk in iter(partial(openfileobject.read, 49152), b''):
                             pieces.append([pieceCounter, hashlib.sha1(chunk).hexdigest()])
+                            print(pieceCounter, hashlib.sha1(chunk).hexdigest())
                             pieceCounter = pieceCounter + 1
                     file["pieces"] = pieces
                     self.files.append(file)

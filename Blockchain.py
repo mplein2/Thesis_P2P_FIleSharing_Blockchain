@@ -103,7 +103,6 @@ class Blockchain:
         if not os.path.exists(self.TRANSACTION_PATH):
             # If Path dosent Exist Create it
             os.makedirs(self.TRANSACTION_PATH)
-
         self.loadTransactions()
 
         # print(self.unconfirmed_transactions)
@@ -140,10 +139,6 @@ class Blockchain:
         genesis_block.hash = genesis_block.computeHash()
         self.saveBlock(genesis_block)
         self.chain.append(genesis_block)
-
-    def verifyTransaction(self, transaction):
-        # TODO verify transactions.
-        return True
 
     def saveBlock(self, block):
         if not os.path.exists(self.BLOCKCHAIN_PATH):
@@ -313,9 +308,10 @@ class Blockchain:
         while True:
             # Update Blockchain.
             self.updateBlockchain(client)
+            # print("Updating BLockchain")
             if not self.unconfirmed_transactions:
                 # If No Transaction sleep and check again soon.
-                sleep(30)
+                sleep(120)
             else:
                 diff = self.getDifficulty()
                 # print(f"Blockchain Difficulty :{diff}")

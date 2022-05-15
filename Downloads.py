@@ -95,11 +95,13 @@ class DownloadManager:
                             pass
                         elif res.answer == 1:
                             # Check if he already is in
-                            seeders.append(peer)
+                            if peer not in seeders:
+                                seeders.append(peer)
                             # new peer found update bundle download file.
                             # print("new peep found")
-                            bundle.peers.append(peer)
-                            self.saveBundle(bundle)
+                            if peer not in bundle.peers:
+                                bundle.peers.append(peer)
+                                self.saveBundle(bundle)
 
                     else:
                         # Dead peer
@@ -125,7 +127,6 @@ class DownloadManager:
                             pass
                         elif res.answer == 1:
                             # print("Have peer with bundle to use . ")
-
                             # Find free port.
                             freePort = False
                             # TODO dynamic

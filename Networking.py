@@ -229,17 +229,15 @@ def requestHandler(data, addr, groupManager: GroupManager):
         group = groupManager.getGroupWithId(req.groupId)
         lastIndex = group.blockchain.getLastBlockIndex()
         # If up to date or more
-        if lastIndex == req.lastIndex:
+        if lastIndex+1 == req.lastIndex:
             # Up To date
-            if group.blockchain.verifyTransaction(req.transaction):
-                # Transaction Ok
-                # print(transactionStr.encode())
-                signature = rsa.sign(transactionStr.encode(), group.client.privateKey, 'SHA-1')
-                return pickle.dumps(GetSignatureResponse(str(signature.hex())))
-            else:
-                # Transaction not ok.
-                return pickle.dumps(GetSignatureResponse(1))
-
+            # Transaction Ok
+            # print(transactionStr.encode())
+            signature = rsa.sign(transactionStr.encode(), group.client.privateKey, 'SHA-1')
+            return pickle.dumps(GetSignatureResponse(str(signature.hex())))
+            # else:
+            #     # Transaction not ok.
+            #     return pickle.dumps(GetSignatureResponse(1))
         else:
             # Not up to date.
             return pickle.dumps(GetSignatureResponse(0))
