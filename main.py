@@ -10,7 +10,7 @@ from Bundles import BundleManager
 from Client import Client
 from Downloads import DownloadManager
 from Groups import GroupManager, Invite, Group
-from Networking import receiver, sendRequest, JoinRequest, SearchBundleRequest, receiveBundle, GetBundleRequest
+from Networking import receiver, sendRequest, JoinRequest, SearchBundleRequest, receiveBundle, GetBundleRequest,is_port_in_use
 
 app = Flask(__name__)
 
