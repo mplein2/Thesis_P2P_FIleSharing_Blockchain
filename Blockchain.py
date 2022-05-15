@@ -288,7 +288,7 @@ class Blockchain:
                         # TODO check if signatures okay.
                         signok = True
                         for sign in newBlock.signatures:
-                            print(f"Signature: {sign}")
+                            # print(f"Signature: {sign}")
                             signature = bytes.fromhex(sign[1])
                             key = rsa.PublicKey.load_pkcs1(self.getRSAKey(sign[0]))
                             # print(f"VERYFING BLOCK")
